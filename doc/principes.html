@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>AIT - Overview</title>
+        <link rel="stylesheet" href="default.css" type="text/css" />
+    </head>
+    <body>
+        <div class="container">
+
+<!--#include virtual="navigation.html"-->
+
+	<div class="holder_top"></div>
+
+	<div class="holder">
+        <h1>Principes Généraux</h1>
+        <h2>But</h2>
+        <p>
+        L'idée sous jacente ici est de concevoir une architecture simple et générique que l'on pourrait réutiliser pour concevoir facilement de petites applications :
+        </p>
+        <ul>
+            <li>
+            un petit tracker
+            </li>
+            <li>
+            un todo list personnel
+            </li>
+            <li>
+            etc ... 
+            </li>
+        </ul>
+        <p>
+        Ce voulant générique elle ne pourrait pas répondre à toutes les spécificités d'un projet.
+        </p>
+
+        <h2>Introduction</h2>
+        <p>
+        Stocker de l'information dans une base de données est un besoin commun, seul la manière de stockage différé entre les projets. Sur Internet, les <acronyme title="Content Management System">CMS</acronyme> proposent des solutions permettant de publier des informations divers. Si pour divers raison o ne souhaite pas utiliser de CMS, la question du stockage et de l'organisation des données doit être réfléchie.
+        </p>
+        <p>
+        Pour cela, voici un système de stockage particulier et générique basé sur une notion très à la mode : le tag.
+        </p>
+
+        <h2>Détails</h2>
+        <p>
+        Le contenu à stocker peut être vu comme des informations auxquelles on attache des caractéristiques ! Le principe de base est de considérer les informations comme un ensemble d'items et les caractéristiques comme un ensemble de tags.
+        </p>
+
+        <p>
+        On a donc 2 grandes notions :
+        </p>
+        <ul>
+            <li>
+            Des items
+            </li>
+            <li>
+            Des tags 
+            </li>
+        </ul>
+
+        <p>
+        Pour être générique on doit pouvoir stocker différents types d'informations et y attacher plusieurs types de caractéristiques. On a donc 2 sous-notions :
+        </p>
+        <ul>
+            <li>
+            Des types d'items
+            </li>
+            <li>
+            Des types de tags 
+            </li>
+        </ul>
+
+        <p>
+        On peut même associer ces deux notions en considérant qu'à chaque type d'items correspond plusieurs types de tag.
+        </p>
+
+        <h3>
+            Modèle conceptuel
+        </h3>
+
+        <p>
+        Si on modélise le principe énoncé auparavant on obtient un schéma théorique en 3FN suivant :
+        </p>
+
+	<pre>
+        <code>
+
+       +------+ 1           +-----------+
+       | ITEM |-------------| TYPE_ITEM |
+       +------+           n +-----------+
+         n|                       | n
+          |n                    1 |
+       +-----+              +----------+
+       | TAG |--------------| TYPE_TAG |
+       +-----+              +----------+
+
+        </code>
+</pre>
+
+        <h3>
+            Modèle optimisé
+        </h3>
+        <p>
+        Si on applique au modèle conceptuel le principe que "tout est tag" on peut considérer que les types d'items et les types de tags sont des tags particuliers, et même qu'un item n'est rien d'autre qu'un tag.
+        </p>
+
+        <p>
+        On obtient donc un schéma optimisé :
+        </p>
+
+    <pre>
+        <code>
+
+                 n +-----+  1
+               +----| TAG |-------------+
+               |    +-----+\            | Type 
+               |       |    \ n           |
+               |       |     +----------+
+               |     1 |
+               | 1 +--------+
+               +---| TAGGED |
+                   +--------+
+
+
+        </code>
+    </pre>
+
+        <h2>Exemple concret</h2>
+        <p>
+        Pour mieux illustrer le modèle théorique prenons par exemple le stockage d'un "bugtraker"
+        </p>
+
+        <p>
+        Un seul type d'item : des bugs Les bugs possèdent plusieurs types de tags : Version, Etat, Rapporteur
+        </p>
+
+        <p>
+        On obtient donc une liste à plat de données (les sous niveau correspondent à une vue développée)
+        </p>
+
+    <pre>
+        <code>
+
+    * tag_type
+    * version
+          o tag_type 
+    * rapporteur
+          o tag_type 
+    * état
+          o tag_type 
+    * item_type
+    * bug
+          o item_type
+          o version
+                + tag_type 
+          o rapporteur
+                + tag_type 
+          o état
+                + tag_type 
+    * v1
+          o version
+                + tag_type 
+    * v2
+          o version
+                + tag_type 
+    * résolu
+          o état
+                + tag_type 
+    * nouveau
+          o état
+                + tag_type 
+    * affecté
+          o état
+                + tag_type 
+    * titi
+          o rapporteur
+                + tag_type 
+    * toto
+          o rapporteur
+                + tag_type 
+    * Bug #1
+          o bug
+          o v1
+                + version
+                      # tag_type 
+          o résolu
+                + état
+                      # tag_type 
+          o titi
+                + rapporteur
+                      # tag_type 
+    * Bug #2
+          o bug
+          o v2
+                + version
+                      # tag_type 
+          o nouveau
+                + état
+                      # tag_type 
+          o toto
+                + rapporteur
+                      # tag_type 
+    * Bug #3
+          o bug
+          o v1
+                + version
+                      # tag_type 
+          o affecté
+                + état
+                      # tag_type 
+          o toto
+                + rapporteur
+                      # tag_type 
+
+        </code>
+    </pre>
+
+        <h2>Avantages</h2>
+        <p>
+        Il y a principalement deux avantages :
+        </p>
+
+        <ul>
+            <li>
+            On peut stocker n'importe quoi à n'importe quel moment, il est inutile de définir de nouvelle colonne ou de nouvelle table
+            </li>
+            <li>
+            La recherche d'information se fait sans avoir besoin d'une sur-indexation. Toutes les données sont au même niveau. Une simple requête SQL permet de faire de recherche sur tous les critères 
+            </li>
+        </ul>
+
+        <h2>Inconvénients</h2>
+        <ul>
+            <li>
+            Les données sont inexploitable sans passaient par un programme
+            </li>
+            <li>
+            Une seule table contient quasiment toutes l'information
+            </li>
+            <li>
+            C'est le raisonnement inverse d'un schéma de base de données traditionnelle 
+            </li>
+        </ul>
+
+        <h2>Typage</h2>
+        <p>
+        Jusqu'à présent on ne s'est pas soucié du type de chaque caractéristiques. Or on peut en avoir plusieurs : chaine de caractère, nombre, date, etc...
+        </p>
+
+        <p>
+        Ce type de structure impose de prévoir une conversion en chaine de caractères avec éventuellement un stockage annexe dans le type original.
+        </p>
+
+        <p>
+        Concrètement pour chaque TAG on aurait plusieurs champs correspondant à chaque type de données (éventuellement vide si la conversion n'a pas de sens).
+        </p>
+
+<pre>
+        <code>
+
+  +--------------------+
+  |  TAG               |
+  +--------------------+
+  | label              |
+  | label_en_entier    |
+  | label_en_date      |
+  | label_en_flotant   |
+  | ...                |
+  +--------------------+
+
+        </code>
+</pre>
+
+        <h2>Exceptions</h2>
+        <p>
+        Ce type de structure convient bien à des caractéristiques courtes et simple. Si un item comporte un texte assez important, une image, un document. Il est nécessaire de stocker ces informations de manière traditionnelle. 
+        </p>
+    </div>        
+
+<!--#include virtual="signature.html"-->
+
+</div>
+
+    </body>
+</html>
+

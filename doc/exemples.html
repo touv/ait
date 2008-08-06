@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <title>AIT - Exemples</title>
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body>
+
+<div class="container">
+<!--#include virtual="navigation.html"-->
+
+<div class="holder_top">
+</div>
+
+<div class="holder">
+<h1>Exemples</h1>
+
+<p>Pour mieux comprendre AIT, voici une étude de cas très concrète montrant
+comment modéliser et coder un petit gestionnaire de bug. </p>
+
+<h2>Connexion à la base</h2>
+
+<p>AIT utilise <a href="http://fr.php.net/pdo">l'extension php PDO</a>, pour se
+connecter à la base on utilise une chaîne de connexion PDO. </p>
+
+<p>La méthode connect prend les même paramètres que le <a
+href="http://fr.php.net/manual/fr/pdo.construct.php">constructeur de l'objet
+PDO</a> </p>
+<pre name="code" class="php">require 'AIT.php';
+
+$db = AIT::connect(
+			'mysql:host=localhost;dbname=allistag', 
+			'root'
+);
+
+// db est une instance de l'objet PDO</pre>
+
+<h2>Types d'item</h2>
+
+<p>Le concept de base d'AIT est le type d'item. Donc pour commencer toutes
+manipulation de données on devra préciser le type d'item que l'on veut
+utiliser. </p>
+
+<p>A partir d'un objet type d'item on va pouvoir manipuler le type d'item
+(suppression, modification). </p>
+<pre name="code" class="php">$issues = new AIT_ItemType('Issue', $db);     
+$issues-&gt;ren('Issues');                                  
+echo $issues-&gt;get();  // Affichera 'Issues'
+$issues-&gt;del();                                             
+d'item </pre>
+
+<p>On peut également récupérer et ajouter les types de tags associés : </p>
+<pre name="code" class="php">$issues = new AIT_ItemType('Issues', $db);
+
+$version = $issues-&gt;getTag('Version');
+if (is_null($version)) {
+		$version = $issues-&gt;addTag('Version');
+}
+$rapporteur = $issues-&gt;getTag('Rapporteur');
+if (is_null($rapporteur)) {
+		$rapporteur = $issues-&gt;addTag('Rapporteur');
+}
+$etat = $issues-&gt;getTag('Etat');
+if (is_null($etat)) {
+		$etat = $issues-&gt;addTag('Etat');
+}
+
+$tags = $issues-&gt;getTags();
+foreach($tags as $tag) {
+		echo $tag-&gt;get();
+}</pre>
+
+<p>A partir d'un type d'item particulier on peut créer ou récupérer un
+élément associé. </p>
+<pre name="code" class="php">$nitem = $issues-&gt;newItem();
+$nitem-&gt;ren('Nouvel élément');
+
+$e1 = $issues-&gt;getItem('élément #1');
+if (is_null($e1)) {
+		$e1 = $issues-&gt;addItem('élément #1');
+}</pre>
+
+<p>On peut également parcourir ou rechercher des items associé à un type
+d'item particulier. </p>
+<pre name="code" class="php">$items = $issues-&gt;getItems(0, 10);
+foreach($items as $item) {
+		echo $item-&gt;get();
+}
+
+$tags = new ArrayObject();
+$tags-&gt;append($etat);
+$tags-&gt;append($rapporteur);
+
+$items = fetchItems($tags, 0, 10);
+foreach($items as $item) {
+		echo $item-&gt;get();
+}</pre>
+
+<p><b>Important</b> : L'utilisation de la méthode del sur un objet
+AIT_ItemType supprimera en cascade tout les items associés. </p>
+
+<h2>Types de tag</h2>
+
+<p>A chaque type d'item correspond un ou plusieurs type de tag. On manipule les
+type de Tags à partir de l'objet AIT_TagType. </p>
+
+<p>A partir de là on peut créer ou accéder à des tags. </p>
+<pre name="code" class="php">$v1 = $version-&gt;addTag('Version Un');
+if (is_null($v1)) {
+		$v1 = $issues-&gt;addTag('Version Un');
+}
+$v2 = $version-&gt;addTag('Version Deux');
+if (is_null($v2)) {
+		$v2 = $issues-&gt;addTag('Version Deux');
+}
+
+$v3 = $version-&gt;addTag('V3');</pre>
+
+<h2>Item</h2>
+
+<p>La notion d'items dans AIT se traduit par la manipulation d'un objet nommé
+AIT_Item. </p>
+
+<p>A partir de cet objet on va pouvoir ajouter ou supprimer des tags à l'item
+</p>
+<pre name="code" class="php">$issue1-&gt;attach($v1);
+$issue2-&gt;attach($v1);
+$issue3-&gt;attach($v3);
+
+$issue1-&gt;addTag('Résolu', $etat);
+$issue2-&gt;addTag('A faire', $etat);
+
+$issue2-&gt;delTag('A faire', $etat);
+$issue1-&gt;delTag('Résolu', $etat);
+
+$issue3-&gt;detach($v3);
+$issue2-&gt;detach($v1);
+$issue1-&gt;detach($v1);</pre>
+
+<p>Bien sur à partir d'un item on peut récupérer les tags qui lui sont
+associés : </p>
+<pre name="code" class="php">$tags = $issue1-&gt;getTags();
+foreach($tags as $tag) {
+		echo $tag-&gt;get();
+}
+
+$tags = new ArrayObject();
+$tags-&gt;append($etat);
+$tags-&gt;append($rapporteur);
+
+$tags = fetchTags($tags, 0, 10);
+foreach($tags as $tag) {
+		echo $item-&gt;get();
+}</pre>
+
+<h2>Tag</h2>
+
+<p>La dernière notion présente dans AIT est le Tag. On manipule un tag avec
+l'objet AIT_Tag. </p>
+
+<p>On peut attacher ou non un tag à un item particulier </p>
+<pre name="code" class="php">$v1-&gt;attach($issue1);
+$v2-&gt;attach($issue1);
+
+$v1-&gt;detach();
+$v2-&gt;detach();</pre>
+
+<p><b>Remarque</b> : Les trois méthodes get, ren, del sont disponibles dans
+tous les objets AIT. Elles permettent respectivement : </p>
+<ul>
+  <li>De modifier le libellé de l'élément </li>
+  <li>De supprimer l'élément et tous les éléments lié à lui. </li>
+  <li>De récupérer la valeur de l'élément </li>
+</ul>
+
+<p><b>Note Technique</b> : Tout les tableaux en entrée ou en sortie des
+méthodes des objets AIT sont des objets de type
+[ArrayObject-&gt;http://fr2.php.net/manual/fr/class.arrayobject.php] </p>
+
+<p><b>Astuce</b> : Les méthodes attach et detach peuvent s'utiliser à la
+chaine. Exemple : </p>
+<pre name="code" class="php">$itemX-&gt;attach($tagA)-&gt;attach($tagB)-&gt;attach($tagC);</pre>
+<br />
+  </div>
+<!--#include virtual="signature.html"-->
+</div>
+<!--#include virtual="syntaxhighlighter.html"-->
+</body>
+</html>

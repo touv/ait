@@ -17,14 +17,14 @@
 		<title>Introduction</title>
 
 		<para>
-			AIT est un ensemble de classes PHP permettant le stockage et 
+			AIT est un ensemble de classes PHP permettant le stockage et
 			la recherche de métadonnées. AIT se base sur 2 concepts
 			: des items et des tags. A partir de là, on peut stocker et effectuer
 			des recherches toutes informations formalisées sur ces 2 concepts.
 
 			Concrètement AIT peut être considéré simplement comme un moteur de Tag
-			(Tag's engine) en PHP, ou alors si on pousse le raisonnement à l'extrême, 
-			comme un moteur générique de stockage d'information. 
+			(Tag's engine) en PHP, ou alors si on pousse le raisonnement à l'extrême,
+			comme un moteur générique de stockage d'information.
 
 		</para>
 
@@ -34,16 +34,16 @@
 		<title>Installation</title>
 
 
-			<para> 
+			<para>
 				AIT se présente sous forme forme d'un fichier AIT-X.Y.Z.tgz.
 				Ce fichier s'installe de deux manières.
-			</para> 
+			</para>
 
 			<section>
 				<title>Avec PEAR</title>
 
 				<procedure>
-					<para>très simple avec la commande pear,</para>         
+					<para>très simple avec la commande pear,</para>
 					<step>
 						<para>Pour installer : </para>
 						<prompt>% </prompt><userinput>pear install AIT-X.Y.Z.tgz </userinput>
@@ -63,10 +63,10 @@
 				<title>sans PEAR</title>
 
 				<para>
-					Il suffit de décompresser l'archive dans un répertoire 
-					et d'ajuster la variable PHP include_path en focntion du 
+					Il suffit de décompresser l'archive dans un répertoire
+					et d'ajuster la variable PHP include_path en focntion du
 					répertoire que vous avez choisi.
-				</para> 
+				</para>
 		</section>
 	</chapter>
 
@@ -93,7 +93,7 @@
 					</row>
 					<row>
 						<entry>
-							<constant>ORDER_DESC</constant> 
+							<constant>ORDER_DESC</constant>
 							(integer)
 						</entry>
 						<entry>4</entry>
@@ -136,20 +136,20 @@
 			</para>
 			<example>
 				<title>Création d'une base de données avec Mysql</title>
-				<programlisting> 
-						CREATE DATABASE AIT; 
+				<programlisting>
+						CREATE DATABASE AIT;
 				</programlisting>
 			</example>
 		</section>
 		<section>
 			<title>Connexion à la base de donnée</title>
 			<para>
-				AIT utilise <ulink href="http://fr.php.net/pdo">l'extension php PDO</ulink>, 
-				pour se connecter à la base on utilise une chaîne de connexion PDO. 
+				AIT utilise <ulink href="http://fr.php.net/pdo">l'extension php PDO</ulink>,
+				pour se connecter à la base on utilise une chaîne de connexion PDO.
 			</para>
 
 			<para>
-				La méthode connect prend les même paramètres que le 
+				La méthode connect prend les même paramètres que le
 				<ulink href="http://fr.php.net/manual/fr/pdo.construct.php">constructeur de l'objet PDO </ulink>
 			</para>
 			<programlisting>
@@ -180,7 +180,7 @@ $db->checkup();
 		<title>Les erreurs et leur gestion</title>
 
 		<para>
-			AIT fait appel à la fonction PHP trigger_error (http://fr2.php.net/trigger_error) 
+			AIT fait appel à la fonction PHP trigger_error (http://fr2.php.net/trigger_error)
 			à chaque fois qu'une erreur est rencontrée. Le niveau d'erreur est toujours E_USER_ERROR.
 			A chaque fois que AIT rencontre une erreur l'exectution du code est donc stoppé.
 		</para>
@@ -241,20 +241,20 @@ $db->checkup();
 
 			<para>
 				Le développement d'AIT est piloté par les tests uitaires. Pour cela on utilise phpunit.
-			</para> 
+			</para>
 			<example><title>Tester la validé du code</title>
 
 				<screen>
 					<prompt>% </prompt><userinput>phpunit AITTest.php</userinput>
 					<prompt>% </prompt><userinput>phpunit AITExtentedTest.php</userinput>
-				</screen>              
+				</screen>
 
-			</example> 
+			</example>
 
 			<para>
-				Bien évidement si l'on ajoute une focntionnalité celle-ci devra posséder 
+				Bien évidement si l'on ajoute une focntionnalité celle-ci devra posséder
 				son propre tests
-			</para> 
+			</para>
 
 		</section>
 	</chapter>
@@ -263,13 +263,13 @@ $db->checkup();
 	<chapter>
 		<title>Références</title>
 
-		<para> + Documentation de PDO : 
+		<para> + Documentation de PDO :
 			<itemizedlist>
 				<listitem>
 					<ulink url="http://fr.php.net/manual/fr/book.pdo.php">
 						http://fr.php.net/manual/fr/book.pdo.php
 					</ulink>
-				</listitem> 
+				</listitem>
 				<listitem>
 					<ulink url="">http://www.phpro.org/tutorials/Introduction-to-PHP-PDO.html
 					</ulink>
@@ -283,7 +283,7 @@ $db->checkup();
 					<ulink url="http://pear.php.net/manual/fr/">http://pear.php.net/manual/fr/</ulink>
 				</listitem>
 			</itemizedlist>
-		</para> 
+		</para>
 
 
 	</chapter>

@@ -1,7 +1,7 @@
 XSLTPROC=xsltproc
 RM=rm
 
-all: 
+all:
 	$(XSLTPROC) docbook.xsl docbook.xml
 
 clean:

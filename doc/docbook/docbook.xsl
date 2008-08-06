@@ -3,7 +3,7 @@
 
 	<xsl:import href="file:///usr/share/docbook-xsl/xhtml/chunk.xsl"/>
 
-	<xsl:param name="html.stylesheet" select="'../default.css docbook.css'"/> 
+	<xsl:param name="html.stylesheet" select="'../default.css docbook.css'"/>
 	<xsl:param name="section.autolabel" select="1" />
 	<xsl:param name="generate.chapter.toc" select="1" />
 	<xsl:param name="css.decoration" select="0" />

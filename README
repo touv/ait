@@ -1,0 +1,210 @@
+Guide d'utilisation de AIT
+==========================
+Nicolas Thouvenin <nthouvenin@gmail.com>
+:Author Initials: NIT
+:language: php
+
+AIT est un ensemble de classes PHP permettant le stockage et
+la recherche de métadonnées. AIT se base sur 2 concepts
+: des items et des tags. A partir de là, on peut stocker et effectuer
+des recherches toutes informations formalisées sur ces 2 concepts.
+
+Concrètement AIT peut être considéré simplement comme un moteur de Tag
+(Tag's engine) en PHP, ou alors si on pousse le raisonnement à l'extrême,
+comme un moteur générique de stockage d'information.
+
+
+
+Installation
+------------
+
+AIT se présente sous forme forme d'un fichier AIT-X.Y.Z.tgz.
+Ce fichier s'installe de deux manières.
+
+Avec PEAR
+~~~~~~~~~
+Pour installer :
+.................
+$ pear install AIT-X.Y.Z.tgz 
+.................
+
+Pour désinstaller :
+.................
+$ pear uninstall AIT
+.................
+
+Pour mettre à jour :
+............................
+$ pear upgrade AIT-X.Y.Z.tgz
+............................
+
+sans PEAR
+~~~~~~~~~
+Il suffit de décompresser l'archive dans un répertoire
+et d'ajuster la variable PHP include_path en fonction du
+répertoire que vous avez choisi.
+
+
+Constantes pré-définies
+-----------------------
+
+.Constantes pour le tri
+[grid="all"]
+`------------------------.------'-------------------------
+Constante                Valeur Description
+----------------------------------------------------------
+ORDER_ASC (integer)      2      Demande un tri ascendant
+ORDER_DESC (integer)     4		Demande un tri descendant
+ORDER_BY_LABEL (integer) 8      Demande un tri sur le label
+ORDER_BY_SCORE (integer) 18     Demande un tri sur le score
+----------------------------------------------------------
+
+
+Connexion/Configuration à Base de Données
+-----------------------------------------
+		
+SGBD supportée
+~~~~~~~~~~~~~~
+
+AIT peut théoriquement fonctionner sur tous les SGBD supportés par l'extension PDO.
+En pratique AIT n'a été testé qu'avec MySQL.
+
+
+Pré-requis
+^^^^^^^^^^^
+AIT a besoin qu'une base de données soit créée peu importe son nom.
+
+
+.Création d'une base de données avec Mysql
+............................
+CREATE DATABASE AIT;
+............................
+
+Connexion à la base de données
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+AIT utilise l'extension http://www.php.net[PHP] http://fr.php.net/pdo[PDO].
+Pour se connecter à la base on utilise donc une chaîne de connexion PDO.
+
+La méthode AIT::connect prend les même paramètres que 
+http://fr.php.net/manual/fr/pdo.construct.php[le constructeur] de l'objet PDO.
+
+[source]
+-------------------------------------------------
+$cnxstr = 'mysql:host=localhost;dbname=allistag';
+$db = AIT::connect($cnxstr, 'root');
+-------------------------------------------------
+
+
+Création et contrôle de la structure de données
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AIT contrôle et créé la structure de données nécessaire à son bon fonctionnement
+de manière automatique à condition de faire appel à la méthode checkup.
+
+[source]
+-------------------------------------------------
+$cnxstr = 'mysql:host=localhost;dbname=allistag';
+$db = AIT::connect($cnxstr, 'root');
+$db->checkup();
+-------------------------------------------------
+
+
+Les erreurs et leur gestion
+---------------------------
+
+AIT fait appel à la fonction PHP http://fr2.php.net/trigger_error[trigger_error]
+à chaque fois qu'une erreur est rencontrée. Le niveau d'erreur est toujours E_USER_ERROR.
+A chaque fois que AIT rencontre une erreur l'exécution du code est donc stoppé.
+
+Les classes de bases
+--------------------
+
+
+AIT_TagType
+~~~~~~~~~~~
+
+__construct
+^^^^^^^^^^^
+
+
+newTag
+^^^^^^
+Synopsis
+++++++++
+
+	function newTag()
+
+
+Description
++++++++++++
+
+Crée un nouveau tag, son label est calculé automatiquement.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+un objet de type AIT_Tag
+
+Exemple
++++++++
+
+.#1
+[source]
+----------------------------------------
+include::./examples/AIT_Tag-newTag.php[]
+----------------------------------------
+
+Affichera:
+
+  #21 
+
+NOTE: Ne numéro (ici 21) dépend du nombre de tag enregisté dans la base.
+
+
+addTag
+^^^^^^^
+
+
+getTag
+^^^^^^^
+
+getTags
+^^^^^^^^
+
+getTagBySystemID
+^^^^^^^^^^^^^^^^^
+
+
+Développement
+-------------
+
+Modification & Ajout
+~~~~~~~~~~~~~~~~~~~~
+
+Le code source de AIT est disponible sur Github.com : http://github.com/touv/ait/tree/master
+
+
+
+Tests Unitaires
+~~~~~~~~~~~~~~~
+
+Le développement d'AIT est piloté par les tests uitaires. Pour cela on utilise phpunit.
+
+
+.Tester la validé du code
+----------------------------
+% phpunit AITTest.php
+% phpunit AITExtentedTest.php
+-----------------------------
+
+
+Bien évidement si l'on ajoute une fonctionnalité celle-ci devra posséder son propre test.
+
+
+
+// vim: set syntax=asciidoc: encoding=utf8

@@ -75,6 +75,7 @@ class AITSchema {
             }
         }
     }
+    // }}}
     // {{{ _toVarname
     /**
      * purifie une chaine de carctère représantant un type en une chaine compatible php
@@ -567,6 +568,7 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
+            settype($this->_id, 'integer');
 
             $c = (int)$stmt->fetchColumn(0);
             $stmt->closeCursor();
@@ -595,11 +597,14 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $l, PDO::PARAM_INT);
             $stmt->execute();
+            settype($l, 'integer');
 
             $sql = sprintf("DELETE FROM %s WHERE id=?", $this->_pdo->tag());
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $l, PDO::PARAM_INT);
             $stmt->execute();
+            settype($l, 'integer');
+
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -625,6 +630,8 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+
             $res = $stmt->fetchAll();
             foreach ($res as $itm) {
                 $this->_delTag((int)current($itm));
@@ -634,11 +641,15 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+
 
             $sql = sprintf("DELETE FROM %s WHERE id=?",$this->_pdo->tag());
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -661,6 +672,7 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $l, PDO::PARAM_INT);
             $stmt->execute();
+
             $res = $stmt->fetchAll();
             foreach ($res as $itm) {
                 $this->_delTag((int)current($itm));
@@ -686,6 +698,8 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+
             $res = $stmt->fetchAll();
             foreach ($res as $itm) {
                 $this->_delTagType((int)current($itm));
@@ -695,6 +709,8 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+
             $res = $stmt->fetchAll();
             foreach ($res as $itm) {
                 $this->_delItem((int)current($itm));
@@ -727,6 +743,8 @@ class AIT
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->bindParam(2, $t, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+            settype($t, 'integer');
 
             $c = (int)$stmt->fetchColumn(0);
             $stmt->closeCursor();
@@ -760,6 +778,8 @@ class AIT
             $stmt->bindParam(1, $m, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($m, 'integer');
+            settype($i, 'integer');
 
             $c = (int)$stmt->fetchColumn(0);
             $stmt->closeCursor();
@@ -814,6 +834,7 @@ class AIT
             $stmt->bindParam(1, $l, PDO::PARAM_STR);
             $stmt->bindParam(2, $t, PDO::PARAM_INT);
             $stmt->execute();
+            settype($t, 'integer');
 
             $id = $stmt->fetchColumn();
             $stmt->closeCursor();
@@ -919,6 +940,7 @@ class AIT
 
             $this->debug($sql, $v, $this->_id);
             $stmt->execute();
+            settype($this->_id, 'integer');
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -942,6 +964,7 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
+            settype($this->_id, 'integer');
             $ret = $stmt->fetchColumn(0);
             $stmt->closeCursor();
             return $ret;
@@ -1009,6 +1032,7 @@ class AIT
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
+            settype($this->_id, 'integer');
             $ret = $stmt->fetch();
             $stmt->closeCursor();
             return new ArrayObject(

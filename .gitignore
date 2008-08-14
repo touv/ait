@@ -1,4 +1,9 @@
 *.tgz
 *.swp
-doc/docbook/ch*.html
-doc/docbook/index.html
+webdoc/docbook/ch*.html
+webdoc/docbook/index.html
+webdoc/README.html
+webdoc/userguide.pdf
+apidoc/*
+README.pdf
+README.xml

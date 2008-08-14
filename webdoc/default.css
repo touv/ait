@@ -22,7 +22,7 @@ a:hover {
 	color: #28E;
 }
 body {
-	background: #F2F2F2 url(img/bg.gif) repeat-y center top;
+	background: #F2F2F2 url(images/bg.gif) repeat-y center top;
 	color: #555A60;
 	font: normal 62.5% "Lucida Sans Unicode",sans-serif;
 	margin: 0;
@@ -37,12 +37,12 @@ h1 {
 		margin-bottom: 4px;
 }
 li {
-		list-style: url(img/li.gif);
+		list-style: url(images/li.gif);
 		/*    margin-left: 18px;*/
 }
 /*
 code {
-				background: url(img/bgcode.gif);
+				background: url(images/bgcode.gif);
 		border: 1px solid #F6F6F6;
 		color: #666;
 				display: block;
@@ -53,7 +53,7 @@ code {
 }
 */
 cite {
-		background: url(img/quote.gif) no-repeat;
+		background: url(images/quote.gif) no-repeat;
 		color: #456;
 		display: block;
 		font: normal 1.4em "Lucida Sans Unicode",serif;
@@ -92,7 +92,7 @@ div.navigation .title h2 {
 
 /* navigation */
 .navigation {
-		background: url(img/holder.jpg) no-repeat;
+		background: url(images/holder.jpg) no-repeat;
 		height: 100px;
 		padding: 0 16px;
 }
@@ -108,19 +108,19 @@ div.navigation .title h2 {
 		text-decoration: none;
 }
 .navigation a:hover {
-		background: #FFF url(img/navhover.gif) repeat-x;
+		background: #FFF url(images/navhover.gif) repeat-x;
 		color: #28E;
 		padding: 56px 18px 10px;
 }
 
 /* holders */
 .holder {
-		background: url(img/bgholder.jpg) repeat-y;
+		background: url(images/bgholder.jpg) repeat-y;
 		padding: 0 32px;
 }
 .holder_top,.footer {
 		clear: both;
-		background: url(img/holder.jpg) no-repeat;
+		background: url(images/holder.jpg) no-repeat;
 		height: 40px;
 }
 

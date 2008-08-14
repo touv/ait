@@ -76,9 +76,10 @@ AIT a besoin qu'une base de données soit créée peu importe son nom.
 
 
 .Création d'une base de données avec Mysql
-............................
+********************
 CREATE DATABASE AIT;
-............................
+********************
+
 
 Connexion à la base de données
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -119,21 +120,35 @@ A chaque fois que AIT rencontre une erreur l'exécution du code est donc stoppé
 Les classes de bases
 --------------------
 
+Le cœur d'AIT est composé de 4 classes de bases qui hérite d'une seul classe mère.
+
 
 AIT_TagType
 ~~~~~~~~~~~
 
+Cette opbet permet de maniupler un "type de tag".
+
 __construct
 ^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+	function __construct($l, $i, PDO $pdo, $id = false)
+
+Description
++++++++++++
+
+Instancier un objet capable de manipuler un Type de Tag particulier.
 
 
 newTag
 ^^^^^^
+
 Synopsis
 ++++++++
 
 	function newTag()
-
 
 Description
 +++++++++++
@@ -168,16 +183,54 @@ NOTE: Ne numéro (ici 21) dépend du nombre de tag enregisté dans la base.
 
 addTag
 ^^^^^^^
+Synopsis
+++++++++
+
+	function addTag($l)
+
+Description
++++++++++++
+
+Ajout un nouveau TAG du TYPE de TAG courant.
 
 
 getTag
 ^^^^^^^
+Synopsis
+++++++++
+
+	 function getTag($l)
+
+Description
++++++++++++
+
+Retourne un TAG en fonction de son nom (de son label).
+
 
 getTags
-^^^^^^^^
+^^^^^^^
+Synopsis
+++++++++
+
+	function getTags($offset = null, $lines = null, $ordering = null)
+
+Description
++++++++++++
+
+Retourne tous les TAG du TYPE de TAG courant.
+
 
 getTagBySystemID
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+Synopsis
+++++++++
+
+	function getTagBySystemID($i)
+
+Description
++++++++++++
+
+Retourne un TAG en fonction de son identifiant système.
 
 
 Développement
@@ -187,7 +240,6 @@ Modification & Ajout
 ~~~~~~~~~~~~~~~~~~~~
 
 Le code source de AIT est disponible sur Github.com : http://github.com/touv/ait/tree/master
-
 
 
 Tests Unitaires
@@ -207,4 +259,4 @@ Bien évidement si l'on ajoute une fonctionnalité celle-ci devra posséder son 
 
 
 
-// vim: set syntax=asciidoc: encoding=utf8
+// vim: set syntax=asciidoc encoding=utf8:

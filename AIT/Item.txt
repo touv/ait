@@ -1,0 +1,210 @@
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    void __construct(string $l, integer $t, PDOAIT $pdo, integer $id=false)
+
+Description
++++++++++++
+
+Constructeur
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau item
+integer *$t*:: Identifiant système du type d'item associé (si connu)
+PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser. 
+integer *$id*:: Identifiant système de l'élément (si déjà connu). 
+
+
+// ----------------------------------------------------------------------------
+addTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag addTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Ajout d'un tag à l'item courant
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau tag 
+AIT_TagType *$o*:: Type de Tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le nouveau tag.
+
+// ----------------------------------------------------------------------------
+delTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    delTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Supprime un tag à l'item courant
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau tag 
+AIT_TagType *$o*:: Type de Tag 
+
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+attach
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item attach(AIT_Tag $o)
+
+Description
++++++++++++
+
+Ajoute une association entre le tag et un item
+
+Paramètres
+++++++++++
+
+AIT_Tag *$o*:: Tag
+
+
+Retour
+++++++
+
+Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
+
+
+// ----------------------------------------------------------------------------
+detach
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item detach(AIT_Tag $o)
+
+Description
++++++++++++
+
+Supprime une association entre le tag et un item
+
+Paramètres
+++++++++++
+
+AIT_Tag *$o*:: Tag
+
+
+Retour
+++++++
+
+Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
+
+// ----------------------------------------------------------------------------
+getTags
+^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les tags de l'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet ArrayObject contenant des objets AIT_Tag.
+
+// ----------------------------------------------------------------------------
+getTypedTags
+^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item::getTypedTags(AIT_TagType $typetag, $offset=null, $lines=null, $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les tags d'un certain type de l'item courant
+
+Paramètres
+++++++++++
+
+AIT_TagType *$typetag*:: un type de tag 
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet ArrayObject contenant des objets AIT_TagType.
+
+// ----------------------------------------------------------------------------
+fetchTags
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+   ArrayObject fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne les tags possédant de un ou plusieurs tags donnés
+
+Paramètres
+++++++++++
+
+ArrayObject *$tags*:: Tableau de type de tag 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet ArrayObject contenant des objets AIT_Tag.
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

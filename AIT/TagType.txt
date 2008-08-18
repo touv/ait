@@ -1,0 +1,150 @@
+
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    void __construct(string $l, integer $i, AITPDO $pdo, integer $id = false)
+
+Description
++++++++++++
+
+Constructeur
+
+Paramètres
+++++++++++
+
+string *$l*:: Label du type de tag.
+integer *$i*:: Identifiant système du type d'item associé. 
+AITPDO *$pdo*::  L'instance de base AIT que l'on souhaite utiliser.
+integer *$id*:: Identifiant système de l'élément (si déjà connu) .
+
+
+// ----------------------------------------------------------------------------
+newTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag newTag()
+
+Description
++++++++++++
+
+Crée un tag. Son label est calculé automatiquement en fonction de l'identifiant système.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+un objet AIT_Tag.
+
+// ----------------------------------------------------------------------------
+addTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag addTag(string $l)
+
+Description
++++++++++++
+
+Ajout d'un tag au type de tag courant
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le nouveau tag
+
+// ----------------------------------------------------------------------------
+getTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag getTag(string $l)
+
+Description
++++++++++++
+
+Récupère un tag
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag trouvé.
+
+// ----------------------------------------------------------------------------
+getTags
+^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les tags du type de tag courant.
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement.
+integer *$lines*:: nombre de lignes à retourner.
+integer *$ordering*:: flag permettant le tri.
+
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_Tag.
+
+// ----------------------------------------------------------------------------
+getTagBySystemID
+^^^^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag getTagBySystemID(inetger $i)
+
+Description
++++++++++++
+
+Récupère un tag avec son identifiant système.
+
+Paramètres
+++++++++++
+
+integer *$i*:: l'identifiant système.
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag trouvé.
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

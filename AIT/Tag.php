@@ -39,7 +39,7 @@ require_once 'AIT.php';
 
 
 /**
- * Représente un TAG
+ * Cette classe permet de manipuler un TAG
  *
  * @category  AIT
  * @package   AIT
@@ -53,13 +53,13 @@ class AIT_Tag extends AIT
     protected $_item_id;
     // {{{ __construct
     /**
-     * Constructeur
+     * Le constructeur de la classe.
      *
-     * @param string $l nom du nouveautag
-     * @param integer $t identifiant du type de tag associé
-     * @param integer $i identifiant de l'item associé
-     * @param PDOAIT $pdo objet de connexion à la base
-     * @param integer $id identifiant physique de l'élement (si déjà connu)
+     * @param string $l Label du TAG
+     * @param integer $t Identifiant système du TYPE de TAG associé.
+     * @param integer $i Identifiant système de l'ITEM (si connu).
+     * @param PDOAIT $pdo Instance de base AIT que l'on souhaite utiliser.
+     * @param integer $id Identifiant système de l'élement (si déjà connu).
      */
     function __construct($l, $t, $i, PDOAIT $pdo, $id = false)
     {
@@ -119,7 +119,7 @@ class AIT_Tag extends AIT
     /**
      * Supprime l'association entre le tag son item
      *
-     * @return AIT_Tag
+     * @return AIT_Tag Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.
      */
     function detach()
     {
@@ -143,7 +143,9 @@ class AIT_Tag extends AIT
     /**
      * Ajoute une association entre le tag et un item
      *
-     * @return AIT_Tag
+     * @param AIT_Item $o Un objet contenant un item.
+     *
+     * @return AIT_Tag Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.
      */
     function attach(AIT_Item $o)
     {
@@ -160,6 +162,7 @@ class AIT_Tag extends AIT
      *
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri.
      *
      * @return ArrayObject
      */
@@ -236,7 +239,7 @@ class AIT_Tag extends AIT
 
     // {{{ getFrequency
     /**
-     * Donne la frenquence d'utilisation du tag courrant
+     * Donne la frequence d'utilisation du tag courrant
      *
      * @return	integer
      */

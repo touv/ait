@@ -16,8 +16,8 @@ class AITTest extends PHPUnit_Framework_TestCase
     var $db;
     function setUp()
     {
-//        $cnxstr = 'mysql:host=localhost;dbname=allistag';
-        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
+        $cnxstr = 'mysql:host=localhost;dbname=allistag';
+//        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',
             'space_callback' => array(
@@ -33,8 +33,8 @@ class AITTest extends PHPUnit_Framework_TestCase
     }
     function tearDown()
     {
-        $this->db->exec("TRUNCATE ".$this->db->tag());
-        $this->db->exec("TRUNCATE ".$this->db->tagged());
+//        $this->db->exec("TRUNCATE ".$this->db->tag());
+//        $this->db->exec("TRUNCATE ".$this->db->tagged());
         $this->db = null;
     }
 
@@ -480,6 +480,37 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+    function test_query()
+    {
+          $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('I1');
+        $i2 = $it->addItem('I2');
+        $i3 = $it->addItem('I3');
+        $i4 = $it->addItem('I4');
+        $tt = $it->addTag('tagtype');
+        $t1 = $tt->addTag('T1');
+        $t2 = $tt->addTag('T2');
+        $t3 = $tt->addTag('T3');
+        $t4 = $tt->addTag('T4');
+        $t5 = $tt->addTag('T5');
+
+        $i1->attach($t1)->attach($t2)->attach($t4);
+        $i2->attach($t1)->attach($t2)->attach($t3);
+        $i3->attach($t1)->attach($t3)->attach($t4);
+        $i4->attach($t2)->attach($t3)->attach($t4);
+
+        $q =  new AITQuery($this->db);
+        $q->all(new ArrayObject(array($t1, $t2)));
+        $q->one(new ArrayObject(array($t3, $t4)));
+
+        $items = $it->queryItems($q);
+        $this->assertEquals($items->count(), 2);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
 
     /**/
     private function _d()

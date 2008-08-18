@@ -175,7 +175,7 @@ GENERATE_XML           = YES
 XML_OUTPUT             = xml
 XML_SCHEMA             =
 XML_DTD                =
-XML_PROGRAMLISTING     = YES
+XML_PROGRAMLISTING     = NO
 #---------------------------------------------------------------------------
 # configuration options for the AutoGen Definitions output
 #---------------------------------------------------------------------------

@@ -15,6 +15,7 @@ comme un moteur générique de stockage d'information.
 
 
 
+// ****************************************************************************
 Installation
 ------------
 
@@ -60,6 +61,7 @@ ORDER_BY_SCORE (integer) 18     Demande un tri sur le score
 ----------------------------------------------------------
 
 
+// ****************************************************************************
 Connexion/Configuration à Base de Données
 -----------------------------------------
 		
@@ -109,7 +111,7 @@ $db = AIT::connect($cnxstr, 'root');
 $db->checkup();
 -------------------------------------------------
 
-
+// ****************************************************************************
 Les erreurs et leur gestion
 ---------------------------
 
@@ -117,122 +119,7 @@ AIT fait appel à la fonction PHP http://fr2.php.net/trigger_error[trigger_error
 à chaque fois qu'une erreur est rencontrée. Le niveau d'erreur est toujours E_USER_ERROR.
 A chaque fois que AIT rencontre une erreur l'exécution du code est donc stoppé.
 
-Les classes de bases
---------------------
-
-Le cœur d'AIT est composé de 4 classes de bases qui hérite d'une seul classe mère.
-
-
-AIT_TagType
-~~~~~~~~~~~
-
-Cette opbet permet de maniupler un "type de tag".
-
-__construct
-^^^^^^^^^^^
-
-Synopsis
-++++++++
-
-	function __construct($l, $i, PDO $pdo, $id = false)
-
-Description
-+++++++++++
-
-Instancier un objet capable de manipuler un Type de Tag particulier.
-
-
-newTag
-^^^^^^
-
-Synopsis
-++++++++
-
-	function newTag()
-
-Description
-+++++++++++
-
-Crée un nouveau tag, son label est calculé automatiquement.
-
-Paramètres
-++++++++++
-
-Aucun.
-
-Retour
-++++++
-
-un objet de type AIT_Tag
-
-Exemple
-+++++++
-
-.#1
-[source]
-----------------------------------------
-include::./examples/AIT_Tag-newTag.php[]
-----------------------------------------
-
-Affichera:
-
-  #21 
-
-NOTE: Ne numéro (ici 21) dépend du nombre de tag enregisté dans la base.
-
-
-addTag
-^^^^^^^
-Synopsis
-++++++++
-
-	function addTag($l)
-
-Description
-+++++++++++
-
-Ajout un nouveau TAG du TYPE de TAG courant.
-
-
-getTag
-^^^^^^^
-Synopsis
-++++++++
-
-	 function getTag($l)
-
-Description
-+++++++++++
-
-Retourne un TAG en fonction de son nom (de son label).
-
-
-getTags
-^^^^^^^
-Synopsis
-++++++++
-
-	function getTags($offset = null, $lines = null, $ordering = null)
-
-Description
-+++++++++++
-
-Retourne tous les TAG du TYPE de TAG courant.
-
-
-getTagBySystemID
-^^^^^^^^^^^^^^^^
-Synopsis
-++++++++
-
-	function getTagBySystemID($i)
-
-Description
-+++++++++++
-
-Retourne un TAG en fonction de son identifiant système.
-
-
+// ****************************************************************************
 Développement
 -------------
 
@@ -245,10 +132,10 @@ Le code source de AIT est disponible sur Github.com : http://github.com/touv/ait
 Tests Unitaires
 ~~~~~~~~~~~~~~~
 
-Le développement d'AIT est piloté par les tests uitaires. Pour cela on utilise phpunit.
+Le développement d'AIT est piloté par les tests unitaires. Pour cela on utilise http://www.phpunit.de/[PHPUnit]
 
 
-.Tester la validé du code
+.Pour tester le code :
 ----------------------------
 % phpunit AITTest.php
 % phpunit AITExtentedTest.php
@@ -259,4 +146,74 @@ Bien évidement si l'on ajoute une fonctionnalité celle-ci devra posséder son 
 
 
 
-// vim: set syntax=asciidoc encoding=utf8:
+// ****************************************************************************
+Références des classes
+----------------------
+
+Le cœur d'AIT est composé de 4 classes de bases qui hérite d'une seul classe mère.
+
+// ============================================================================
+
+AITPDO
+~~~~~~~~~
+
+Cette classe permet de pointer sur la base données que l'on souhaite utiliser.
+
+// include::./AITPDO.txt[]
+
+AITSchema
+~~~~~~~~~
+
+Cette classe permet de créer et de manipuler des schémas de données.
+
+include::./AITSchema.txt[]
+
+
+// ============================================================================
+AITQuery
+~~~~~~~~
+
+Cette classe permet de créer des requêtes avancées pour trouver des items.
+
+include::./AITQuery.txt[]
+
+
+// ============================================================================
+AIT_ItemType
+~~~~~~~~~~~
+
+Cette classe permet de manipuler un TYPE d'ITEM.
+
+include::./AIT/ItemType.txt[]
+
+
+// ============================================================================
+AIT_Item
+~~~~~~~~
+
+Cette classe permet de manipuler un ITEM.
+
+include::./AIT/Item.txt[]
+
+
+// ============================================================================
+AIT_TagType
+~~~~~~~~~~~
+
+Cette classe permet de manipuler un "type de tag".
+
+include::./AIT/TagType.txt[]
+
+
+// ============================================================================
+AIT_Tag
+~~~~~~~
+
+Cette classe permet de manipuler un TAG.
+
+include::./AIT/Tag.txt[]
+
+
+
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

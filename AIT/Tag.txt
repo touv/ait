@@ -1,0 +1,154 @@
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+     void __construct($l, $t, $i, PDOAIT $pdo, $id=false)
+
+Description
++++++++++++
+
+Le constructeur de la classe.
+
+Paramètres
+++++++++++
+
+string *$l*:: Label du TAG 
+integer *$t*:: Identifiant système du TYPE de TAG associé. 
+integer *$i*:: Identifiant système de l'ITEM (si connu). 
+PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser. 
+integer *$id*:: Identifiant système de l'élément (si déjà connu). 
+
+
+// ----------------------------------------------------------------------------
+detach
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag detach()
+
+Description
++++++++++++
+
+Supprime l'association entre le tag son item
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
+
+// ----------------------------------------------------------------------------
+attach
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag attach(AIT_Item $o)
+
+Description
++++++++++++
+
+Ajoute une association entre le tag et un item
+
+Paramètres
+++++++++++
+
+AIT_Item *$o*:: Un objet contenant un item.
+
+
+Retour
+++++++
+
+Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
+
+// ----------------------------------------------------------------------------
+getRelatedTags
+^^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les tags associés au même item que le tag courant.
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri.
+
+
+Retour
+++++++
+
+Un objet ArrayObject contenant des objets AIT_Tag.
+
+// ----------------------------------------------------------------------------
+fetchRelatedTags
+^^^^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne les tags associés au même item que le tag courant mais en 
+filtrant sur une certain nombre de type de tag.
+
+Paramètres
+++++++++++
+
+ArrayObject *$tags*:: Tableau de type de tag 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet ArrayObject contenant des objets AIT_Tag.
+
+// ----------------------------------------------------------------------------
+getFrequency
+^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    integer getFrequency()
+
+Description
++++++++++++
+
+Donne la fréquence d'utilisation du tag courant
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un entier représentant la fréquence.
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

@@ -365,7 +365,7 @@ class AIT
     /**
      * @var boolean
      */
-    public $debugging = false;
+    public $debugging = true;
     /**
      * @var PDOAIT
      */
@@ -1180,5 +1180,137 @@ class AIT
 }
 
 
+
+/**
+ * Objet représantant une requete au sens AIT
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
+class AITQuery {
+
+
+    protected $sql = '';
+
+    /**
+     * @var PDOAIT
+     */
+    protected $_pdo;
+
+
+    // {{{ __construct
+    /**
+    * Constructeur
+    *
+    * @param PDOAIT $pdo objet de connexion à la base
+    */
+    function __construct(PDOAIT $pdo)
+    {
+        $this->_pdo = $pdo;
+    }
+    // }}}
+
+    // {{{ all
+    /**
+     * Recherche les items ayant tout les tags donnés en paramètres
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
+    public function all(ArrayObject $tags)
+    {
+        $n = 0;
+        $w  = '';
+        if ($tags->count() == 0) return false;
+        foreach($tags as $tag) {
+            if (! $tag instanceof AIT_Tag) {
+                trigger_error('Line #'.($n + 1).' of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
+                continue;
+            }
+            if (empty($w))  {
+                $w = sprintf("SELECT item_id FROM %s WHERE tag_id = %s",
+                    $this->_pdo->tagged(),
+                    $tag->getSystemID()
+                );
+            }
+            else {
+                $w = sprintf("SELECT item_id FROM %s WHERE tag_id = %s AND item_id IN (%s)",
+                    $this->_pdo->tagged(),
+                    $tag->getSystemID(), 
+                    $w
+                );
+
+            }
+            $n++;
+        }
+        if ($n === 0) return false;
+
+        $this->sql .= $w;
+        return true;
+    }
+    // }}}
+    // {{{ one
+    /**
+     * Recherche les items ayant au moins l'un des tags passé en paramètres
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
+    public function one($tags)
+    {
+        $n = 0;
+        $w  = '';
+        if ($tags->count() == 0) return false;
+        foreach($tags as $tag) {
+            if (! $tag instanceof AIT_Tag) {
+                trigger_error('Line #'.($n + 1).' of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
+                continue;
+            }
+            if (!empty($w)) $w .= ' OR ';
+            $w .= 'tag_id = '. $tag->getSystemID();
+            $n++;
+        }
+        if ($n === 0) return false;
+        if (empty($this->sql)) {
+            $this->sql = sprintf(
+                "SELECT item_id FROM %s WHERE %s",
+                $this->_pdo->tagged(),
+                $tag->getSystemID(), 
+                $w
+            );
+        }
+        else {
+            $this->sql = sprintf(
+                "SELECT item_id FROM %s WHERE (%s) AND item_id IN (%s)",
+                $this->_pdo->tagged(),
+                $w,
+                $this->sql
+            );
+        }
+
+        return true;
+    }
+    // }}}
+
+    // {{{ getSQL
+    /**
+     * Retourne le SQL correspondant à la requete 
+     *
+     * @return string
+     */
+    public function getSQL()
+    {
+        return $this->sql;
+    }
+    // }}}
+}
 
 

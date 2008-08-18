@@ -238,7 +238,7 @@ class AIT_ItemType extends AIT
         if ($tags->count() == 0) return new ArrayObject(array());
         foreach($tags as $tag) {
             if (! $tag instanceof AIT_Tag) {
-                trigger_error('Line 3 of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
+                trigger_error('Line #'.($n + 1).' of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
                 continue;
             }
             if (!empty($w)) $w .= ' OR ';
@@ -394,6 +394,53 @@ class AIT_ItemType extends AIT
         }
     }
     // }}}
+
+  // {{{ queryItems
+    /**
+    * On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery
+    *
+    * @param AITQuery $query requete
+    * @param integer $offset décalage à parir du premier enregistrement
+    * @param integer $lines nombre de lignes à retourner
+    * @param integer $ordering flag permettant le tri
+    *
+    * @return	ArrayObject
+    */
+    function queryItems(AITQuery $query, $offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        $w = $query->getSQL();
+        $sql = sprintf("
+            SELECT DISTINCT id, label, type
+            FROM (%s) temp
+            LEFT JOIN %s b ON temp.item_id = b.id
+            WHERE type = ?
+            ",
+            $w,
+            $this->_pdo->tag()
+        );
+        $this->sqler($sql, $offset, $lines, $ordering);
+        $this->debug($sql, $this->_id);
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id']);
+        }
+        return new ArrayObject($ret);
+    }
+    // }}}
+
 
 }
 

@@ -1,0 +1,308 @@
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    void __construct(string $l, PDOAIT $pdo)
+
+Description
++++++++++++
+
+Constructeur
+
+Paramètres
+++++++++++
+
+string *$label*:: Label du type d'item 
+PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser. 
+
+
+// ----------------------------------------------------------------------------
+addTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag addTag(string $l)
+
+Description
++++++++++++
+
+Ajout d'un type de tag au type d'item courant
+
+Paramètres
+++++++++++
+
+string *$l*:: label
+
+
+Retour
+++++++
+
+Un objet AIT_TagType représentant le nouveau type de tag
+
+// ----------------------------------------------------------------------------
+getTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_TagType getTag(string $l)
+
+Description
++++++++++++
+
+Retourne un type de tag du type d'item courant en fonction de son label.
+
+Paramètres
+++++++++++
+
+string *$l*:: Le label.
+
+
+Retour
+++++++
+
+Un objet AIT_TagType représentant le type de tag trouvé.
+
+// ----------------------------------------------------------------------------
+newItem
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item newItem()
+
+Description
++++++++++++
+
+Crée un item. Son label est calculé automatiquement en fonction de l'identifiant système.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet AIT_Item représentant le nouvel item.
+
+// ----------------------------------------------------------------------------
+addItem
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item addItem(string $l)
+
+Description
++++++++++++
+
+Ajout d'un item au type d'item courant
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau item
+
+
+Retour
+++++++
+
+Un objet AIT_Item représentant le nouvel item.
+
+// ----------------------------------------------------------------------------
+getItem
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item getItem(string $l)
+
+Description
++++++++++++
+
+Récupère un item
+
+Paramètres
+++++++++++
+
+string *$l*:: nom de l'item
+
+
+Retour
+++++++
+
+Un objet AIT_Item représentant l'item trouvé.
+
+// ----------------------------------------------------------------------------
+getItems
+^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les items du type d'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_Item.
+
+// ----------------------------------------------------------------------------
+fetchItems
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne les items possédant un ou plusieurs tags donnés en paramètres
+
+Paramètres
+++++++++++
+
+ArrayObject *$tags*:: Tableau de tag 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_Item.
+
+// ----------------------------------------------------------------------------
+getTags
+^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les types de tags de l'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_TagType.
+
+// ----------------------------------------------------------------------------
+searchItems
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Recherche des items du type courant
+
+Paramètres
+++++++++++
+
+string *$query*:: requete (le format dépend de la query_callback) sans callback c'est une chaine de caractères contenant du SQL 
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_Item.
+
+// ----------------------------------------------------------------------------
+getItemBySystemID
+^^^^^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item getItemBySystemID(integer $i)
+
+Description
++++++++++++
+
+Récupère un Item en fonction de son identifiant système
+
+Paramètres
+++++++++++
+
+integer *$i*:: un identifiant système
+
+
+Retour
+++++++
+
+Un objet AIT_Item représentant l'item trouvé.
+
+// ----------------------------------------------------------------------------
+queryItems
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_ItemType::queryItems(AITQuery $query, $offset=null, $lines=null, $ordering=null)
+
+Description
++++++++++++
+
+On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery
+
+Paramètres
+++++++++++
+
+*$l*:: $query objet contenant la requête d'interrogation.
+*$offset*:: décalage à partir du premier enregistrement.
+*$lines*:: nombre de lignes à retourner.
+*$ordering*:: flag permettant le tri.
+
+Retour
+++++++
+
+un objet ArrayObject contenant des objets AIT_Item.
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

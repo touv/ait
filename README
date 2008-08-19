@@ -92,11 +92,42 @@ Pour se connecter à la base on utilise donc une chaîne de connexion PDO.
 La méthode AIT::connect prend les même paramètres que 
 http://fr.php.net/manual/fr/pdo.construct.php[le constructeur] de l'objet PDO.
 
+Synopsis
+++++++++
+
+    PDO  connect(string $dsn, string $username = 'root', string $password= '', array $driver_options=array(), array $ait_options=array())
+
+Description
++++++++++++
+
+Méthode statique permettant de se connecter à une base de données.
+
+Paramètres
+++++++++++
+
+string *$dsn*:: chaine de connexion 
+string *$username*:: user de connexion 
+string *$password*:: mot de passe de connexion 
+array *$driver_options*:: options pour pdo 
+array *$ait_options*:: options pour pdo
+
+
+Retour
+++++++
+
+Un objet AITPDO qui dérive l'objet PDO.
+
+Exemple
++++++++
+
 [source]
 -------------------------------------------------
 $cnxstr = 'mysql:host=localhost;dbname=allistag';
 $db = AIT::connect($cnxstr, 'root');
 -------------------------------------------------
+
+WARNING: IL n'est pas possible d'utiliser directement un objet PDO. AIT pour fonctionner
+utilise un objet spécifique dérivé de l'objet PDO.
 
 
 Création et contrôle de la structure de données
@@ -155,12 +186,13 @@ Le cœur d'AIT est composé de 4 classes de bases qui hérite d'une seul classe 
 // ============================================================================
 
 AITPDO
-~~~~~~~~~
+~~~~~~
 
 Cette classe permet de pointer sur la base données que l'on souhaite utiliser.
 
 // include::./AITPDO.txt[]
 
+// ============================================================================
 AITSchema
 ~~~~~~~~~
 

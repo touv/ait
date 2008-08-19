@@ -1,0 +1,49 @@
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+	void __construct(PDOAIT $pdo, $name, array $attributs)
+
+Description
++++++++++++
+
+Le constructeur de la classe.
+
+Paramètres
+++++++++++
+
+AITPDO *$pdo*:: L'instance de base AIT que l'on souhaite interroger.
+string *$name*:: Nom du schéma
+array *$attributs*:: Liste des élements du schéma
+
+
+// ----------------------------------------------------------------------------
+__get
+^^^^^
+
+Synopsis
+++++++++
+
+	mixed __get(string $name)
+
+Description
++++++++++++
+
+Retroune un objet AIT_TypeItem si on donne en argument le nom du schéma.
+AIT_TypeTag si on donne en argument le nom d'un des élement du schéma.
+
+Paramètres
+++++++++++
+
+string *$name*:: Nom d'un élément du schéma
+
+
+Retour
+++++++
+
+mixed 
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

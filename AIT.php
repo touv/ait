@@ -365,7 +365,7 @@ class AIT
     /**
      * @var boolean
      */
-    public $debugging = true;
+    public $debugging = false;
     /**
      * @var PDOAIT
      */
@@ -420,7 +420,7 @@ class AIT
         $scb = $this->_pdo->getOption('space_callback');
         if (isset($scb[$element])) $this->setSpaceCallback($scb[$element]);
         $qcb = $this->_pdo->getOption('query_callback');
-        if (isset($qcb[$element])) $this->setQueryCallback($qcb[$element]);
+        if (isset($qcb[$element])) $this->setSearchCallback($qcb[$element]);
         $ccb = $this->_pdo->getOption('class_callback');
         if (isset($ccb[$element])) $this->setClassCallback($ccb[$element]);
 
@@ -491,8 +491,11 @@ class AIT
     }
     // }}}
 
+    // {{{ setSpaceCallback
     /**
     * Fixe la callback de remplissage du champ space
+    *
+    * @param callback $c 
     *
     * @access	public
     */
@@ -505,13 +508,17 @@ class AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a valid callback', E_USER_ERROR);
         }
     }
+    // }}}
 
+    // {{{ setSearchCallback
     /**
-    * Fixe la callback de traitement du paramètre query des méthodes searchXXX
+     * Fixe la callback de traitement du paramètre query des méthodes searchXXX
+     *
+     * @param callback $c 
     *
     * @access	public
     */
-    function setQueryCallback($c)
+    function setSearchCallback($c)
     {
         if (is_callable($c, true)) {
             $this->_queryspace = $c;
@@ -520,6 +527,7 @@ class AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a valid callback', E_USER_ERROR);
         }
     }
+    // }}}
 
     // {{{ ren
     /**
@@ -580,7 +588,6 @@ class AIT
         }
     }
     // }}}
-
 
     // {{{ _delTag
     /**
@@ -916,7 +923,6 @@ class AIT
     }
     // }}}
 
-
     // {{{ _set
     /**
     * Méthode permttant de changer la valeur d'une colonne
@@ -974,7 +980,6 @@ class AIT
         }
     }
     // }}}
-
 
     // {{{ getSystemID
     /**
@@ -1138,20 +1143,20 @@ class AIT
         $buf = '';
         if (!$r) {
             $buf .= '<pre>';
-            }
-            $buf .= $s;
-            $buf .= "\t [";
-            $buf .= $this->_element;
-            $buf .= "]\t #";
-            $buf .= $this->_id;
-            $buf .= "\t @";
-            $buf .= $this->_type;
-            $buf .= "\t (";
-            $buf .= $this->_label;
-            $buf .= ')';
-            if (!$r) {
-                $buf .= "\n";
-                $buf .= "</pre>";
+        }
+        $buf .= $s;
+        $buf .= "\t [";
+        $buf .= $this->_element;
+        $buf .= "]\t #";
+        $buf .= $this->_id;
+        $buf .= "\t @";
+        $buf .= $this->_type;
+        $buf .= "\t (";
+        $buf .= $this->_label;
+        $buf .= ')';
+        if (!$r) {
+            $buf .= "\n";
+            $buf .= "</pre>";
         }
         if ($r) return $buf;
         else echo $buf;
@@ -1159,11 +1164,11 @@ class AIT
     // }}}
 
     /**
-    * Traitement des méthodes ajoutées
-    *
-    * @param string $name
-    * @param array $arguments
-    */
+     * Traitement des méthodes ajoutées
+     *
+     * @param string $name
+     * @param array $arguments
+     */
     function __call($name, array $arguments)
     {
         if (isset($this->_methods[$name]) &&
@@ -1201,16 +1206,47 @@ class AITQuery {
      */
     protected $_pdo;
 
+    private $_step = array();
+
 
     // {{{ __construct
     /**
-    * Constructeur
-    *
-    * @param PDOAIT $pdo objet de connexion à la base
-    */
+     * Constructeur
+     *
+     * @param PDOAIT $pdo objet de connexion à la base
+     */
     function __construct(PDOAIT $pdo)
     {
         $this->_pdo = $pdo;
+        $this->clean();
+    }
+
+    // }}}
+    // {{{ clean
+    /**
+     * On efface tout et on recommence
+     *
+     * @return boolean 
+     */
+    public function clean()
+    {
+        array_push($this->_step, 'start');
+        $this->sql = '';
+    }
+
+
+    // {{{ or
+    /**
+     * Appique un Or entre 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
+    public function eitheror()
+    {
+        if (end($this->_step) == 'eitheror') return;
+        array_push($this->_step, 'eitheror');
     }
     // }}}
 
@@ -1225,6 +1261,7 @@ class AITQuery {
      */
     public function all(ArrayObject $tags)
     {
+        array_push($this->_step, 'all');
         $n = 0;
         $w  = '';
         if ($tags->count() == 0) return false;
@@ -1234,15 +1271,14 @@ class AITQuery {
                 continue;
             }
             if (empty($w))  {
-                $w = sprintf("SELECT item_id FROM %s WHERE tag_id = %s",
-                    $this->_pdo->tagged(),
+                $w = sprintf("tag_id = %s",
                     $tag->getSystemID()
                 );
             }
             else {
-                $w = sprintf("SELECT item_id FROM %s WHERE tag_id = %s AND item_id IN (%s)",
-                    $this->_pdo->tagged(),
+                $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
                     $tag->getSystemID(), 
+                    $this->_pdo->tagged(),
                     $w
                 );
 
@@ -1251,10 +1287,11 @@ class AITQuery {
         }
         if ($n === 0) return false;
 
-        $this->sql .= $w;
+        $this->_concat($w);
         return true;
     }
     // }}}
+
     // {{{ one
     /**
      * Recherche les items ayant au moins l'un des tags passé en paramètres
@@ -1266,6 +1303,7 @@ class AITQuery {
      */
     public function one($tags)
     {
+        array_push($this->_step, 'one');
         $n = 0;
         $w  = '';
         if ($tags->count() == 0) return false;
@@ -1279,22 +1317,7 @@ class AITQuery {
             $n++;
         }
         if ($n === 0) return false;
-        if (empty($this->sql)) {
-            $this->sql = sprintf(
-                "SELECT item_id FROM %s WHERE %s",
-                $this->_pdo->tagged(),
-                $tag->getSystemID(), 
-                $w
-            );
-        }
-        else {
-            $this->sql = sprintf(
-                "SELECT item_id FROM %s WHERE (%s) AND item_id IN (%s)",
-                $this->_pdo->tagged(),
-                $w,
-                $this->sql
-            );
-        }
+        $this->_concat($w);
 
         return true;
     }
@@ -1308,9 +1331,40 @@ class AITQuery {
      */
     public function getSQL()
     {
-        return $this->sql;
+         return sprintf('SELECT item_id FROM %s WHERE %s', $this->_pdo->tagged(), $this->sql);
     }
     // }}}
+
+
+    // {{{ _concat
+    /**
+     * Ajoute une nouvelle condition SQL
+     *
+     * @return string
+     */
+    protected function _concat($sql)
+    {
+        array_pop($this->_step);
+        if (end($this->_step) === 'eitheror') {
+            if ($this->sql === '') 
+                $this->sql = $sql;
+            else 
+                $this->sql .= ' OR '.$sql;
+        }
+        else {
+            if ($this->sql === '') 
+                $this->sql = $sql;
+            else 
+                $this->sql = sprintf(
+                    " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                    $sql,
+                    $this->_pdo->tagged(),
+                    $this->sql
+                );
+        }
+    }
+    // }}}
+
 }
 
 

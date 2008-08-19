@@ -83,7 +83,7 @@ class AIT_Extended_Searching extends AIT_Extended
                 'TagType'    => array($this, 'spaceHook'),
                 'Tag'        => array($this, 'spaceHook'),
             ),
-            'query_callback' => array(
+            'search_callback' => array(
                 'ItemType'   => array($this, 'queryHook'),
                 'Item'       => array($this, 'queryHook'),
                 'TagType'    => array($this, 'queryHook'),

@@ -1,0 +1,306 @@
+
+// ----------------------------------------------------------------------------
+extendWith
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::extendWith(AIT_Extended $o)
+
+Description
++++++++++++
+
+Ajoute à AIT un module complémentaire
+
+Paramètres
+++++++++++
+
+AIT_Extended **:: 
+
+
+Retour
+++++++
+
+PDOAIT 
+
+// ----------------------------------------------------------------------------
+getOption
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::getOption($n)
+
+Description
++++++++++++
+
+renvoit la valeur d'une option
+
+Paramètres
+++++++++++
+
+string *$name*:: name 
+
+
+Retour
+++++++
+
+string 
+
+// ----------------------------------------------------------------------------
+getOptions
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::getOptions()
+
+Description
++++++++++++
+
+Retourne les options
+
+Paramètres
+++++++++++
+
+array *$a*:: tableau d'option 
+
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+setOption
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::setOption($n, $v)
+
+Description
++++++++++++
+
+Fixe une option
+
+Paramètres
+++++++++++
+
+string *$name*:: nom 
+string *$value*:: valeur 
+
+
+Retour
+++++++
+
+string 
+
+// ----------------------------------------------------------------------------
+setOptions
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::setOptions(array $a)
+
+Description
++++++++++++
+
+Fixe les options
+
+Paramètres
+++++++++++
+
+array *$a*:: tableau d'option 
+
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+opt
+^^^
+
+Synopsis
+++++++++
+
+PDOAIT::opt()
+
+Description
++++++++++++
+
+Renvoit le nom de la table ait
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+string 
+
+// ----------------------------------------------------------------------------
+tag
+^^^
+
+Synopsis
+++++++++
+
+PDOAIT::tag()
+
+Description
++++++++++++
+
+Renvoit le nom de la table tag
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+string 
+
+// ----------------------------------------------------------------------------
+tagged
+^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::tagged()
+
+Description
++++++++++++
+
+Renvoit le nom de la table tagged
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+string 
+
+// ----------------------------------------------------------------------------
+checkup
+^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::checkup($init=true)
+
+Description
++++++++++++
+
+Controle la validité de la structure de données
+
+Paramètres
+++++++++++
+
+boolean *$init*:: Lance ou non l'initaliasation automatatique (par défaut true)
+
+
+Retour
+++++++
+
+boolean 
+
+// ----------------------------------------------------------------------------
+registerSchema
+^^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::registerSchema($name, array $attr)
+
+Description
++++++++++++
+
+Enregistre un schema AIT (soit un type d'item associé à des types de tags)
+
+Paramètres
+++++++++++
+
+string *Type*:: d'Item 
+array *tableau*:: de type de tag
+
+
+Retour
+++++++
+
+AITSchema 
+
+// ----------------------------------------------------------------------------
+_initTable
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::_initTable()
+
+Description
++++++++++++
+
+Initialise la structure de données 
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+_initData
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+PDOAIT::_initData()
+
+Description
++++++++++++
+
+Initialise les données obligatoires 
+
+PDO
+
+
+$this Pointeur sur la base de données 
+
+
+
+
+Paramètres
+++++++++++
+
+PDO *$this*:: Pointeur sur la base de données 
+
+
+Retour
+++++++
+
+NULL.

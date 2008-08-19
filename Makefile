@@ -2,17 +2,26 @@ PEAR=pear
 PHPDOC=phpdoc
 DOXYGEN=doxygen
 ASCIIDOC=asciidoc
+XSLTPROC=xsltproc
 A2X=a2x
 CP=cp
+MKDIR=mkdir
+RM=rm
 
-all: doc
-apidoc: doxygen phpdocumentor
-webdoc: webdoc/userguide.pdf 
+all : apidoc webdoc
+apidoc : doxygen phpdocumentor
+webdoc : userguide docbook
 
-doc: webdoc/README.html
+userguide : webdoc/userguide.pdf
+docbook : webdoc/docbook/index.html
 
-webdoc/README.html: README
-	$(ASCIIDOC) -a icons -o $@ $?
+webdoc/docbook/index.html: README.xml
+	$(XSLTPROC) --nonet  \
+		--stringparam base.dir "./webdoc/docbook/" \
+		docbook.xsl $?
+
+README.xml: README
+	$(ASCIIDOC) -b docbook -d book -o $@ $?
 
 webdoc/userguide.pdf: README.pdf
 	$(CP) $? $@

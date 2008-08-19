@@ -33,8 +33,8 @@ class AITTest extends PHPUnit_Framework_TestCase
     }
     function tearDown()
     {
-//        $this->db->exec("TRUNCATE ".$this->db->tag());
-//        $this->db->exec("TRUNCATE ".$this->db->tagged());
+        $this->db->exec("TRUNCATE ".$this->db->tag());
+        $this->db->exec("TRUNCATE ".$this->db->tagged());
         $this->db = null;
     }
 
@@ -480,9 +480,9 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
-    function test_query()
+    function test_query1()
     {
-          $it = new AIT_ItemType('itemtype', $this->db);
+        $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('I1');
         $i2 = $it->addItem('I2');
         $i3 = $it->addItem('I3');
@@ -510,6 +510,44 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+
+    function test_query2()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+        $i2 = $it->addItem('2');
+        $i3 = $it->addItem('3');
+        $i4 = $it->addItem('4');
+        $i5 = $it->addItem('5');
+        $tt = $it->addTag('tagtype');
+        $a = $tt->addTag('A');
+        $b = $tt->addTag('B');
+        $c = $tt->addTag('C');
+        $d = $tt->addTag('D');
+        $e = $tt->addTag('E');
+        $f = $tt->addTag('F');
+
+        $i1->attach($a)->attach($b)->attach($d);
+        $i2->attach($a)->attach($c)->attach($d);
+        $i3->attach($a)->attach($b)->attach($d);
+        $i4->attach($a)->attach($e);
+        $i5->attach($a)->attach($f);
+
+        $q =  new AITQuery($this->db);
+        $q->all(new ArrayObject(array($a, $b, $d)));
+        $q->eitheror();
+        $q->all(new ArrayObject(array($a, $e)));
+        $q->eitheror();
+        $q->all(new ArrayObject(array($a, $f)));
+
+        $items = $it->queryItems($q);
+        $this->assertEquals($items->count(), 4);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
 
 
     /**/

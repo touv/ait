@@ -242,7 +242,7 @@ Recherche des items du type courant
 Paramètres
 ++++++++++
 
-string *$query*:: requete (le format dépend de la query_callback) sans callback c'est une chaine de caractères contenant du SQL 
+string *$query*:: requete (le format dépend de la search_callback) sans callback c'est une chaine de caractères contenant du SQL 
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
@@ -305,4 +305,5 @@ Retour
 
 un objet ArrayObject contenant des objets AIT_Item.
 
+include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

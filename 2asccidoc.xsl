@@ -20,8 +20,17 @@ version="1.0">
 Synopsis
 ++++++++
 
-</xsl:text>
-<xsl:value-of select="concat(./definition,./argsstring)"/>
+    </xsl:text>
+<xsl:choose>
+<xsl:when test="count(.//simplesect[@kind='return']/para) = 0">
+<xsl:text>void</xsl:text>
+</xsl:when>
+<xsl:otherwise>
+<xsl:value-of select=".//simplesect[@kind='return']/para"/>
+</xsl:otherwise>
+</xsl:choose>
+<xsl:text> </xsl:text>
+<xsl:value-of select="concat(substring-after(./definition,'::'),./argsstring)"/>
 <xsl:text>
 
 Description

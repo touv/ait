@@ -24,12 +24,7 @@ a:hover {
 body {
 	background: #F2F2F2 url(images/bg.gif) repeat-y center top;
 	color: #555A60;
-	font: normal 62.5% "Lucida Sans Unicode",sans-serif;
 	margin: 0;
-}
-p,cite,code,ul {
-		font-size: 1.2em;
-		padding-bottom: 1.2em;
 }
 h1 {
 		font-size: 1.4em;
@@ -40,18 +35,6 @@ li {
 		list-style: url(images/li.gif);
 		/*    margin-left: 18px;*/
 }
-/*
-code {
-				background: url(images/bgcode.gif);
-		border: 1px solid #F6F6F6;
-		color: #666;
-				display: block;
-		font: normal 1.1em "Lucida Sans Unicode",serif;
-				margin-bottom: 12px;
-				padding: 8px 10px;
-		white-space: pre;
-}
-*/
 cite {
 		background: url(images/quote.gif) no-repeat;
 		color: #456;
@@ -60,8 +43,7 @@ cite {
 		padding-left: 28px;
 }
 h1,h2,h3 {
-		color: #579;
-/*        padding-top: 6px;*/
+		color: #557799;
 }
 
 /* misc */
@@ -83,11 +65,11 @@ div.navigation .title {
 		width: 220px;
 }
 div.navigation .title h1 {
-		font: normal 2em Verdana,sans-serif;
+		font: normal .8em Verdana,sans-serif;
 }
 div.navigation .title h2 {
 		color: #999;
-		font: normal 1.1em Verdana,sans-serif;
+		font: normal .8em Verdana,sans-serif;
 }
 
 /* navigation */
@@ -101,7 +83,7 @@ div.navigation .title h2 {
 		border-right: 1px solid #FFF;
 		color: #89A;
 		float: right;
-		font: bold 1.2em "Trebuchet MS",sans-serif;
+		font: bold .8em "Trebuchet MS",sans-serif;
 		margin-top: 9px;
 		padding: 58px 18px 8px;
 		text-align: center;
@@ -118,6 +100,10 @@ div.navigation .title h2 {
 		background: url(images/bgholder.jpg) repeat-y;
 		padding: 0 32px;
 }
+.holder h1 {
+	border-bottom: 2px solid silver;
+}
+
 .holder_top,.footer {
 		clear: both;
 		background: url(images/holder.jpg) no-repeat;
@@ -128,6 +114,6 @@ div.navigation .title h2 {
 .footer {
 		background-position: left bottom;
 		color: #666;
-		font-size: 1.1em;
+		font-size: .7em;
 		text-align: center;
 }

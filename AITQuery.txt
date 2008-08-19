@@ -1,0 +1,96 @@
+// ----------------------------------------------------------------------------
+__construct
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+	function __construct(AITPDO $pdo)
+
+Description
++++++++++++
+
+Le constructeur de la classe.
+
+Paramètres
+++++++++++
+
+AITPDO *$pdo*:: L'instance de base AIT que l'on souhaite interroger.
+
+// ----------------------------------------------------------------------------
+all
+^^^
+
+Synopsis
+++++++++
+
+    public function all(ArrayObject $tags)
+
+Description
++++++++++++
+
+On recherche des items ayant tous les tags donnés en paramètre.
+
+Paramètres
+++++++++++
+
+*$tags*:: Contient des objet AIT_Tag représentant les tags que l'on souhaite rechercher
+
+
+Retour
+++++++
+
+Retourne FALSE si aucun tag n'a été trouvé dans le tableau d'entrée sinon retourne TRUE. 
+
+// ----------------------------------------------------------------------------
+one
+^^^
+
+Synopsis
+++++++++
+
+    public function one(ArrayObject $tags)
+
+Description
++++++++++++
+
+On recherche des items ayant au moisn l'un des tags donnés en paramètre.
+
+Paramètres
+++++++++++
+
+*$tags*:: Contient des objet AIT_Tag représentant les tags que l'on souhaite rechercher
+
+
+Retour
+++++++
+
+Retourne false si aucun tag n'a été trouvé dans le tableau d'entrée sinon retourne true. 
+
+
+// ----------------------------------------------------------------------------
+getSQL
+^^^^^^
+
+Synopsis
+++++++++
+
+     public function getSQL()
+
+Description
++++++++++++
+
+Retourne la requête construite avec les méthodes one et all sous forme de requête SQL.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+
+Retour
+++++++
+
+Retourne une chaine de caractère contenant une requête SQL.
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

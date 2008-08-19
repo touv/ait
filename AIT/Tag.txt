@@ -151,4 +151,5 @@ Retour
 
 Un entier représentant la fréquence.
 
+include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

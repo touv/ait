@@ -1,0 +1,278 @@
+// ----------------------------------------------------------------------------
+getPDO
+^^^^^^
+
+Synopsis
+++++++++
+
+    PDO  getPDO()
+
+Description
++++++++++++
+
+Retourne l'objet PDOAIT utilisé dans l'objet
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet PDO 
+
+// ----------------------------------------------------------------------------
+ren
+^^^
+
+Synopsis
+++++++++
+
+    void ren(string $l)
+
+Description
++++++++++++
+
+Renomme l'élément. Cela revient à changer son label.
+
+Paramètres
+++++++++++
+
+string *$l*:: nouveau label 
+
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+del
+^^^
+
+Synopsis
+++++++++
+
+    void del()
+
+Description
++++++++++++
+
+Suppression de l'élément 
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+exists
+^^^^^^
+
+Synopsis
+++++++++
+
+    boolean exists()
+
+Description
++++++++++++
+
+Vérifie l'existence de l'élément 
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+TRUE ou FALSE en focntion de l'existence de l'élément
+
+// ----------------------------------------------------------------------------
+getSystemID
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    integer  getSystemID()
+
+Description
++++++++++++
+
+Retourne l'identifiant système de l'élément.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un nombre entier représentant l'identifiant système.
+
+// ----------------------------------------------------------------------------
+get
+^^^
+
+Synopsis
+++++++++
+
+    mixed  get(string $name= 'label')
+
+Description
++++++++++++
+
+Retourne la valeur d'une propriété de l'élément. 
+Les propriétés accessibles sont : type, label, space
+
+Paramètres
+++++++++++
+
+string *$name*:: nom de la propriété
+
+
+Retour
+++++++
+
+mixed 
+
+// ----------------------------------------------------------------------------
+getTimestamps
+^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    ArrayObject  getTimestamps()
+
+Description
++++++++++++
+
+Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet ArrayObject dont le premier item contient la date de modification 
+et le deuxième contient la date de création.
+
+// ----------------------------------------------------------------------------
+getScore
+^^^^^^^^
+
+Synopsis
+++++++++
+
+    integer  getScore()
+
+Description
++++++++++++
+
+Retourne le score de l'élément
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un entier représentant le score l'élément.
+
+// ----------------------------------------------------------------------------
+setScore
+^^^^^^^^
+
+Synopsis
+++++++++
+
+    void setScore($i)
+
+Description
++++++++++++
+
+Donne un score à  l'élément
+
+Paramètres
+++++++++++
+
+integer *$i*:: Un entier représentant le score l'élément.
+
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+debug
+^^^^^
+
+Synopsis
+++++++++
+
+    void debug()
+
+Description
++++++++++++
+
+DEBUG 
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+NULL.
+
+// ----------------------------------------------------------------------------
+dump
+^^^^
+
+Synopsis
+++++++++
+
+    mixed dump(string $s = '', boolean $r = false)
+
+Description
++++++++++++
+
+Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des <pre> et </pre>
+
+Paramètres
+++++++++++
+
+string *$s*:: chaine de carat cure à afficher avant le contenu de l'objet.
+booelan *$r*:: si vrai a retourne la chaine à afficher plutôt que de l'afficher 
+
+
+Retour
+++++++
+
+Retourne NULL ou une chaine de caractères (dépend du paramètre $r).
+
+
+
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

@@ -207,4 +207,5 @@ Retour
 
 Un objet ArrayObject contenant des objets AIT_Tag.
 
+include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

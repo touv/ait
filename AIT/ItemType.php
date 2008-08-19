@@ -325,7 +325,7 @@ class AIT_ItemType extends AIT
     /**
      * Recherche des items du type courant
      *
-     * @param string  $query requete (le format dépend de la query_callback) sans callback c'est du SQL
+     * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri

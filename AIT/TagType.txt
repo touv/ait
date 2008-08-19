@@ -147,4 +147,5 @@ Retour
 
 Un objet AIT_Tag représentant le tag trouvé.
 
+include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

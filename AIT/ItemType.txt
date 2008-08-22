@@ -170,6 +170,14 @@ Retour
 
 un objet ArrayObject contenant des objets AIT_Item.
 
+Exemple
++++++++
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_ItemType-getItem.php[]
+-------------------------------------------------
+
 // ----------------------------------------------------------------------------
 fetchItems
 ^^^^^^^^^^

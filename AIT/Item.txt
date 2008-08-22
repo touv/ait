@@ -177,7 +177,16 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_TagType.
+Un objet ArrayObject contenant des objets AIT_Tag.
+
+Exemple
++++++++
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_Item-getTypedTags.php[]
+-------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 fetchTags

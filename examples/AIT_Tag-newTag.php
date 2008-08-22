@@ -1,18 +1,8 @@
 <?php
-require_once 'AIT.php';
-
-// Connexion à la base 
-$db = AIT::connect(
-        'mysql:host=localhost;dbname=test', 
-        'root'
-);
-
-// Définition d'un schéma de données
-$sm = $db->registerSchema('Disques', array('titre', 'artiste', 'style'));  
-
+require_once 'prepend.php';
 
 // Ajout d'un nouveau tag 
-$tag = $sm->style->newTag();
+$tag = $schema->style->newTag();
 
 echo $tag->get(); 
 

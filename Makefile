@@ -21,7 +21,7 @@ webdoc/docbook/index.html: README.xml
 		docbook.xsl $?
 
 README.xml: README
-	$(ASCIIDOC) -b docbook -d book -o $@ $?
+	$(ASCIIDOC) --unsafe -b docbook -d book -o $@ $?
 
 webdoc/userguide.pdf: README.pdf
 	$(CP) $? $@

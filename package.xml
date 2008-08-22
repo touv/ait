@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-07-09</date>
+    <date>2008-08-22</date>
     <version>
-        <release>1.0.7</release>
+        <release>1.0.8</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,9 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + Bugfix
-        + Accès par systemID
-        + Controle des types dans tout les constructeurs
+		+ ajout de l'objet AITQuery (pour construire des requetes)
     </notes>
     <contents>
         <dir name="/">
@@ -103,6 +101,23 @@
             <notes>
                 + Ajout de la notion de schéma
             </notes>
-        </release>
-    </changelog>
+		</release>
+		<release>
+			<date>2008-07-09</date>
+			<version>
+				<release>1.0.7</release>
+				<api>1.0</api>
+			</version>
+			<stability>
+				<release>stable</release>
+				<api>stable</api>
+			</stability>
+			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+			<notes>
+				+ Bugfix
+				+ Accès par systemID
+				+ Controle des types dans tout les constructeurs
+			</notes>
+		</release>
+	</changelog>
 </package>

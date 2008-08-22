@@ -198,6 +198,15 @@ Retour
 
 un objet ArrayObject contenant des objets AIT_Item.
 
+Exemple
++++++++
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_ItemType-fetchItems.php[]
+-------------------------------------------------
+
+
 // ----------------------------------------------------------------------------
 getTags
 ^^^^^^^
@@ -306,4 +315,5 @@ Retour
 un objet ArrayObject contenant des objets AIT_Item.
 
 include::../AIT.txt[]
-// vim: set syntax=asciidoc encoding=utf8 spl=fr:
+// vim: set syntax=asciidoc encoding=utf8 spl=fr: 
+

@@ -122,8 +122,7 @@ Exemple
 
 [source]
 -------------------------------------------------
-$cnxstr = 'mysql:host=localhost;dbname=allistag';
-$db = AIT::connect($cnxstr, 'root');
+include::./examples/AIT-connect.php[]
 -------------------------------------------------
 
 WARNING: IL n'est pas possible d'utiliser directement un objet PDO. AIT pour fonctionner
@@ -137,7 +136,7 @@ de manière automatique à condition de faire appel à la méthode checkup.
 
 [source]
 -------------------------------------------------
-$cnxstr = 'mysql:host=localhost;dbname=allistag';
+$cnxstr = 'mysql:host=localhost;dbname=music';
 $db = AIT::connect($cnxstr, 'root');
 $db->checkup();
 -------------------------------------------------

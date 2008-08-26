@@ -46,6 +46,15 @@ Retour
 
 Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
 
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_Tag-detach.php[]
+-------------------------------------------------
+
+
 // ----------------------------------------------------------------------------
 attach
 ^^^^^^
@@ -70,6 +79,12 @@ Retour
 ++++++
 
 Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes. 
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_Tag-attach.php[]
+-------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 getRelatedTags

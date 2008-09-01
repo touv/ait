@@ -1040,11 +1040,12 @@ class AIT
             settype($this->_id, 'integer');
             $ret = $stmt->fetch();
             $stmt->closeCursor();
-            return new ArrayObject(
+            return new ArrayObject( 
                 array(
-                'updated' => (int) $ret[0],
-                'created' => (int) $ret[1],
-            ));
+                    'updated' => (int) $ret[0],
+                    'created' => (int) $ret[1],
+                ), ArrayObject::ARRAY_AS_PROPS
+            );
         }
         catch (PDOException $e) {
             self::catchError($e);

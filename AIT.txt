@@ -171,6 +171,15 @@ Retour
 Un objet ArrayObject dont le premier item contient la date de modification 
 et le deuxième contient la date de création.
 
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::./examples/AIT-getTimestamps.php[]
+-------------------------------------------------
+
+
 // ----------------------------------------------------------------------------
 getScore
 ^^^^^^^^

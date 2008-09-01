@@ -27,7 +27,7 @@ webdoc/userguide.pdf: README.pdf
 	$(CP) $? $@
 
 README.pdf: README
-	$(A2X) --format=pdf --doctype=book --icons README
+	$(A2X) --asciidoc-opts="--unsafe" --format=pdf --doctype=book --icons README
 
 doxygen:
 	$(DOXYGEN) apidoc.doxygen

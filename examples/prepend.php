@@ -21,10 +21,11 @@ $d2->addTag('Fuck me I\'m famous Ibiza mix 08', $schema->titre);
 $d2->addTag('David Guetta',                     $schema->artiste); 
 $d2->attach($electro);
 
-$d3 = $schema->disques->addItem('a1902425');
+$d3 = $schema->disques->addItem('???');
 $d3->addTag('Heroes',             $schema->titre); 
 $d3->addTag('Antonio Vivaldi',    $schema->artiste); 
 $d3->addTag('Philippe Jaroussky', $schema->artiste); 
 $d3->attach($classique);
+$d3->ren('a1902425');
 
 

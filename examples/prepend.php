@@ -28,4 +28,8 @@ $d3->addTag('Philippe Jaroussky', $schema->artiste);
 $d3->attach($classique);
 $d3->ren('a1902425');
 
+$d4 = $schema->disques->addItem('a762424');
+$d4->addTag('The very best of Louis Armstrong', $schema->titre); 
+$d4->addTag('Louis Armstrong',       $schema->artiste);  
+$d4->attach($jazz);
 

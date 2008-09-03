@@ -166,5 +166,14 @@ Retour
 
 Un entier représentant la fréquence.
 
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_Tag-getFrequency.php[]
+-------------------------------------------------
+
+
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

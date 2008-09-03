@@ -209,7 +209,7 @@ un objet ArrayObject contenant des objets AIT_Item.
 Exemple
 +++++++
 
-[source,php]
+[source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-fetchItems.php[]
 -------------------------------------------------
@@ -294,6 +294,12 @@ Retour
 ++++++
 
 Un objet AIT_Item représentant l'item trouvé.
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_ItemType-getItemBySystemID.php[]
+-------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 queryItems

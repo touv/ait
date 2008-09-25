@@ -131,7 +131,7 @@ getTags
 Synopsis
 ++++++++
 
-    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -149,7 +149,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_Tag.
+Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 // ----------------------------------------------------------------------------
 getTypedTags
@@ -177,7 +177,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_Tag.
+Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 Exemple
 +++++++
@@ -195,7 +195,7 @@ fetchTags
 Synopsis
 ++++++++
 
-   ArrayObject fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+   AITResult fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -214,7 +214,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_Tag.
+Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

@@ -143,6 +143,15 @@ Retour
 
 Un objet AIT_Item représentant l'item trouvé.
 
+Exemple
++++++++
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_ItemType-getItem.php[]
+-------------------------------------------------
+
+
 // ----------------------------------------------------------------------------
 getItems
 ^^^^^^^^
@@ -150,7 +159,7 @@ getItems
 Synopsis
 ++++++++
 
-    ArrayObject getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -168,14 +177,14 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_Item.
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
 
 Exemple
 +++++++
 
 [source,php]
 -------------------------------------------------
-include::../examples/AIT_ItemType-getItem.php[]
+include::../examples/AIT_ItemType-getItems.php[]
 -------------------------------------------------
 
 // ----------------------------------------------------------------------------
@@ -185,7 +194,7 @@ fetchItems
 Synopsis
 ++++++++
 
-    ArrayObject fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -204,7 +213,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_Item.
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
 
 Exemple
 +++++++
@@ -222,7 +231,7 @@ getTags
 Synopsis
 ++++++++
 
-    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -240,7 +249,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_TagType.
+un objet AITResult (ArrayObject) contenant des objets AIT_TagType.
 
 // ----------------------------------------------------------------------------
 searchItems
@@ -249,7 +258,7 @@ searchItems
 Synopsis
 ++++++++
 
-    ArrayObject searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -268,7 +277,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_Item.
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
 
 // ----------------------------------------------------------------------------
 getItemBySystemID
@@ -326,7 +335,43 @@ Paramètres
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_Item.
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_ItemType-queryItems.php[]
+-------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+countItems
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_ItemType::countItems()
+
+Description
++++++++++++
+
+Retourne le nombre total d'items attaché au type d'item courrant.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+un nombre entier représentant le nombre d'enregistrment.
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_ItemType-countItems.php[]
+-------------------------------------------------
+
 
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr: 

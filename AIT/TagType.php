@@ -163,7 +163,7 @@ class AIT_TagType extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getTags($offset = null, $lines = null, $ordering = null)
     {
@@ -175,7 +175,7 @@ class AIT_TagType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $sql = sprintf("
-            SELECT id, label
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label
             FROM %s
             WHERE type = ?
             ",
@@ -192,7 +192,10 @@ class AIT_TagType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 

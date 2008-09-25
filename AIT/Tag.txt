@@ -93,7 +93,7 @@ getRelatedTags
 Synopsis
 ++++++++
 
-    ArrayObject getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -111,7 +111,7 @@ integer *$ordering*:: flag permettant le tri.
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_Tag.
+Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 // ----------------------------------------------------------------------------
 fetchRelatedTags
@@ -120,7 +120,7 @@ fetchRelatedTags
 Synopsis
 ++++++++
 
-    ArrayObject fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -140,7 +140,7 @@ integer *$ordering*:: flag permettant le tri
 Retour
 ++++++
 
-Un objet ArrayObject contenant des objets AIT_Tag.
+Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 // ----------------------------------------------------------------------------
 getFrequency

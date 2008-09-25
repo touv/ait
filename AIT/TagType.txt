@@ -117,7 +117,7 @@ getTags
 Synopsis
 ++++++++
 
-    ArrayObject getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -135,7 +135,7 @@ integer *$ordering*:: flag permettant le tri.
 Retour
 ++++++
 
-un objet ArrayObject contenant des objets AIT_Tag.
+un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
 // ----------------------------------------------------------------------------
 getTagBySystemID

@@ -12,7 +12,12 @@ $db = AIT::connect(
         $dsn, 
         $user,
         $password
-);
+    );
+
+// On purge 
+$db->exec("TRUNCATE ".$db->tag());
+$db->exec("TRUNCATE ".$db->tagged());
+
 
 // Contrôle et création de la structure de données  
 $db->checkup(); 

@@ -1054,7 +1054,21 @@ class AIT
     // }}}
 
 
+    // {{{ getFoundRows
+    /**
+    * Recherche le nombre de lignes trouvées 
+    *
+    * @return integer
+    */
+    protected function getFoundRows()
+    {
+        $stmt = $this->_pdo->query('SELECT FOUND_ROWS()');
+        $foundrows = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
 
+        return $foundrows;
+    }
+    // }}}
 
     // {{{ getScore
     /**
@@ -1221,8 +1235,8 @@ class AITQuery {
         $this->_pdo = $pdo;
         $this->clean();
     }
-
     // }}}
+
     // {{{ clean
     /**
      * On efface tout et on recommence
@@ -1234,6 +1248,7 @@ class AITQuery {
         array_push($this->_step, 'start');
         $this->sql = '';
     }
+    // }}}
 
 
     // {{{ or
@@ -1366,6 +1381,46 @@ class AITQuery {
     }
     // }}}
 
+}
+
+
+/**
+ * Objet représantant une requete au sens AIT
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
+class AITResult extends ArrayObject {
+
+    private $_total = 0;
+
+    // {{{ setTotal 
+    /**
+     * Fixe le nombre total de résultats trouvés
+     *
+     * @return string
+     */
+    public function setTotal($i)
+    {
+        $this->_total = (int) $i;
+    }
+    // }}}
+
+    // {{{ total 
+    /**
+     * Retourne le nombre total de résultats trouvés
+     *
+     * @return string
+     */
+    public function total()
+    {
+        return $this->_total;
+    }
+    // }}}
 }
 
 

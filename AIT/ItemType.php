@@ -167,7 +167,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
-
+        
         if ($id > 0) {
             return new AIT_Item($l, $this->_id, $this->_pdo, $id);
         }
@@ -182,7 +182,7 @@ class AIT_ItemType extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getItems($offset = null, $lines = null, $ordering = null)
     {
@@ -194,7 +194,7 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $sql = sprintf("
-            SELECT id, label
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label
             FROM %s
             WHERE type = ?
             ", $this->_pdo->tag());
@@ -209,7 +209,10 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 
@@ -222,7 +225,7 @@ class AIT_ItemType extends AIT
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
     *
-    * @return	ArrayObject
+    * @return	AITResult
     */
     function fetchItems(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
     {
@@ -247,7 +250,7 @@ class AIT_ItemType extends AIT
         }
         if ($n === 0) return new ArrayObject(array());
         $sql = sprintf("
-            SELECT  id, label, type
+            SELECT SQL_CALC_FOUND_ROWS id, label, type
             FROM (
             SELECT count(item_id) n, item_id
             FROM %s a
@@ -274,7 +277,10 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 
@@ -286,7 +292,7 @@ class AIT_ItemType extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getTags($offset = null, $lines = null, $ordering = null)
     {
@@ -298,7 +304,7 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $sql = sprintf("
-            SELECT DISTINCT id, label, type
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
             WHERE item_id = ?
@@ -317,7 +323,10 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 
@@ -330,7 +339,7 @@ class AIT_ItemType extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function searchItems($query, $offset = null, $lines = null, $ordering = null)
     {
@@ -346,7 +355,7 @@ class AIT_ItemType extends AIT
         }
         if ($query !== '') $query = 'AND '.$query;
         $sql = sprintf('
-            SELECT DISTINCT item.id, item.label
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS item.id, item.label
             FROM %1$s tag
             LEFT JOIN %2$s b ON tag.type=b.tag_id
             LEFT JOIN %2$s d ON tag.id=d.tag_id
@@ -371,7 +380,9 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 
@@ -404,7 +415,7 @@ class AIT_ItemType extends AIT
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
     *
-    * @return	ArrayObject
+    * @return	AITResult
     */
     function queryItems(AITQuery $query, $offset = null, $lines = null, $ordering = null)
     {
@@ -417,7 +428,7 @@ class AIT_ItemType extends AIT
 
         $w = $query->getSQL();
         $sql = sprintf("
-            SELECT DISTINCT id, label, type
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
             FROM (%s) temp
             LEFT JOIN %s b ON temp.item_id = b.id
             WHERE type = ?
@@ -437,7 +448,36 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
+    }
+    // }}}
+
+    // {{{ countItems
+    /**
+     * Compte le nombre d'items du type d'item courant
+     *
+     * @return integer
+     */
+    function countItems()
+    {
+        $sql = sprintf("
+            SELECT count(id)
+            FROM %s
+            WHERE type = ?
+            ", $this->_pdo->tag());
+        $this->debug($sql, $this->_id);
+
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+
+        $c = (int)$stmt->fetchColumn(0);
+        $stmt->closeCursor();
+
+        return $c;
     }
     // }}}
 

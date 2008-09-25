@@ -81,13 +81,12 @@ class AIT_Tag extends AIT
         if (!is_null($this->_item_id) && $id === false ) {
             try {
                 $sql = sprintf(
-                    "SELECT item_id FROM %s WHERE tag_id=? LIMIT 0,1",
-                    $this->_pdo->tagged(),
+                    "SELECT type FROM %s WHERE id=? LIMIT 0,1",
                     $this->_pdo->tag()
                 );
-                $this->debug($sql, $t);
+                $this->debug($sql, $i);
                 $stmt = $this->_pdo->prepare($sql);
-                $stmt->bindParam(1, $t, PDO::PARAM_INT);
+                $stmt->bindParam(1,  $i, PDO::PARAM_INT);
                 $stmt->execute();
                 $it = (int)$stmt->fetchColumn(0);
                 $stmt->closeCursor();
@@ -98,7 +97,7 @@ class AIT_Tag extends AIT
             if (! $this->_checkTag($this->_type, 2)) {
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_NOTICE);
             }
-            if (! $this->_checkTag($this->_item_id, $it)) {
+            if (! $this->_checkTagged($t, $it)) {
                 trigger_error('Argument 3 passed to '.__METHOD__.' not describe a "item" joined with "tag"', E_USER_NOTICE);
             }
             $this->_id = $this->_addTag($this->_label, $this->_type);
@@ -164,7 +163,7 @@ class AIT_Tag extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri.
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getRelatedTags($offset = null, $lines = null, $ordering = null)
     {
@@ -182,7 +181,7 @@ class AIT_Tag extends AIT
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
     *
-    * @return	ArrayObject
+    * @return AITResult
     */
     function fetchRelatedTags(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
     {
@@ -209,7 +208,7 @@ class AIT_Tag extends AIT
             else $w = ' AND ('.$w.')';
         }
         $sql = sprintf("
-            SELECT DISTINCT id, label, type
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
             LEFT JOIN %s c ON b.tag_id=c.id
@@ -232,8 +231,9 @@ class AIT_Tag extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_item_id, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
-
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 

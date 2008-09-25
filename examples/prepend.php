@@ -33,3 +33,8 @@ $d4->addTag('The very best of Louis Armstrong', $schema->titre);
 $d4->addTag('Louis Armstrong',       $schema->artiste);  
 $d4->attach($jazz);
 
+$d5 = $schema->disques->addItem('a1095444');
+$d5->addTag('Tourist',          $schema->titre); 
+$d5->addTag('St Germain',       $schema->artiste);  
+$d5->attach($jazz)->attach($electro);
+

@@ -10,7 +10,8 @@ $tags = $item->fetchTags($ttags);
 
 if ($tags->count() > 0) {
     foreach($tags as $tag) {
-        echo $tag->get();
+        echo "- ".$tag->get()."\n";
     }
-}  
-// Affichera : Musique Classique
+}
+echo 'Showed : '.$tags->count(). ' / '.$tags->total()."\n";
+

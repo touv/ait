@@ -152,7 +152,7 @@ class AIT_Item extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getTags($offset = null, $lines = null, $ordering = null)
     {
@@ -169,7 +169,7 @@ class AIT_Item extends AIT
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
      *
-     * @return ArrayObject
+     * @return AITResult
      */
     function getTypedTags(AIT_TagType $typetag, $offset = null, $lines = null, $ordering = null)
     {
@@ -187,7 +187,7 @@ class AIT_Item extends AIT
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
     *
-    * @return	ArrayObject
+    * @return AITResult	
     */
     function fetchTags(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
     {
@@ -214,7 +214,7 @@ class AIT_Item extends AIT
             else $w = ' AND ('.$w.')';
         }
         $sql = sprintf("
-            SELECT id, label, type
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
             WHERE item_id = ? %s
@@ -235,7 +235,10 @@ class AIT_Item extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id']);
         }
-        return new ArrayObject($ret);
+
+        $r = new AITResult($ret);
+        $r->setTotal($this->getFoundRows());
+        return $r;
     }
     // }}}
 }

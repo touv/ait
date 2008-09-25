@@ -7,7 +7,10 @@ $tags = new ArrayObject();
 $tags->append($jazz);  
 
 $items = $schema->disques->fetchItems($tags, 0, 10);  
+
 foreach($items as $item) {  
-    echo $item->get();  
-}  
+    echo $item->get()."\n";  
+}
+
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
 ?>

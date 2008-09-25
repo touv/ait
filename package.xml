@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-08-22</date>
+    <date>2008-09-25</date>
     <version>
-        <release>1.0.8</release>
+        <release>1.0.9</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,7 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-		+ ajout de l'objet AITQuery (pour construire des requetes)
+        + ajout de l'objet AITResult 
+        + remplacement des retours ArrayObject par des retours AITResult 
     </notes>
     <contents>
         <dir name="/">
@@ -118,6 +119,21 @@
 				+ Accès par systemID
 				+ Controle des types dans tout les constructeurs
 			</notes>
-		</release>
-	</changelog>
+        </release>
+        <release>
+            <date>2008-08-22</date>
+            <version>
+                <release>1.0.8</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + ajout de l'objet AITQuery (pour construire des requetes)
+            </notes>
+        </release>
+    </changelog>
 </package>

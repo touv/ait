@@ -126,6 +126,7 @@ class PDOAIT extends PDO
         'username' => '',
         'password' => '',
         'drvropts' => array(),
+        'prefix'      => '',
         'opt'      => 'opt',
         'tag'      => 'tag',
         'tagged'   => 'tagged',

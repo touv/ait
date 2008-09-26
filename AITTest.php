@@ -16,7 +16,7 @@ class AITTest extends PHPUnit_Framework_TestCase
     var $db;
     function setUp()
     {
-        $cnxstr = 'mysql:host=localhost;dbname=allistag';
+        $cnxstr = 'mysql:host=localhost;dbname=ait';
 //        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',
@@ -546,6 +546,22 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it->del();
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
+    }
+    function test_serialize()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('#1');
+        $i2 = $it->addItem('#2');
+        $this->assertEquals($this->_d(), 5);
+
+        $si1 = unserialize(serialize($i1));
+
+        $this->assertEquals($i1->get(), $si1->get());
+        $this->assertEquals($i1->getSystemID(), $si1->getSystemID());
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+
     }
 
 

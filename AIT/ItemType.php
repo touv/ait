@@ -105,7 +105,27 @@ class AIT_ItemType extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
-        return new AIT_TagType($l, $this->_id, $this->_pdo);
+        $sql = sprintf("
+            SELECT id
+            FROM %s a
+            LEFT JOIN %s b ON a.id=b.tag_id
+            WHERE label = ? and type = 2 and item_id = ?
+            LIMIT 0,1
+            ",
+            $this->_pdo->tag(),
+            $this->_pdo->tagged()
+        );
+        $this->debug($sql, $l, $this->_id);
+
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $l, PDO::PARAM_STR);
+        $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $id = (int)$stmt->fetchColumn(0);
+        $stmt->closeCursor();
+
+        return new AIT_TagType($l, $this->_id, $this->_pdo, $id);
     }
     // }}}
 

@@ -122,14 +122,27 @@ class AITSchema {
 class PDOAIT extends PDO
 {
     private $_options = array(
-        'prefix' => '',
-        'opt'    => 'opt',
-        'tag'    => 'tag',
-        'tagged' => 'tagged',
+        'dsn'      => '',
+        'username' => '',
+        'password' => '',
+        'drvropts' => array(),
+        'opt'      => 'opt',
+        'tag'      => 'tag',
+        'tagged'   => 'tagged',
         'space_callback' => array(),
         'query_callback' => array(),
         'class_callback' => array(),
     );
+
+    public function __construct($dsn, $username = null, $password = null, $driver_options = null)
+    {
+        parent::__construct($dsn, $username, $password, $driver_options);
+        $this->setOption('dsn',      $dsn);
+        $this->setOption('username', $username);
+        $this->setOption('password', $password);
+        $this->setOption('drvropts', $driver_options);
+    }
+
     // {{{ extendsWith
     /**
      * Ajoute à AIT un module complémentaire
@@ -158,7 +171,7 @@ class PDOAIT extends PDO
         }
     }
     // }}}
-     // {{{ getOptions
+    // {{{ getOptions
     /**
      * Retourne les options
      *
@@ -240,7 +253,7 @@ class PDOAIT extends PDO
     {
         try {
             $sql = sprintf(
-                "SELECT count(*) n FROM %s WHERE label='tag' or label='item LIMIT 0,1';",
+                "SELECT count(*) n FROM %s WHERE label='tag' or label='item' LIMIT 0,1;",
                 $this->tag());
             $stmt = $this->query($sql);
 
@@ -289,16 +302,20 @@ class PDOAIT extends PDO
                         type INT NULL,
                         updated timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
                         created timestamp NOT NULL default '0000-00-00 00:00:00',
-                        FULLTEXT (space),
-                INDEX(type)
+                        INDEX (label),
+                FULLTEXT (space),
+                INDEX (score),
+                INDEX (type)
             ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
                 ", $this->tag()));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
                         tag_id INT NOT NULL,
                         item_id INT NOT NULL,
-                        PRIMARY KEY (tag_id, item_id)
-                    ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+                        PRIMARY KEY (tag_id, item_id),
+                INDEX (tag_id),
+                INDEX (item_id)
+            ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
                 ", $this->tagged()));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
@@ -307,8 +324,8 @@ class PDOAIT extends PDO
                         PRIMARY KEY (name)
                     ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
                 ", $this->opt()));
-                 $this->exec(sprintf("
-                     INSERT INTO %s VALUES ('version', '%s');
+                $this->exec(sprintf("
+                    INSERT INTO %s VALUES ('version', '%s');
                 ", $this->opt(), AIT::VERSION));
                 $this->_initData();
                 break;
@@ -371,6 +388,10 @@ class AIT
      */
     protected $_pdo;
     /**
+     * @var array
+     */
+    protected $_pdo_opt;
+    /**
      * @var integer
      */
     protected $_id;
@@ -405,6 +426,9 @@ class AIT
     const ORDER_DESC = 4;
     const ORDER_BY_LABEL = 8;
     const ORDER_BY_SCORE = 16;
+    const ORDER_BY_UPDATED = 32;
+	const ORDER_BY_CREATED = 64;
+
 
     // {{{ __construct
     /**
@@ -1113,9 +1137,13 @@ class AIT
             if ( (AIT::ORDER_BY_LABEL & $ordering) === AIT::ORDER_BY_LABEL)
             $sql .= ' label';
             elseif ( (AIT::ORDER_BY_SCORE & $ordering) === AIT::ORDER_BY_SCORE)
-            $sql .= ' score';
+                $sql .= ' score';
+            elseif ( (AIT::ORDER_BY_UPDATED & $ordering) === AIT::ORDER_BY_UPDATED)
+                $sql .= ' updated';
+            elseif ( (AIT::ORDER_BY_CREATED & $ordering) === AIT::ORDER_BY_CREATED)
+                $sql .= ' created';
             else
-            $sql .= ' id';
+                $sql .= ' id';
 
             if ( (AIT::ORDER_ASC & $ordering) === AIT::ORDER_ASC)
             $sql .= ' ASC';
@@ -1197,6 +1225,33 @@ class AIT
         }
     }
 
+
+    /** 
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        $this->_pdo_opt = $this->_pdo->getOptions();
+        $vars = array_keys(get_object_vars($this));
+        unset($vars[array_search('_pdo', $vars)]);
+        return $vars;
+    }
+
+    /** 
+     * Avant unserialization
+     *
+     */
+    public function __wakeup() 
+    {
+        $this->_pdo = new PDOAIT(
+            $this->_pdo_opt['dsn'],
+            $this->_pdo_opt['username'],
+            $this->_pdo_opt['password'],
+            $this->_pdo_opt['drvropts']
+        );
+        $this->_pdo->setOptions($this->_pdo_opt);
+     }
 }
 
 

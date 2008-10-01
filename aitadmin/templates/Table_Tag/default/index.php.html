@@ -1,0 +1,24 @@
+<table id="<?php echo $ClassID ?>">
+		<thead>
+				<tr>
+						<th>
+								SystemID
+						</th>
+						<th>
+								Valeur
+						</th>
+				</tr>
+		</thead>
+		<tbody>
+				<?php foreach($rows as $row): ?>
+				<tr>
+						<td>
+								#<?php echo $row->getSystemID() ?>
+						</td>
+						<td>
+								<?php echo $row->get() ?>
+						</td>
+				</tr>
+				<?php endforeach; ?>
+		</tbody>
+</table>

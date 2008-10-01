@@ -95,16 +95,22 @@ class AIT_Tag extends AIT
                 self::catchError($e);
             }
             if (! $this->_checkTag($this->_type, 2)) {
-                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_NOTICE);
+                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_ERROR);
             }
             if (! $this->_checkTagged($t, $it)) {
-                trigger_error('Argument 3 passed to '.__METHOD__.' not describe a "item" joined with "tag"', E_USER_NOTICE);
+                trigger_error('Argument 3 passed to '.__METHOD__.' not describe a "item" joined with "tag"', E_USER_ERROR);
+            }
+            if (! $this->_checkType($t)) {
+                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
             }
             $this->_id = $this->_addTag($this->_label, $this->_type);
             $this->_addTagged($this->_id, $this->_item_id);
         }
         else {
             if ($id === false) {
+                if (! $this->_checkType($t)) {
+                    trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
+                }
                 $this->_id = $this->_addTag($this->_label, $this->_type);
             }
             else {

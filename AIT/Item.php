@@ -63,9 +63,9 @@ class AIT_Item extends AIT
     {
         parent::__construct($pdo, 'Item');
 
-        if (!is_string($l))
+        if (!is_string($l) and !is_null($l) and $id !== false)
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
-        if (!is_null($t) && !is_int($t))
+        if (!is_int($t) and !is_null($t) and $id !== false)
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($t).' given', E_USER_ERROR);
         if ($id !== false && !is_int($id))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
@@ -74,8 +74,25 @@ class AIT_Item extends AIT
         $this->_type = $t;
         if ($id !== false) {
             $this->_id = (int) $id;
+            $r = null;
+            if (is_null($this->_label)) {
+                $r = $this->_getTagBySystemID($this->_id);
+                $this->_label = $r['label'];
+            }
+            if (is_null($this->_type)) {
+                if (is_null($r)) {
+                    $r = $this->_getTagBySystemID($this->_id);
+                }
+                $this->_label = $r['type'];
+            }
         }
-        elseif ($this->_checkTag($this->_type, 1)) {
+        else {
+            if (! $this->_checkType($this->_type)) {
+                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
+            }
+            if (! $this->_checkTag($t, 1)) {
+                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "typeitem" ', E_USER_ERROR);
+            }
             $this->_id = $this->_addTag($this->_label, $this->_type);
         }
     }

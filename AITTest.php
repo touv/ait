@@ -564,6 +564,22 @@ class AITTest extends PHPUnit_Framework_TestCase
 
     }
 
+    function test_static()
+    {
+        $it1 = new AIT_ItemType('A', $this->db);
+        $it2 = new AIT_ItemType('B', $this->db);
+
+        $ret = AIT_ItemType::getAll($this->db);
+        $this->assertEquals($ret->count(), 2);
+        $this->assertEquals($ret[0]->get(), 'A');
+        $this->assertEquals($ret[1]->get(), 'B');
+
+        $it1->del();
+        $it2->del();
+        $this->assertEquals($this->_d(), 2);
+    }
+
+
 
 
     /**/

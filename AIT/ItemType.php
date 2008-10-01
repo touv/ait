@@ -58,17 +58,29 @@ class AIT_ItemType extends AIT
      *
      * @param string $label nom du tupe d'item
      * @param PDOAIT $pdo objet de connexion à la base
+     * @param integer $id Identifiant système de l'élement (si déjà connu).
      */
-    function __construct($l, PDOAIT $pdo)
+    function __construct($l, PDOAIT $pdo, $id = false)
     {
         parent::__construct($pdo, 'ItemType');
 
-        if (!is_string($l))
+        if (!is_string($l) and !is_null($l) and $id !== false)
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
+        if ($id !== false && !is_int($id))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
+
 
         $this->_label = $l;
         $this->_type  = 1;
-        $this->_id    = $this->_addTag($this->_label, $this->_type);
+        if ($id === false)
+            $this->_id = $this->_addTag($this->_label, $this->_type);
+        else {
+            $this->_id = (int) $id;
+            if (is_null($this->_label)) {
+                $r = $this->_getTagBySystemID($id);
+                $this->_label = $r['label'];
+            }
+        }
     }
     // }}}
 
@@ -95,8 +107,6 @@ class AIT_ItemType extends AIT
      * Récupére un type de tag du type d'item courant
      *
      * @param string $l label
-     *
-     * @todo NE PAS CREER D'OBJET SI L'ELEMENT N'EXISTE PAS
      *
      * @return AIT_TagType
      */
@@ -125,7 +135,10 @@ class AIT_ItemType extends AIT
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
 
-        return new AIT_TagType($l, $this->_id, $this->_pdo, $id);
+        if ($id === 0)
+            return null;
+        else 
+            return new AIT_TagType($l, $this->_id, $this->_pdo, $id);
     }
     // }}}
 
@@ -501,6 +514,50 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
+   // {{{ getAll
+    /**
+     * Récupére Tous les types d'items de la base
+     *
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return	AITResult
+     */
+    static function getAll(PDOAIT $pdo, $offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        $sql = sprintf("
+            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label
+            FROM %s
+            WHERE type = 1 
+            ",
+            $pdo->tag()
+        );
+        self::sqler($sql, $offset, $lines, $ordering);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_ItemType($row['label'], $pdo, $row['id']);
+        }
+        $stmt = $pdo->query('SELECT FOUND_ROWS()');
+        $foundrows = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
+
+        $r = new AITResult($ret);
+        $r->setTotal($foundrows);
+        return $r;
+    }
+    // }}}
 
 }
 

@@ -4,5 +4,9 @@
 webdoc/docbook/*.html
 webdoc/userguide.pdf
 apidoc/*
+aitadmin/rsc/*.css
+aitadmin/rsc/*.png
+aitadmin/rsc/*.js
+aitadmin/tmp/*cache*
 README.pdf
 README.xml

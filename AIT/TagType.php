@@ -64,7 +64,7 @@ class AIT_TagType extends AIT
     {
         parent::__construct($pdo, 'TagType');
 
-        if (!is_string($l))
+        if (!is_string($l) and !is_null($l) and $id !== false)
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
         if (!is_null($i) && !is_int($i))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
@@ -76,13 +76,18 @@ class AIT_TagType extends AIT
         $this->_item_id = $i;
 
         if ($id === false) {
-            if ($this->_checkTag($this->_item_id, 1)) {
-                $this->_id = $this->_addTag($this->_label, 2);
-                $this->_addTagged($this->_id, $this->_item_id);
+            if (! $this->_checkTag($this->_item_id, 1)) {
+                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tagtype"', E_USER_ERROR);
             }
+            $this->_id = $this->_addTag($this->_label, 2);
+            $this->_addTagged($this->_id, $this->_item_id);
         }
         else {
-            $this->_id = $id;
+            $this->_id = (int) $id;
+            if (is_null($this->_label)) {
+                $r = $this->_getTagBySystemID($id);
+                $this->_label = $r['label'];
+            }
         }
     }
     // }}}

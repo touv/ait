@@ -71,7 +71,7 @@ class AITSchema {
             $a = $this->_toVarname($attr);
             $this->_pointers[$a] = $this->_pointers[$n]->getTag($attr);
             if (is_null($this->_pointers[$a])) {
-                $this->_pointers[$a] = $links->addTag($attr);
+                $this->_pointers[$a] = $this->_pointers[$n]->addTag($attr);
             }
         }
     }
@@ -789,6 +789,34 @@ class AIT
     }
     // }}}
 
+    // {{{
+    /**
+    * Vérifie l'existance d'un type d'un tag
+    *
+    * @param integer $t identifiant de son type
+    *
+    * @return boolean
+    */
+    protected function _checkType($t)
+    {
+        try {
+            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->_pdo->tag());
+
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $t, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $c = (int)$stmt->fetchColumn(0);
+            $stmt->closeCursor();
+            if ($c > 0) return true;
+            else return false;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
     // {{{ _checkTagged
     /**
     * Vérifie l'existance de l'association d'un tag et d'un item
@@ -915,7 +943,7 @@ class AIT
     *
     * @param integer $i
     *
-    * @return integer
+    * @return array
      */
     protected function _getTagBySystemID($i)
     {
@@ -1131,7 +1159,7 @@ class AIT
     *
     * @return string
     */
-    protected function sqler(&$sql, $offset, $lines, $ordering)
+    protected static function sqler(&$sql, $offset, $lines, $ordering)
     {
         if (!is_null($ordering)) {
             $sql .= ' ORDER BY';

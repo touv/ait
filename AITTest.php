@@ -1,6 +1,7 @@
 <?php
 // vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 encoding=utf-8 fdm=marker :
 
+error_reporting(E_ALL);
 ini_set('include_path', dirname(__FILE__).PATH_SEPARATOR.ini_get('include_path'));
 
 require_once 'AIT.php';

@@ -1,43 +1,55 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-		<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $charset ?>" />
-				<meta http-equiv="Content-Language" content="<?php echo substr($Lang, 0, 2) ?>" />
-				<title>
-						<?php
-						foreach($this->Headers as $v) if ($v->isType('title')) echo $v->get();
-						?>
-				</title>
-				<meta name="Generator" content="Pxxo" />
-				<?php $Self->dumphead() ?>
-		</head>
-		<body>
-				<table id="<?php echo $ClassID ?>" border="1">
-						<tr>
-								<td>
-								</td>
-								<td>
-										<?php echo $ITEMTYPE ?>
-								</td>
-								<td>
-								</td>
-						</tr>
-						<tr>
-								<td>
-										<?php echo $TAGTYPE ?>
-										<hr/>
-										<?php echo $TAG2 ?>
-								</td>
-								<td>
-								</td>
-								<td>
-										<?php echo $ITEM ?>
-										<hr/>
-										<?php echo $TAG1 ?>
-								</td>
-						</tr>
-				</table>
-		</body>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $charset ?>" />
+		<meta http-equiv="Content-Language" content="<?php echo substr($Lang, 0, 2) ?>" />
+		<title>
+			<?php
+			foreach($this->Headers as $v) if ($v->isType('title')) echo $v->get();
+			?>
+		</title>
+		<meta name="Generator" content="Pxxo" />
+		<?php $Self->dumphead() ?>
+	</head>
+	<body>
+		<table id="<?php echo $ClassID ?>">
+			<tr>
+				<td style="text-align:right;vertical-align:bottom;">
+					<img src="<?php echo $left_png ?>" />
+				</td>
+				<td style="text-align:center;">
+					<h1>Les types d'items</H1>
+					<?php echo $ITEMTYPE ?>
+				</td>
+				<td style="text-align:left;vertical-align:bottom;">
+					<img src="<?php echo $right_png ?>" />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					<h2>Les types de tag associ&eacute;s</h2>
+					<?php echo $TAGTYPE ?>
+					<div style="text-align:center;">
+						<img src="<?php echo $down_png ?>"/>
+					</div>
+					<h3>Les tags associ&eacute;s</h3>
+
+					<?php echo $TAG2 ?>
+				</td>
+				<td>
+				</td>
+				<td style="text-align:center;">
+					<h3>Les items associ&eacute;s</h3>
+					<?php echo $ITEM ?>
+										<div style="text-align:center;">
+						<img src="<?php echo $down_png ?>"/>
+					</div>
+					<h3>Les tags associ&eacute;s</h3>
+					<?php echo $TAG1 ?>
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>
 
 

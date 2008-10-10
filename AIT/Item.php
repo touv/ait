@@ -227,11 +227,11 @@ class AIT_Item extends AIT
                 $w = 'type = '. $tag->getSystemID();
                 $n++;
             }
-            if ($n === 0) return new ArrayObject(array());
+            if ($n === 0) return new AITResult(array());
             else $w = ' AND ('.$w.')';
         }
-        $sql = sprintf("
-            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
+        $sql1 = 'SELECT id, label, type ';
+        $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
             WHERE item_id = ? %s
@@ -240,8 +240,9 @@ class AIT_Item extends AIT
             $this->_pdo->tag(),
             $w
         );
-        $this->sqler($sql, $offset, $lines, $ordering);
-        $this->debug($sql, $this->_id);
+        $sql = $sql1.$sql2;
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::debug($sql, $this->_id);
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -252,9 +253,19 @@ class AIT_Item extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id']);
         }
+        $stmt->closeCursor();
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        self::debug($sql, $this->_id);
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $foundrows = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
 
         $r = new AITResult($ret);
-        $r->setTotal($this->getFoundRows());
+        $r->setTotal($foundrows);
         return $r;
     }
     // }}}

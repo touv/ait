@@ -84,7 +84,7 @@ class AIT_Tag extends AIT
                     "SELECT type FROM %s WHERE id=? LIMIT 0,1",
                     $this->_pdo->tag()
                 );
-                $this->debug($sql, $i);
+                self::debug($sql, $i);
                 $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1,  $i, PDO::PARAM_INT);
                 $stmt->execute();
@@ -210,11 +210,11 @@ class AIT_Tag extends AIT
                 $w = 'type = '. $tag->getSystemID();
                 $n++;
             }
-            if ($n === 0) return new ArrayObject(array());
+            if ($n === 0) return new AITResult(array());
             else $w = ' AND ('.$w.')';
         }
-        $sql = sprintf("
-            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label, type
+        $sql1 = 'SELECT DISTINCT id, label, type ';
+        $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
             LEFT JOIN %s c ON b.tag_id=c.id
@@ -224,8 +224,9 @@ class AIT_Tag extends AIT
             $this->_pdo->tagged(),
             $this->_pdo->tag()
         );
-        $this->sqler($sql, $offset, $lines, $ordering);
-        $this->debug($sql, $this->_id);
+        $sql = $sql1.$sql2;
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::debug($sql, $this->_id);
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -237,8 +238,19 @@ class AIT_Tag extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_item_id, $this->_pdo, $row['id']);
         }
+                $stmt->closeCursor();
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        self::debug($sql, $this->_id);
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $foundrows = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
+
         $r = new AITResult($ret);
-        $r->setTotal($this->getFoundRows());
+        $r->setTotal($foundrows);
         return $r;
     }
     // }}}
@@ -260,7 +272,7 @@ class AIT_Tag extends AIT
                 ",
                 $this->_pdo->tagged()
             );
-            $this->debug($sql, $this->_id);
+            self::debug($sql, $this->_id);
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();

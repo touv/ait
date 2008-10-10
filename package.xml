@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-09-26</date>
+    <date>2008-10-10</date>
     <version>
-        <release>1.0.11</release>
+        <release>1.0.13</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,8 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + ajout du tri par date (updated et created)
-        + prise en compte de la serialization des objets
+        + Optimisation (notament avec le count(*))
+        * meilleur utilisation des méthodes statiques
     </notes>
     <contents>
         <dir name="/">
@@ -102,23 +102,23 @@
             <notes>
                 + Ajout de la notion de schéma
             </notes>
-		</release>
-		<release>
-			<date>2008-07-09</date>
-			<version>
-				<release>1.0.7</release>
-				<api>1.0</api>
-			</version>
-			<stability>
-				<release>stable</release>
-				<api>stable</api>
-			</stability>
-			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-			<notes>
-				+ Bugfix
-				+ Accès par systemID
-				+ Controle des types dans tout les constructeurs
-			</notes>
+        </release>
+        <release>
+            <date>2008-07-09</date>
+            <version>
+                <release>1.0.7</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Bugfix
+                + Accès par systemID
+                + Controle des types dans tout les constructeurs
+            </notes>
         </release>
         <release>
             <date>2008-08-22</date>
@@ -134,22 +134,53 @@
             <notes>
                 + ajout de l'objet AITQuery (pour construire des requetes)
             </notes>
-		</release>
-		<release>
-			<date>2008-09-25</date>
-			<version>
-				<release>1.0.9</release>
-				<api>1.0</api>
-			</version>
-			<stability>
-				<release>stable</release>
-				<api>stable</api>
-			</stability>
-			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
-			<notes>
-				+ ajout de l'objet AITResult 
-				+ remplacement des retours ArrayObject par des retours AITResult 
-			</notes>
-		</release>
-	</changelog>
+        </release>
+        <release>
+            <date>2008-09-25</date>
+            <version>
+                <release>1.0.9</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + ajout de l'objet AITResult 
+                + remplacement des retours ArrayObject par des retours AITResult 
+            </notes>
+        </release>
+        <release>
+            <date>2008-09-26</date>
+            <version>
+                <release>1.0.11</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + ajout du tri par date (updated et created)
+                + prise en compte de la serialization des objets
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-02</date>
+            <version>
+                <release>1.0.12</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Correction de Bugs
+            </notes>
+        </release>
+    </changelog>
 </package>

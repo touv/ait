@@ -383,7 +383,7 @@ class AIT
     /**
      * @var boolean
      */
-    public $debugging = false;
+    static $debugging = false;
     /**
      * @var PDOAIT
      */
@@ -412,6 +412,10 @@ class AIT
      * @var callback
      */
     protected $_fillspace;
+    /**
+     * @var callback
+     */
+    protected $_queryspace;
     /**
      * @var callback
      */
@@ -956,7 +960,7 @@ class AIT
                     ",
                     $this->_pdo->tag()
                 );
-                $this->debug($sql, $i);
+                self::debug($sql, $i);
                 $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1, $i, PDO::PARAM_INT);
                 $stmt->execute();
@@ -997,7 +1001,7 @@ class AIT
             throw new Exception('type not supported (`'.$typ.'`)');
             $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
 
-            $this->debug($sql, $v, $this->_id);
+            self::debug($sql, $v, $this->_id);
             $stmt->execute();
             settype($this->_id, 'integer');
         }
@@ -1019,7 +1023,7 @@ class AIT
     {
         try {
             $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->_pdo->tag());
-            $this->debug($sql, $this->_id);
+            self::debug($sql, $this->_id);
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -1106,23 +1110,6 @@ class AIT
     }
     // }}}
 
-
-    // {{{ getFoundRows
-    /**
-    * Recherche le nombre de lignes trouvées 
-    *
-    * @return integer
-    */
-    protected function getFoundRows()
-    {
-        $stmt = $this->_pdo->query('SELECT FOUND_ROWS()');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
-        return $foundrows;
-    }
-    // }}}
-
     // {{{ getScore
     /**
     * Revoit le score de l'élement
@@ -1159,24 +1146,24 @@ class AIT
     *
     * @return string
     */
-    protected static function sqler(&$sql, $offset, $lines, $ordering)
+    public static function sqler(&$sql, $offset, $lines, $ordering)
     {
         if (!is_null($ordering)) {
             $sql .= ' ORDER BY';
-            if ( (AIT::ORDER_BY_LABEL & $ordering) === AIT::ORDER_BY_LABEL)
+            if ( (self::ORDER_BY_LABEL & $ordering) === self::ORDER_BY_LABEL)
             $sql .= ' label';
-            elseif ( (AIT::ORDER_BY_SCORE & $ordering) === AIT::ORDER_BY_SCORE)
+            elseif ( (self::ORDER_BY_SCORE & $ordering) === self::ORDER_BY_SCORE)
                 $sql .= ' score';
-            elseif ( (AIT::ORDER_BY_UPDATED & $ordering) === AIT::ORDER_BY_UPDATED)
+            elseif ( (self::ORDER_BY_UPDATED & $ordering) === self::ORDER_BY_UPDATED)
                 $sql .= ' updated';
-            elseif ( (AIT::ORDER_BY_CREATED & $ordering) === AIT::ORDER_BY_CREATED)
+            elseif ( (self::ORDER_BY_CREATED & $ordering) === self::ORDER_BY_CREATED)
                 $sql .= ' created';
             else
                 $sql .= ' id';
 
-            if ( (AIT::ORDER_ASC & $ordering) === AIT::ORDER_ASC)
+            if ( (self::ORDER_ASC & $ordering) === self::ORDER_ASC)
             $sql .= ' ASC';
-            elseif ( (AIT::ORDER_DESC & $ordering) === AIT::ORDER_DESC)
+            elseif ( (self::ORDER_DESC & $ordering) === self::ORDER_DESC)
             $sql .= ' DESC';
         }
         if (!is_null($offset) && !is_null($lines)) {
@@ -1190,15 +1177,15 @@ class AIT
     * DEBUG
     *
     */
-    public function debug()
+    public static function debug()
     {
-        if ($this->debugging === true)  {
+        if (self::$debugging === true)  {
             $argc = func_num_args();
             for ($i = 0; $i < $argc; $i++) {
                 $value = func_get_arg($i);
                 echo $value.' / ';
             }
-            echo "<br/>";
+            echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n" : "<br/>";
         }
     }
     // }}}

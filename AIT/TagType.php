@@ -145,7 +145,7 @@ class AIT_TagType extends AIT
             ",
             $this->_pdo->tag()
         );
-        $this->debug($sql, $l, $this->_id);
+        self::debug($sql, $l, $this->_id);
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
@@ -179,15 +179,16 @@ class AIT_TagType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql = sprintf("
-            SELECT DISTINCT SQL_CALC_FOUND_ROWS id, label
+        $sql1 = 'SELECT id, label ';
+        $sql2 = sprintf("
             FROM %s
             WHERE type = ?
             ",
             $this->_pdo->tag()
         );
-        $this->sqler($sql, $offset, $lines, $ordering);
-        $this->debug($sql, $this->_id);
+        $sql = $sql1.$sql2;
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::debug($sql, $this->_id);
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -197,9 +198,19 @@ class AIT_TagType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id']);
         }
+        $stmt->closeCursor();
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        self::debug($sql, $this->_id);
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $foundrows = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
 
         $r = new AITResult($ret);
-        $r->setTotal($this->getFoundRows());
+        $r->setTotal($foundrows);
         return $r;
     }
     // }}}

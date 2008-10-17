@@ -47,29 +47,6 @@ Retour
 
 NULL.
 
-// ----------------------------------------------------------------------------
-del
-^^^
-
-Synopsis
-++++++++
-
-    void del()
-
-Description
-+++++++++++
-
-Suppression de l'élément 
-
-Paramètres
-++++++++++
-
-Aucun.
-
-Retour
-++++++
-
-NULL.
 
 // ----------------------------------------------------------------------------
 exists
@@ -234,6 +211,33 @@ Retour
 ++++++
 
 NULL.
+
+
+// ----------------------------------------------------------------------------
+setFrequency
+^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    void setFrequency($i)
+
+Description
++++++++++++
+
+Donne une fréquence à l'élément
+
+Paramètres
+++++++++++
+
+integer *$i*:: Un entier représentant la fréquence de l'élément
+
+
+Retour
+++++++
+
+NULL.
+
 
 // ----------------------------------------------------------------------------
 debug

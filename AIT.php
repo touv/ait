@@ -135,6 +135,15 @@ class PDOAIT extends PDO
         'class_callback' => array(),
     );
 
+    // {{{ __construct
+    /**
+     * Constructeur
+     *
+     * @param string $dsn chaine de connexion
+     * @param string $username user de connexion
+     * @param string $password mot de passe de connexion
+     * @param array $driver_options options pour pdo
+     */
     public function __construct($dsn, $username = null, $password = null, $driver_options = null)
     {
         parent::__construct($dsn, $username, $password, $driver_options);
@@ -143,7 +152,7 @@ class PDOAIT extends PDO
         $this->setOption('password', $password);
         $this->setOption('drvropts', $driver_options);
     }
-
+    // }}}
     // {{{ extendsWith
     /**
      * Ajoute à AIT un module complémentaire
@@ -296,23 +305,28 @@ class PDOAIT extends PDO
             case 'mysql':
                 $this->exec(sprintf("
                     CREATE TABLE %s (
-                        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        id INTEGER(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
                         label VARCHAR(200) COLLATE latin1_general_cs NOT NULL,
                         space VARCHAR(200) COLLATE latin1_general_cs NULL,
                         score INTEGER(10) NOT NULL default '0',
+                        frequency INTEGER(10) UNSIGNED NOT NULL default '0',
                         type INT NULL,
                         updated timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
                         created timestamp NOT NULL default '0000-00-00 00:00:00',
                         INDEX (label),
-                FULLTEXT (space),
-                INDEX (score),
-                INDEX (type)
-            ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+                        FULLTEXT (space),
+                        INDEX (score),
+                        INDEX (type),
+                        INDEX (type,created),
+                        INDEX (type,updated),
+                        INDEX (type,score),
+                        INDEX (type,frequency)
+                    ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
                 ", $this->tag()));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
-                        tag_id INT NOT NULL,
-                        item_id INT NOT NULL,
+                        tag_id INTEGER(11) UNSIGNED NOT NULL,
+                        item_id INTEGER(11) UNSIGNED NOT NULL,
                         PRIMARY KEY (tag_id, item_id),
                 INDEX (tag_id),
                 INDEX (item_id)
@@ -348,11 +362,11 @@ class PDOAIT extends PDO
     {
         try {
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (1, 'item', null, 0, null, now(), now());",
+                "INSERT INTO %s VALUES (1, 'item', null, 0, 0, null, now(), now());",
                 $this->tag()
             ));
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (2, 'tag', null, 0, null, now(), now());",
+                "INSERT INTO %s VALUES (2, 'tag', null, 0, 0, null, now(), now());",
                 $this->tag()
             ));
         }
@@ -433,6 +447,7 @@ class AIT
     const ORDER_BY_SCORE = 16;
     const ORDER_BY_UPDATED = 32;
 	const ORDER_BY_CREATED = 64;
+	const ORDER_BY_FREQUENCY = 128;
 
 
     // {{{ __construct
@@ -582,16 +597,6 @@ class AIT
     }
     // }}}
 
-    // {{{ del
-    /**
-    * Suppression de l'élement courrant
-    */
-    function del()
-    {
-        $method = '_del'.$this->_element;
-        $this->$method($this->_id);
-    }
-    // }}}
 
     // {{{ exists
     /**
@@ -615,148 +620,6 @@ class AIT
         catch (PDOException $e) {
             self::catchError($e);
         }
-    }
-    // }}}
-
-    // {{{ _delTag
-    /**
-    * Supprime en cascade un tag
-    *
-    * @param mixed $l identifiant du tag
-    * @param mixed $t identifiant du type de tag associé
-    * @param mixed $i identifiant de l'item associé
-    */
-    protected function _delTag($l, $t = null, $i = null)
-    {
-        try {
-            $sql = sprintf("DELETE FROM %s WHERE tag_id=?", $this->_pdo->tagged());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $l, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($l, 'integer');
-
-            $sql = sprintf("DELETE FROM %s WHERE id=?", $this->_pdo->tag());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $l, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($l, 'integer');
-
-        }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
-    }
-    // }}}
-
-    // {{{ _delItem
-    /**
-    * Supprime en cascade item
-    *
-    * @param integer $i identifiant d'item
-    */
-    protected function _delItem($i)
-    {
-        try {
-            $sql = sprintf("
-            SELECT tag_id
-            FROM %s a
-            LEFT JOIN (SELECT tag_id m, count(*) n FROM %s GROUP BY tag_id) b  ON a.tag_id=b.m
-            WHERE item_id = ? and n = 1
-            ", $this->_pdo->tagged(),$this->_pdo->tagged());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($i, 'integer');
-
-            $res = $stmt->fetchAll();
-            foreach ($res as $itm) {
-                $this->_delTag((int)current($itm));
-            }
-
-            $sql = sprintf("DELETE FROM %s WHERE item_id=?", $this->_pdo->tagged());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($i, 'integer');
-
-
-            $sql = sprintf("DELETE FROM %s WHERE id=?",$this->_pdo->tag());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($i, 'integer');
-
-        }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
-    }
-    // }}}
-
-    // {{{ _delTagType
-    /**
-    * Supprime en cascade type de tag
-    *
-    * @param string $l identifiant du type de tag
-    * @param integer $i identifiant du type d'item
-    */
-    protected function _delTagType($l, $i = null)
-    {
-        $this->_delTag($l);
-        try {
-            $sql = sprintf("SELECT id FROM %s WHERE type=?", $this->_pdo->tag());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $l, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $res = $stmt->fetchAll();
-            foreach ($res as $itm) {
-                $this->_delTag((int)current($itm));
-            }
-        }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
-    }
-    // }}}
-
-    // {{{ _delItemType
-    /**
-    * Supprime en cascade un type d'item
-    * donc l'ensemble des items qui lui sont attachés
-    *
-    * @param integer $i identifiant du type d'item
-    */
-    protected function _delItemType($i)
-    {
-        try {
-            $sql = sprintf("SELECT tag_id FROM %s WHERE item_id=?",$this->_pdo->tagged());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($i, 'integer');
-
-            $res = $stmt->fetchAll();
-            foreach ($res as $itm) {
-                $this->_delTagType((int)current($itm));
-            }
-
-            $sql = sprintf("SELECT id FROM %s WHERE type=?", $this->_pdo->tag());
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($i, 'integer');
-
-            $res = $stmt->fetchAll();
-            foreach ($res as $itm) {
-                $this->_delItem((int)current($itm));
-            }
-        }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
-
-        $this->_delItem($i);
     }
     // }}}
 
@@ -793,7 +656,7 @@ class AIT
     }
     // }}}
 
-    // {{{
+    // {{{ _checkType
     /**
     * Vérifie l'existance d'un type d'un tag
     *
@@ -856,6 +719,58 @@ class AIT
     }
     // }}}
 
+    // {{{ _increaseFrequency
+    /**
+    * Incremente la frequence d'une ligne dans TAG
+    *
+    * @param string $t id
+    */
+    protected function _increaseFrequency($i)
+    {
+        try {
+            $sql = sprintf(
+                "UPDATE %s SET frequency=frequency+1 WHERE id = ?",
+                $this->_pdo->tag()
+            );
+            self::debug($sql, $i);
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $i, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+    // {{{ _decreaseFrequency
+    /**
+    * Incremente la frequence d'une ligne dans TAG
+    *
+    * @param string $t id
+    */
+    protected function _decreaseFrequency($i)
+    {
+        try {
+            $sql = sprintf(
+                "UPDATE %s SET frequency=frequency-1 WHERE id = ?",
+                $this->_pdo->tag()
+            );
+            self::debug($sql, $i);
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $i, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+
+
     // {{{ _addTagged
     /**
     * Ajout d'une ligne dans la table tagged
@@ -866,13 +781,81 @@ class AIT
     protected function _addTagged($t, $i)
     {
         try {
-            $stmt = $this->_pdo->prepare(sprintf(
+            $sql = sprintf(
                 "REPLACE INTO %s VALUES (?, ?);",
                 $this->_pdo->tagged()
-            ));
+            );
+            self::debug($sql, $t, $i);
+            $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $t, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
+            $stmt->closeCursor();
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+    // {{{ _rmTagged
+    /**
+    * Supprime une ligne dans la table tagged
+    *
+    * @param string $t tag id
+    * @param string $i item id
+    */
+    protected function _rmTagged($t, $i)
+    {
+        try {
+            if (is_null($t) and !is_null($i)) {
+                $field = 'item_id';
+                $value = $i;
+            }
+            elseif (!is_null($t) and is_null($i)) {
+                $field = 'tag_id';
+                $value = $t;
+            }
+            else
+                throw new Exception('Bad Arguments');
+
+            $sql = sprintf(
+                "DELETE FROM %s WHERE %s=?",
+                $this->_pdo->tagged(),
+                $field
+            );
+            self::debug($sql, $this->_id);
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $value, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+    // {{{ _rmTag
+    /**
+    * Suppression d'une ligne dans tag
+    *
+    * @param string $i id
+    */
+    protected function _rmTag($i)
+    {
+        try {
+            $sql = sprintf(
+                "DELETE FROM %s WHERE id=?", 
+                $this->_pdo->tag()
+            );
+            self::debug($sql, $this->_id);
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($this->_id, 'integer');
+
+            $this->_id = null;
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -914,10 +897,12 @@ class AIT
             }
 
             if (is_null($t)) {
-                $stmt = $this->_pdo->prepare(sprintf(
+                $sql = sprintf(
                     "INSERT INTO %s (label, space, updated, created) VALUES (?, ?, now(), now());",
                     $this->_pdo->tag()
-                ));
+                );
+                self::debug($sql, $l, $s);
+                $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
                 $stmt->bindParam(2, $s, PDO::PARAM_STR);
             }
@@ -931,8 +916,10 @@ class AIT
                 $stmt->bindParam(3, $t, PDO::PARAM_INT);
             }
             $ret = $stmt->execute();
+            $stmt->closeCursor();
 
             $id = (int) $this->_pdo->lastInsertId();
+
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -1069,6 +1056,7 @@ class AIT
         $fld = array(
             'space',
             'score',
+            'frequency',
         );
 
         if (isset($attr[$name])) {
@@ -1136,6 +1124,21 @@ class AIT
     }
     // }}}
 
+    // {{{ setScore
+    /**
+    * Renvoit la frequence de l'élement
+    *
+    * @param integer $i
+    */
+    public function setFrequency($i)
+    {
+        if (!is_int($i))
+        trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
+        $this->_set('frequency', $i);
+    }
+    // }}}
+
+
     // {{{ sqler
     /**
     *Ajout les close ORDER et LIMIT à une requete sql
@@ -1158,6 +1161,8 @@ class AIT
                 $sql .= ' updated';
             elseif ( (self::ORDER_BY_CREATED & $ordering) === self::ORDER_BY_CREATED)
                 $sql .= ' created';
+            elseif ( (self::ORDER_BY_FREQUENCY & $ordering) === self::ORDER_BY_FREQUENCY)
+                $sql .= ' frequency';
             else
                 $sql .= ' id';
 
@@ -1468,6 +1473,9 @@ class AITQuery {
 class AITResult extends ArrayObject {
 
     private $_total = 0;
+    private $_sql = null;
+    private $_params = array();
+    private $_pdo = null;
 
     // {{{ setTotal 
     /**
@@ -1481,6 +1489,22 @@ class AITResult extends ArrayObject {
     }
     // }}}
 
+    // {{{ setQueryForTotal
+    /**
+     * Fixe le nombre total de résultats trouvés
+     *
+     * @param string $sql la requete SQL 
+     * @param array $params les paramètres nécessaire à la requete
+     * @param pdo $pdo pointeur vers la base de données
+     */
+    public function setQueryForTotal($sql,  $params, $pdo) 
+    {
+        $this->_sql = $sql;
+        $this->_params = $params;
+        $this->_pdo = $pdo;
+    }
+    // }}}
+
     // {{{ total 
     /**
      * Retourne le nombre total de résultats trouvés
@@ -1489,6 +1513,22 @@ class AITResult extends ArrayObject {
      */
     public function total()
     {
+        if (is_null($this->_sql) or !is_array($this->_params))
+            return $this->_total;
+
+        AIT::debug($this->_sql, implode('/', $this->_params));
+        $stmt = $this->_pdo->prepare($this->_sql);
+        $i = 1;
+        foreach($this->_params as $k => $v) {
+            $stmt->bindParam($i++, $k, $v);
+        }
+        $stmt->execute();
+        $this->_total = (int) $stmt->fetchColumn(0);
+        $stmt->closeCursor();
+
+        $this->_sql = null;
+        $this->_params = array();
+
         return $this->_total;
     }
     // }}}

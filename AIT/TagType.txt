@@ -161,5 +161,60 @@ Retour
 
 Un objet AIT_Tag représentant le tag trouvé.
 
+// ----------------------------------------------------------------------------
+countItems
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_TagType::countItems()
+
+Description
++++++++++++
+
+Retourne le nombre total de tags attachés au type de tag courrant.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+un nombre entier représentant le nombre d'enregistrement.
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_TagType-countItems.php[]
+-------------------------------------------------
+
+// ----------------------------------------------------------------------------
+del
+^^^
+
+Synopsis
+++++++++
+
+    void del(boolean $cascade = false)
+
+Description
++++++++++++
+
+Suppression de l'élément et des tags qui lui sont associés. 
+On peut également avec le paramètre $cascade supprimer les items associés aux tags.
+
+
+Paramètres
+++++++++++
+
+boolean *$cascade*:: permet une suppression en cascade
+
+Retour
+++++++
+
+NULL.
+
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

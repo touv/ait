@@ -92,16 +92,24 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('#1');
         $i2 = $it->addItem('#2');
+        $this->assertEquals($it->countItems(), 2);
         $this->assertEquals($this->_d(), 5);
 
         $tt = $it->addTag('tagtype');
         $t1 = $tt->addTag('@1');
         $t2 = $tt->addTag('@2');
+
+        $this->assertEquals($it->countTags(), 1);
+        $this->assertEquals($tt->countTags(), 2);
         $this->assertEquals($this->_d(), 8);
 
         $this->assertEquals($this->_q(), 1);
         $i1->attach($t1)->attach($t2);
         $i2->attach($t1);
+
+        $this->assertEquals($t1->countItems(), 2);
+        $this->assertEquals($t2->countItems(), 1);
+
         $this->assertEquals($this->_q(), 4);
 
         $it->del();
@@ -117,15 +125,22 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i1->attach($t1);
         $i2->attach($t1);
 
+        $this->assertEquals($it->countItems(), 2);
+        $this->assertEquals($tt->countItems(), 2);
+        $this->assertEquals($tt->countTags(),  1);
+        $this->assertEquals($t1->countItems(), 2);
         $this->assertEquals($this->_d(), 7);
         $this->assertEquals($this->_q(), 3);
 
         $i2->del();
+        $this->assertEquals($it->countItems(), 1);
+        $this->assertEquals($tt->countItems(), 1);
+        $this->assertEquals($t1->countItems(), 1);
         $this->assertEquals($this->_d(), 6);
         $this->assertEquals($this->_q(), 2);
 
         $i1->del();
-        $this->assertEquals($this->_d(), 4);
+        $this->assertEquals($this->_d(), 5);
         $this->assertEquals($this->_q(), 1);
 
         $it->del();
@@ -220,13 +235,13 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i1->attach($t1)->attach($t3);
         $i2->attach($t2)->attach($t4);
 
-        $tags = $i1->getTags();
+        $tags = $i1->getTags(null, null, AIT::ORDER_BY_LABEL | AIT::ORDER_ASC);
         $this->assertEquals($tags->count(), 2);
-        $this->assertEquals($tags[0]->get(), 'C');
         $this->assertTrue($tags[0]->exists());
-        $this->assertEquals($tags[1]->get(), 'E');
+        $this->assertEquals($tags[0]->get(), 'C');
         $this->assertTrue($tags[1]->exists());
-        $tags = $i2->getTags();
+        $this->assertEquals($tags[1]->get(), 'E');
+        $tags = $i2->getTags(null, null, AIT::ORDER_BY_LABEL | AIT::ORDER_ASC);
         $this->assertEquals($tags->count(), 2);
         $this->assertEquals($tags[0]->get(), 'D');
         $this->assertTrue($tags[0]->exists());
@@ -262,7 +277,7 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
-    function test_frequency()
+    function test_attachement()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('A');
@@ -282,10 +297,10 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($tags[2]->get(), $t3->get());
         $this->assertEquals($tags[3]->get(), $t4->get());
 
-        $this->assertEquals($tags[0]->getFrequency(), 2);
-        $this->assertEquals($tags[1]->getFrequency(), 1);
-        $this->assertEquals($tags[2]->getFrequency(), 1);
-        $this->assertEquals($tags[3]->getFrequency(), 1);
+        $this->assertEquals($tags[0]->countItems(), 2);
+        $this->assertEquals($tags[1]->countItems(), 1);
+        $this->assertEquals($tags[2]->countItems(), 1);
+        $this->assertEquals($tags[3]->countItems(), 1);
 
         $it->del();
         $this->assertEquals($this->_d(), 2);
@@ -580,6 +595,117 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
     }
 
+
+    function test_searchtags()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $tt = $it->addTag('tagtype');
+        $a = $tt->addTag('A');
+        $b = $tt->addTag('B');
+        $c = $tt->addTag('C');
+        $d = $tt->addTag('D1');
+        $e = $tt->addTag('D2');
+        $f = $tt->addTag('D3');
+
+        $this->assertEquals($tt->countTags(), 6);
+
+        $tags = $tt->searchTags('');
+        $this->assertEquals($tags->count(), 6);
+
+        $tags = $tt->searchTags('tag.label=\'A\'');
+        $this->assertEquals($tags->count(), 1);
+
+        $tags = $tt->searchTags('label=\'A\'');
+        $this->assertEquals($tags->count(), 1);
+
+        $tags = $tt->searchTags('label like \'D%\'');
+        $this->assertEquals($tags->count(), 3);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+    }
+
+
+
+    function test_frequency()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+        $i2 = $it->addItem('2');
+        $i3 = $it->addItem('3');
+        $i4 = $it->addItem('4');
+        $i5 = $it->addItem('5');
+        $tt = $it->addTag('tagtype');
+        $a = $tt->addTag('A');
+        $b = $tt->addTag('B');
+        $c = $tt->addTag('C');
+        $d = $tt->addTag('D');
+        $e = $tt->addTag('E');
+        $f = $tt->addTag('F');
+
+        $i1->attach($a)->attach($b)->attach($d);
+        $i2->attach($a)->attach($c)->attach($d);
+        $i3->attach($a)->attach($b)->attach($d);
+        $i4->attach($a)->attach($e);
+        $i5->attach($a)->attach($f);
+
+        $this->assertEquals($a->countItems(), 5);
+        $this->assertEquals($b->countItems(), 2);
+        $this->assertEquals($c->countItems(), 1);
+        $this->assertEquals($d->countItems(), 3);
+        $this->assertEquals($e->countItems(), 1);
+        $this->assertEquals($f->countItems(), 1);
+
+        $f->setFrequency(2);        
+        $this->assertEquals($f->countItems(), 2);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
+    function test_fetchItems()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+        $i2 = $it->addItem('2');
+        $i3 = $it->addItem('3');
+        $i4 = $it->addItem('4');
+        $i5 = $it->addItem('5');
+        $tt = $it->addTag('tagtype');
+        $a = $tt->addTag('A');
+        $b = $tt->addTag('B');
+        $c = $tt->addTag('C');
+        $d = $tt->addTag('D');
+        $e = $tt->addTag('E');
+        $f = $tt->addTag('F');
+
+        $i1->attach($a)->attach($b)->attach($d);
+        $i2->attach($a)->attach($b)->attach($d);
+        $i3->attach($a)->attach($b)->attach($d);
+        $i4->attach($a)->attach($c)->attach($e);
+        $i5->attach($c)->attach($e)->attach($f);
+
+        $q = new ArrayObject(array($a, $b, $d));
+        $items = $it->fetchItems($q);
+        $this->assertEquals($items->count(), 3);
+
+        $q = new ArrayObject(array($e));
+        $items = $it->fetchItems($q);
+        $this->assertEquals($items->count(), 2);
+
+        $q = new ArrayObject(array($e, $c));
+        $items = $it->fetchItems($q);
+        $this->assertEquals($items->count(), 2);
+
+        $q = new ArrayObject(array($f));
+        $items = $it->fetchItems($q);
+        $this->assertEquals($items->count(), 1);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
 
 
 

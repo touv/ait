@@ -90,21 +90,26 @@ class AIT_Tag extends AIT
                 $stmt->execute();
                 $it = (int)$stmt->fetchColumn(0);
                 $stmt->closeCursor();
+
+                if (! $this->_checkTag($this->_type, 2)) {
+                    trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_ERROR);
+                }
+                if (! $this->_checkTagged($t, $it)) {
+                    trigger_error('Argument 3 passed to '.__METHOD__.' not describe a "item" joined with "tag"', E_USER_ERROR);
+                }
+                if (! $this->_checkType($t)) {
+                    trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
+                }
+                $this->_id = $this->_addTag($this->_label, $this->_type);
+                $this->_addTagged($this->_id, $this->_item_id);
+
+                $this->_increaseFrequency($this->_id);
+                $this->_increaseFrequency($this->_type);
             }
             catch (PDOException $e) {
                 self::catchError($e);
             }
-            if (! $this->_checkTag($this->_type, 2)) {
-                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_ERROR);
-            }
-            if (! $this->_checkTagged($t, $it)) {
-                trigger_error('Argument 3 passed to '.__METHOD__.' not describe a "item" joined with "tag"', E_USER_ERROR);
-            }
-            if (! $this->_checkType($t)) {
-                trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
-            }
-            $this->_id = $this->_addTag($this->_label, $this->_type);
-            $this->_addTagged($this->_id, $this->_item_id);
+
         }
         else {
             if ($id === false) {
@@ -128,19 +133,29 @@ class AIT_Tag extends AIT
      */
     function detach()
     {
-        $sql = sprintf(
-            "DELETE FROM %s WHERE tag_id=? AND item_id=?",
-            $this->_pdo->tagged()
-        );
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->bindParam(2, $this->_item_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        settype($this->_item_id, 'integer');
-        $this->_item_id = null;
+        try {
+            $sql = sprintf(
+                "DELETE FROM %s WHERE tag_id=? AND item_id=?",
+                $this->_pdo->tagged()
+            );
+            self::debug($sql, $this->_id);
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+            $stmt->bindParam(2, $this->_item_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+            settype($this->_id, 'integer');
+            settype($this->_item_id, 'integer');
+            $this->_item_id = null;
 
-        return $this;
+            $this->_decreaseFrequency($this->_id);
+            $this->_decreaseFrequency($this->_type);
+
+            return $this;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
     }
     // }}}
 
@@ -156,7 +171,8 @@ class AIT_Tag extends AIT
     {
         $this->_item_id = $o->getSystemID();
         $this->_addTagged($this->_id, $this->_item_id);
-
+        $this->_increaseFrequency($this->_id);
+        $this->_increaseFrequency($this->_type);
         return $this;
     }
     // }}}
@@ -240,50 +256,36 @@ class AIT_Tag extends AIT
         }
                 $stmt->closeCursor();
 
-        $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
+        $sql = 'SELECT COUNT(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo); 
         return $r;
     }
     // }}}
 
-    // {{{ getFrequency
+    // {{{ countItems
     /**
-     * Donne la frequence d'utilisation du tag courrant
+     * Compte le nombre de tags du type d'item courant
      *
-     * @return	integer
+     * @return integer
      */
-    function getFrequency()
+    function countItems()
     {
-        try {
-            $sql = sprintf("
-                SELECT count(*) n
-                FROM %s
-                WHERE tag_id = ?
-                LIMIT 0,1
-                ",
-                $this->_pdo->tagged()
-            );
-            self::debug($sql, $this->_id);
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($this->_id, 'integer');
-            $c = (int)$stmt->fetchColumn(0);
-            $stmt->closeCursor();
-            return $c;
+        return (int) $this->_get('frequency');
+    }
+    // }}}
+
+    // {{{ del
+    /**
+    * Suppression de l'élement courrant
+    */
+    public function del($cascade = false)
+    {
+        if ($cascade) {
+            // Le mode cascade devrait également supprimer les items attachés au TAG
         }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
+        $this->_rmTagged($this->_id, null);
+        $this->_rmTag($this->_id);
     }
     // }}}
 

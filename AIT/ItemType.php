@@ -72,8 +72,9 @@ class AIT_ItemType extends AIT
 
         $this->_label = $l;
         $this->_type  = 1;
-        if ($id === false)
+        if ($id === false) {
             $this->_id = $this->_addTag($this->_label, $this->_type);
+        }
         else {
             $this->_id = (int) $id;
             if (is_null($this->_label)) {
@@ -246,16 +247,9 @@ class AIT_ItemType extends AIT
         $stmt->closeCursor();
 
         $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
     }
     // }}}
@@ -288,32 +282,33 @@ class AIT_ItemType extends AIT
                 trigger_error('Line #'.($n + 1).' of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
                 continue;
             }
-            if (!empty($w)) $w .= ' OR ';
-            $w .= 'tag_id = '. $tag->getSystemID();
+            if (empty($w)) {
+                $w .= sprintf(' tagged.tag_id = %s ', $tag->getSystemID());
+            }
+            else {
+                $w .= sprintf(' AND EXISTS (SELECT null FROM %s t WHERE t.item_id = tagged.item_id and t.tag_id = %s)',
+                    $this->_pdo->tagged(),
+                    $tag->getSystemID()
+                );
+            }
             $n++;
         }
         if ($n === 0) return new AITResult(array());
-        $sql1 = 'SELECT id, label, type ';
+        
+        $sql1 = 'SELECT DISTINCT id, label, type ';
         $sql2 = sprintf("
-            FROM (
-            SELECT count(item_id) n, item_id
-            FROM %s a
-            WHERE %s
-            GROUP BY item_id
-            ) temp
-            LEFT JOIN %s b ON temp.item_id = b.id
-            WHERE n = ? AND type = ?
+            FROM %s tagged LEFT JOIN %s tag ON tagged.item_id = tag.id
+            WHERE %s AND type = ?
             ",
             $this->_pdo->tagged(),
-            $w,
-            $this->_pdo->tag()
+            $this->_pdo->tag(),
+            $w
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $n, $this->_id);
+        self::debug($sql, $this->_id);
         $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $n, PDO::PARAM_INT);
-        $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
         $ret = array();
@@ -324,25 +319,17 @@ class AIT_ItemType extends AIT
         }
         $stmt->closeCursor();
 
-        $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $n, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $n, PDO::PARAM_INT);
-        $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
+        $sql = 'SELECT count(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
     }
     // }}}
 
     // {{{ getTags
     /**
-     * Récupére tout les type de tags de l'item courant
+     * Récupére tout les types de tags de l'item courant
      *
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
@@ -383,16 +370,9 @@ class AIT_ItemType extends AIT
         $stmt->closeCursor();
 
         $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
     }
     // }}}
@@ -450,18 +430,10 @@ class AIT_ItemType extends AIT
         }
                 $stmt->closeCursor();
 
-        $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
+        $sql = 'SELECT COUNT(DISTINCT item.id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
     }
     // }}}
@@ -532,44 +504,10 @@ class AIT_ItemType extends AIT
         $stmt->closeCursor();
 
         $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
-    }
-    // }}}
-
-    // {{{ countItems
-    /**
-     * Compte le nombre d'items du type d'item courant
-     *
-     * @return integer
-     */
-    function countItems()
-    {
-        $sql = sprintf("
-            SELECT count(id)
-            FROM %s
-            WHERE type = ?
-            ", $this->_pdo->tag());
-        self::debug($sql, $this->_id);
-
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-
-        $c = (int)$stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
-        return $c;
     }
     // }}}
 
@@ -609,13 +547,75 @@ class AIT_ItemType extends AIT
             settype($row['id'], 'integer');
             $ret[] = new AIT_ItemType($row['label'], $pdo, $row['id']);
         }
-        $stmt = $pdo->query('SELECT FOUND_ROWS()');
-        $foundrows = (int) $stmt->fetchColumn(0);
         $stmt->closeCursor();
 
+        $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array(), $pdo);
+
         return $r;
+    }
+    // }}}
+
+    // {{{ countTags
+    /**
+     * Compte le nombre de tags associés au type d'item courant
+     *
+     * @return integer
+     */
+    function countTags()
+    {
+        try {
+            $sql = sprintf("
+                SELECT count(*)
+                FROM %s
+                WHERE item_id = ?
+                ", $this->_pdo->tagged());
+            self::debug($sql, $this->_id);
+
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($this->_id, 'integer');
+
+            $c = (int)$stmt->fetchColumn(0);
+            $stmt->closeCursor();
+
+            return $c;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+     // {{{ countItems
+    /**
+     * Compte le nombre d'items du type d'item courant
+     *
+     * @return integer
+     */
+    function countItems()
+    {
+        return (int) $this->_get('frequency');
+    }
+    // }}}
+
+    // {{{ del
+    /**
+     * Suppression de l'élement courrant
+     */
+    public function del()
+    {
+        $items = $this->getItems();
+        foreach($items as $item) {
+            $item->del(true);
+        }
+        $tags = $this->getTags();
+        foreach($tags as $tag) {
+            $tag->del(true);
+        }
+        $this->_rmTag($this->_id);
     }
     // }}}
 

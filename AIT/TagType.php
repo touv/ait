@@ -81,6 +81,8 @@ class AIT_TagType extends AIT
             }
             $this->_id = $this->_addTag($this->_label, 2);
             $this->_addTagged($this->_id, $this->_item_id);
+
+            // Ne Pas incrémenter la fréquence, car elle sert à compter le nombre d'items
         }
         else {
             $this->_id = (int) $id;
@@ -201,20 +203,12 @@ class AIT_TagType extends AIT
         $stmt->closeCursor();
 
         $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
     }
     // }}}
-
 
     // {{{ getTagBySystemID
     /**
@@ -238,9 +232,119 @@ class AIT_TagType extends AIT
     }
     // }}}
 
+      // {{{ searchTags
+    /**
+     * Recherche des tags du type courant
+     *
+     * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return AITResult
+     */
+    function searchTags($query, $offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        if (is_callable($this->_queryspace)) {
+            $query = call_user_func($this->_queryspace, $query, $this);
+        }
+        if ($query !== '') $query = 'AND '.$query;
+        $sql1 = 'SELECT id, label ';
+        $sql2 = sprintf('
+            FROM %1$s tag
+            WHERE tag.type = ? %2$s
+            ',
+            $this->_pdo->tag(),
+            $query
+        );
+        $sql = $sql1.$sql2;
+
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::debug($sql, $this->_id, $this->_id);
+
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id']);
+        }
+        $stmt->closeCursor();
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        $r = new AITResult($ret);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
+        return $r;
+    }
+    // }}}
+
+    // {{{ countTags
+    /**
+     * Compte le nombre de tags du type de tag courant
+     *
+     * @return integer
+     */
+    function countTags()
+    {
+        try {
+            $sql = sprintf("
+                SELECT count(*)
+                FROM %s
+                WHERE type = ?
+                ", $this->_pdo->tag());
+            self::debug($sql, $this->_id);
+
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($this->_id, 'integer');
+
+            $c = (int)$stmt->fetchColumn(0);
+            $stmt->closeCursor();
+
+            return $c;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    // }}}
+
+    // {{{ countItems
+    /**
+     * Compte le nombre d'item atatché au tag du 'ytpe de tag courant
+     *
+     * @return integer
+     */
+    function countItems()
+    {
+        return (int) $this->_get('frequency');
+    }
+    // }}}
+
+    // {{{ del
+    /**
+     * Suppression de l'élement courrant
+     */
+    public function del($cascade = false)
+    {
+        $tags = $this->getTags();
+        foreach($tags as $tag) {
+            $tag->del($cascade);
+        }
+        $this->_rmTagged($this->_id, null);
+        $this->_rmTag($this->_id);
+    }
+    // }}}
+
 }
-
-
-
-
-

@@ -34,3 +34,9 @@ doxygen:
 
 phpdocumentor:
 	$(PHPDOC) -c apidoc.ini
+
+release: AIT-`./extract-version.sh`.tgz
+
+AIT-`./extract-version.sh`.tgz: package.xml
+	$(PEAR) package package.xml
+	git tag -a -m "Version `./extract-version.sh`"  v`./extract-version.sh`

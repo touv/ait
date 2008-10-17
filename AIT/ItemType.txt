@@ -146,7 +146,7 @@ Un objet AIT_Item représentant l'item trouvé.
 Exemple
 +++++++
 
-[source,php]
+[source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-getItem.php[]
 -------------------------------------------------
@@ -182,7 +182,7 @@ un objet AITResult (ArrayObject) contenant des objets AIT_Item.
 Exemple
 +++++++
 
-[source,php]
+[source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-getItems.php[]
 -------------------------------------------------
@@ -304,6 +304,9 @@ Retour
 
 Un objet AIT_Item représentant l'item trouvé.
 
+Exemple
++++++++
+
 [source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-getItemBySystemID.php[]
@@ -337,7 +340,10 @@ Retour
 
 un objet AITResult (ArrayObject) contenant des objets AIT_Item.
 
-[source,php]
+Exemple
++++++++
+
+[source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-queryItems.php[]
 -------------------------------------------------
@@ -355,7 +361,7 @@ Synopsis
 Description
 +++++++++++
 
-Retourne le nombre total d'items attaché au type d'item courrant.
+Retourne le nombre total d'items attachés au type d'item courrant.
 
 Paramètres
 ++++++++++
@@ -365,12 +371,66 @@ Aucun.
 Retour
 ++++++
 
-un nombre entier représentant le nombre d'enregistrment.
+un nombre entier représentant le nombre d'enregistrement.
 
-[source,php]
+Exemple
++++++++
+
+[source]
 -------------------------------------------------
 include::../examples/AIT_ItemType-countItems.php[]
 -------------------------------------------------
+
+// ----------------------------------------------------------------------------
+countTags
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_ItemType::countTags()
+
+Description
++++++++++++
+
+Retourne le nombre total de tags attachés au type d'item courrant.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+un nombre entier représentant le nombre d'enregistrement.
+
+
+// ----------------------------------------------------------------------------
+del
+^^^
+
+Synopsis
+++++++++
+
+    void del()
+
+Description
++++++++++++
+
+Suppression de l'élément des tags et des items qui lui sont associés. 
+
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+NULL.
+
 
 
 include::../AIT.txt[]

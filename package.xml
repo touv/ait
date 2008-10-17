@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-10-10</date>
+    <date>2008-10-16</date>
     <version>
-        <release>1.0.13</release>
+        <release>1.0.20</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,8 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + Optimisation (notament avec le count(*))
-        * meilleur utilisation des méthodes statiques
+        + amélioration de LA requete SQL
+        + Le comptage des résulats n'est plus systèmatique
     </notes>
     <contents>
         <dir name="/">
@@ -180,6 +180,70 @@
             <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
             <notes>
                 + Correction de Bugs
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-10</date>
+            <version>
+                <release>1.0.13</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Optimisation (notament avec le count(*))
+                * meilleur utilisation des méthodes statiques
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-13</date>
+            <version>
+                <release>1.0.14</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + La frequence n'est plus dynamique 
+                + ajout de searchTags
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-14</date>
+            <version>
+                <release>1.0.15</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + ajout d'index
+                + Suppression de getFrequency (alimentation du champ frequency pour tous les types d'éléments)
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-15</date>
+            <version>
+                <release>1.0.16</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + refactoring (notamment pour la suppression)
+                + amélioration des requetes SQL
             </notes>
         </release>
     </changelog>

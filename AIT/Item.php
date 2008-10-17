@@ -94,6 +94,7 @@ class AIT_Item extends AIT
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "typeitem" ', E_USER_ERROR);
             }
             $this->_id = $this->_addTag($this->_label, $this->_type);
+            $this->_increaseFrequency($this->_type);
         }
     }
     // }}}
@@ -145,7 +146,7 @@ class AIT_Item extends AIT
     }
     // }}}
 
-     // {{{ detach
+    // {{{ detach
     /**
      * Supprime une association entre le tag et un item
      *
@@ -159,7 +160,6 @@ class AIT_Item extends AIT
         return $this;
     }
     // }}}
-
 
     // {{{ getTags
     /**
@@ -194,18 +194,17 @@ class AIT_Item extends AIT
     }
     // }}}
 
-
     // {{{ fetchTags
     /**
-    * Récupére les tags possédant de un ou plusieurs tags donnée
-    *
-    * @param ArrayObject $tags Tableau de type de tag
-    * @param integer $offset décalage à parir du premier enregistrement
-    * @param integer $lines nombre de lignes à retourner
-    * @param integer $ordering flag permettant le tri
-    *
-    * @return AITResult	
-    */
+     * Récupére les tags possédant de un ou plusieurs tags donnée
+     *
+     * @param ArrayObject $tags Tableau de type de tag
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return AITResult
+     */
     function fetchTags(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
     {
         if (!is_null($offset) && !is_int($offset))
@@ -256,17 +255,28 @@ class AIT_Item extends AIT
         $stmt->closeCursor();
 
         $sql = 'SELECT COUNT(*) '.$sql2;
-        self::debug($sql, $this->_id);
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $foundrows = (int) $stmt->fetchColumn(0);
-        $stmt->closeCursor();
-
         $r = new AITResult($ret);
-        $r->setTotal($foundrows);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
         return $r;
+    }
+    // }}}
+
+    // {{{ del
+    /**
+     * Suppression de l'élement courrant
+     */
+    public function del($cascade = false)
+    {
+        $tags = $this->getTags();
+        foreach($tags as $tag) {
+            if ($cascade) $tag->del();
+            $this->_decreaseFrequency($tag->getSystemID());
+            $this->_decreaseFrequency($tag->get('type'));
+        }
+        $this->_decreaseFrequency($this->_type);
+        $this->_rmTagged(null, $this->_id);
+        $this->_rmTag($this->_id);
     }
     // }}}
 }

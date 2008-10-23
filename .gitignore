@@ -11,3 +11,4 @@ aitadmin/rsc/*.js
 aitadmin/tmp/*cache*
 userguide.pdf
 userguide.xml
+userguide.html

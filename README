@@ -1,0 +1,34 @@
+AIT - All Is Tag
+================
+Nicolas Thouvenin <nthouvenin@gmail.com>
+:Author Initials: NIT
+
+
+Description 
+-----------
+
+AIT is PHP tag's engine. It provide a API, that can store in a database tags and items.
+More information can be found at http://ait.touv.fr
+
+
+License
+-------
+
+AIT is licensed under the LGPL version 2. For more information, see the attached COPYING file.
+
+
+Downloading
+------------
+
+AIT is currently hosted at GitHub. It's source code can be found at
+http://github.com/touv/ait. PEAR's package can be found at http://pear.pxxo.net/get/
+
+You can also you the Pear's Installer :
+
+......................................
+$ pear channel-discover pear.pxxo.net
+$ pear install pxxo/ait
+......................................
+
+
+// vim: set syntax=asciidoc encoding=utf8 spl=fr:

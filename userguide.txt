@@ -1,8 +1,10 @@
 Guide d'utilisation de AIT
 ==========================
-Nicolas Thouvenin <nthouvenin@gmail.com>
-:Author Initials: NIT
-:language: php
+:Author:    Nicolas Thouvenin
+:Homepage:  http://ait.touv.fr[AIT home page]
+:Email:     nthouvenin@gmail.com
+:Key words: php, tags, store, search
+:language:  php
 
 AIT est un ensemble de classes PHP permettant le stockage et
 la recherche de métadonnées. AIT se base sur 2 concepts
@@ -158,10 +160,9 @@ AIT posséde un mode *debugging* qui permet notamenent d'afficher les réquetes 
  cas, seule les requêtes produitent entre le moment ou le mode debug est activé et le moment 
 ou il est désactivé seront affichées.
 
-Exemple
-+++++++
 
-[source]
+.Debug ponctuel
+[code,php]
 -------------------------------------------------
 
 AIT::debugging = true;

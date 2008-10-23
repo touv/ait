@@ -150,6 +150,29 @@ AIT fait appel à la fonction PHP http://fr2.php.net/trigger_error[trigger_error
 A chaque fois que AIT rencontre une erreur l'exécution du code est donc stoppé.
 
 // ****************************************************************************
+Debugger
+--------
+
+AIT posséde un mode *debugging* qui permet notamenent d'afficher les réquetes SQL envoyés à
+ la base. Ce mode peut-être activé et désactivé globalement ou ponctuellement. Dans ce dernier
+ cas, seule les requêtes produitent entre le moment ou le mode debug est activé et le moment 
+ou il est désactivé seront affichées.
+
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+
+AIT::debugging = true;
+jazz = $schema->style->getTag('Jazz');
+AIT::debugging = false;
+
+-------------------------------------------------
+
+
+
+// ****************************************************************************
 Développement
 -------------
 

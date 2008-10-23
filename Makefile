@@ -15,19 +15,19 @@ webdoc : userguide docbook
 userguide : webdoc/userguide.pdf
 docbook : webdoc/docbook/index.html
 
-webdoc/docbook/index.html: README.xml
+webdoc/docbook/index.html: userguide.xml
 	$(XSLTPROC) --nonet  \
 		--stringparam base.dir "./webdoc/docbook/" \
 		docbook.xsl $?
 
-README.xml: README
+userguide.xml: userguide.txt
 	$(ASCIIDOC) --unsafe -b docbook -d book -o $@ $?
 
-webdoc/userguide.pdf: README.pdf
+webdoc/userguide.pdf: userguide.pdf
 	$(CP) $? $@
 
-README.pdf: README
-	$(A2X) --asciidoc-opts="--unsafe" --format=pdf --doctype=book --icons README
+userguide.pdf: userguide.txt
+	$(A2X) --asciidoc-opts="--unsafe" --format=pdf --doctype=book --icons  $?
 
 doxygen:
 	$(DOXYGEN) apidoc.doxygen

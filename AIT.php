@@ -233,9 +233,10 @@ class PDOAIT extends PDO
     /**
      * Renvoit le nom de la table tag
      *
+     * @param   boolean
      * @return	string
      */
-    public function tag()
+    public function tag($crud = false)
     {
         return $this->_options['prefix'].$this->_options['tag'];
     }
@@ -244,9 +245,10 @@ class PDOAIT extends PDO
     /**
      * Renvoit le nom de la table tagged
      *
+     * @param   boolean
      * @return	string
      */
-    public function tagged()
+    public function tagged($crue = false)
     {
         return $this->_options['prefix'].$this->_options['tagged'];
     }
@@ -322,7 +324,7 @@ class PDOAIT extends PDO
                         INDEX (type,score),
                         INDEX (type,frequency)
                     ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-                ", $this->tag()));
+                ", $this->tag(true)));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
                         tag_id INTEGER(11) UNSIGNED NOT NULL,
@@ -331,17 +333,17 @@ class PDOAIT extends PDO
                 INDEX (tag_id),
                 INDEX (item_id)
             ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-                ", $this->tagged()));
+                ", $this->tagged(true)));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
                         name VARCHAR(10) COLLATE latin1_general_cs NOT NULL,
                         value VARCHAR(200) COLLATE latin1_general_cs NOT NULL,
                         PRIMARY KEY (name)
                     ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-                ", $this->opt()));
+                ", $this->opt(true)));
                 $this->exec(sprintf("
                     INSERT INTO %s VALUES ('version', '%s');
-                ", $this->opt(), AIT::VERSION));
+                ", $this->opt(true), AIT::VERSION));
                 $this->_initData();
                 break;
             default:
@@ -363,11 +365,11 @@ class PDOAIT extends PDO
         try {
             $this->exec(sprintf(
                 "INSERT INTO %s VALUES (1, 'item', null, 0, 0, null, now(), now());",
-                $this->tag()
+                $this->tag(true)
             ));
             $this->exec(sprintf(
                 "INSERT INTO %s VALUES (2, 'tag', null, 0, 0, null, now(), now());",
-                $this->tag()
+                $this->tag(true)
             ));
         }
         catch (PDOException $e) {
@@ -398,6 +400,10 @@ class AIT
      * @var boolean
      */
     static $debugging = false;
+    /**
+     * @var integer
+     */
+    static $time = 0;
     /**
      * @var PDOAIT
      */
@@ -438,6 +444,14 @@ class AIT
     * @var array
     */
     protected $_methods = array();
+    /**
+    * @var array
+    */
+    protected $_cols  = array('space' => 'string', 'score' => 'integer', 'frequency' => 'integer',);
+    /**
+    * @var array
+    */
+    protected $_data  = array();
 
 
     const VERSION = '1.0.2';
@@ -728,15 +742,17 @@ class AIT
     protected function _increaseFrequency($i)
     {
         try {
+            if (isset($this->_data['frequency'])) unset($this->_data['frequency']);
             $sql = sprintf(
                 "UPDATE %s SET frequency=frequency+1 WHERE id = ?",
-                $this->_pdo->tag()
+                $this->_pdo->tag(true)
             );
-            self::debug($sql, $i);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $i);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -753,15 +769,17 @@ class AIT
     protected function _decreaseFrequency($i)
     {
         try {
+            if (isset($this->_data['frequency'])) unset($this->_data['frequency']);
             $sql = sprintf(
                 "UPDATE %s SET frequency=frequency-1 WHERE id = ?",
-                $this->_pdo->tag()
+                $this->_pdo->tag(true)
             );
-            self::debug($sql, $i);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $i);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -782,15 +800,16 @@ class AIT
     {
         try {
             $sql = sprintf(
-                "REPLACE INTO %s VALUES (?, ?);",
-                $this->_pdo->tagged()
+                "INSERT INTO %s VALUES (?, ?);",
+                $this->_pdo->tagged(true)
             );
-            self::debug($sql, $t, $i);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $t, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $t, $i);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -821,14 +840,15 @@ class AIT
 
             $sql = sprintf(
                 "DELETE FROM %s WHERE %s=?",
-                $this->_pdo->tagged(),
+                $this->_pdo->tagged(true),
                 $field
             );
-            self::debug($sql, $this->_id);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $value, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -847,13 +867,15 @@ class AIT
         try {
             $sql = sprintf(
                 "DELETE FROM %s WHERE id=?", 
-                $this->_pdo->tag()
+                $this->_pdo->tag(true)
             );
-            self::debug($sql, $this->_id);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
             settype($this->_id, 'integer');
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
 
             $this->_id = null;
         }
@@ -896,27 +918,29 @@ class AIT
                 trigger_error('fillspace callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
             }
 
+            self::timer();
             if (is_null($t)) {
                 $sql = sprintf(
                     "INSERT INTO %s (label, space, updated, created) VALUES (?, ?, now(), now());",
-                    $this->_pdo->tag()
+                    $this->_pdo->tag(true)
                 );
-                self::debug($sql, $l, $s);
                 $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
                 $stmt->bindParam(2, $s, PDO::PARAM_STR);
             }
             else {
-                $stmt = $this->_pdo->prepare(sprintf(
+                $sql = sprintf(
                     "INSERT INTO %s (label, space, type, updated, created) VALUES (?, ?, ?, now(), now());",
-                    $this->_pdo->tag()
-                ));
+                    $this->_pdo->tag(true)
+                );
+                $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
                 $stmt->bindParam(2, $s, PDO::PARAM_STR);
                 $stmt->bindParam(3, $t, PDO::PARAM_INT);
             }
             $ret = $stmt->execute();
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $l, $s, $t);
 
             $id = (int) $this->_pdo->lastInsertId();
 
@@ -947,12 +971,13 @@ class AIT
                     ",
                     $this->_pdo->tag()
                 );
-                self::debug($sql, $i);
+                self::timer();
                 $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1, $i, PDO::PARAM_INT);
                 $stmt->execute();
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $i);
 
                 if (is_array($row)) {
                     settype($row['type'], 'integer');
@@ -969,34 +994,53 @@ class AIT
 
     // {{{ _set
     /**
-    * Méthode permttant de changer la valeur d'une colonne
+    * Méthode permettant de changer la valeur d'une colonne
     *
     * @param string $name nom de la colonne
     * @param mixed $value valeur de la colonne
     */
     protected function _set($n, $v)
     {
+        $this->_data[$n] = $v;
         try {
-            $sql = sprintf("UPDATE %s set %s=? WHERE id=?", $this->_pdo->tag(), $n);
+            self::timer();
+            $sql = sprintf("UPDATE %s set %s=? WHERE id=?", $this->_pdo->tag(true), $n);
             $stmt = $this->_pdo->prepare($sql);
             $typ = gettype($v);
             if ($typ === 'string')
-            $stmt->bindParam(1, $v, PDO::PARAM_STR);
+                $stmt->bindParam(1, $v, PDO::PARAM_STR);
             elseif ($typ === 'integer')
-            $stmt->bindParam(1, $v, PDO::PARAM_INT);
+                $stmt->bindParam(1, $v, PDO::PARAM_INT);
             else
-            throw new Exception('type not supported (`'.$typ.'`)');
+                throw new Exception('type not supported (`'.$typ.'`)');
             $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
 
-            self::debug($sql, $v, $this->_id);
             $stmt->execute();
             settype($this->_id, 'integer');
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $v, $this->_id);
         }
         catch (PDOException $e) {
             self::catchError($e);
         }
     }
     // }}}
+
+    // {{{ _fill
+    /**
+     * Méthode permettant de charger les propritétes de l'objet 
+     * à partir d'un atbleau de données
+    *
+    * @param array $a
+    */
+    protected function _fill($a)
+    {
+        foreach($this->_cols as $n => $t)
+            if (isset($a[$n])) {
+                $this->_data[$n] = $a[$n];
+                settype($this->_data[$n], $t);
+            }
+    }
 
     // {{{ _get
     /**
@@ -1008,20 +1052,23 @@ class AIT
     */
     protected function _get($n)
     {
-        try {
-            $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->_pdo->tag());
-            self::debug($sql, $this->_id);
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($this->_id, 'integer');
-            $ret = $stmt->fetchColumn(0);
-            $stmt->closeCursor();
-            return $ret;
+        if (!isset($this->_data[$n])) {
+            try {
+                $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->_pdo->tag());
+                self::timer();
+                $stmt = $this->_pdo->prepare($sql);
+                $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+                $stmt->execute();
+                settype($this->_id, 'integer');
+                $this->_data[$n] = $stmt->fetchColumn(0);
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $this->_id);
+            }
+            catch (PDOException $e) {
+                self::catchError($e);
+            }
         }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
+        return $this->_data[$n];
     }
     // }}}
 
@@ -1053,17 +1100,12 @@ class AIT
             'label'      => 'label',
             'value'      => 'label',
         );
-        $fld = array(
-            'space',
-            'score',
-            'frequency',
-        );
 
         if (isset($attr[$name])) {
             $name = '_'.$attr[$name];
             return $this->$name;
         }
-        if (in_array($name, $fld)) {
+        if (isset($this->_cols[$name])) {
             return $this->_get($name);
         }
     }
@@ -1188,12 +1230,36 @@ class AIT
             $argc = func_num_args();
             for ($i = 0; $i < $argc; $i++) {
                 $value = func_get_arg($i);
-                echo $value.' / ';
+                echo implode(' ', array_map('trim',explode("\n",$value))). ($i < $argc - 1 ? ' / ' : '');
+                
             }
             echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n" : "<br/>";
         }
     }
     // }}}
+
+    // {{{ debug
+    /**
+    * timer
+    *
+    */
+    public static function timer($compute = false)
+    {
+        static $t = 0;
+        if (self::$debugging === true)  {
+            if ($compute === false || $t === 0) {
+                $t = microtime(true);
+            }
+            else {
+                $t = microtime(true) - $t;
+                self::$time += $t;
+            }
+            return $t;
+        }
+    }
+    // }}}
+
+
 
     // {{{ dump
     /**
@@ -1516,7 +1582,7 @@ class AITResult extends ArrayObject {
         if (is_null($this->_sql) or !is_array($this->_params))
             return $this->_total;
 
-        AIT::debug($this->_sql, implode('/', $this->_params));
+        $time = AIT::timer();
         $stmt = $this->_pdo->prepare($this->_sql);
         $i = 1;
         foreach($this->_params as $k => $v) {
@@ -1525,6 +1591,7 @@ class AITResult extends ArrayObject {
         $stmt->execute();
         $this->_total = (int) $stmt->fetchColumn(0);
         $stmt->closeCursor();
+        AIT::debug(AIT::timer(true), $this->_sql, implode('/', array_keys($this->_params)));
 
         $this->_sql = null;
         $this->_params = array();

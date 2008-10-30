@@ -58,8 +58,9 @@ class AIT_Item extends AIT
      * @param mixed $t identifiant du type d'item associé
      * @param PDOAIT $pdo objet de connexion à la base
      * @param integer $id identifiant physique du de l'élement (si déjà connu)
+     * @param array $row Propriétés de l'élément (si déja connu)
      */
-    function __construct($l, $t, PDOAIT $pdo, $id = false)
+    function __construct($l, $t, PDOAIT $pdo, $id = false, $row = false)
     {
         parent::__construct($pdo, 'Item');
 
@@ -69,10 +70,14 @@ class AIT_Item extends AIT
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($t).' given', E_USER_ERROR);
         if ($id !== false && !is_int($id))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
+        if ($row !== false && !is_array($row))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a Array, '.gettype($row).' given', E_USER_ERROR);
+
 
         $this->_label = $l;
         $this->_type = $t;
         if ($id !== false) {
+            if ($row !== false) $this->_fill($row);
             $this->_id = (int) $id;
             $r = null;
             if (is_null($this->_label)) {
@@ -229,7 +234,7 @@ class AIT_Item extends AIT
             if ($n === 0) return new AITResult(array());
             else $w = ' AND ('.$w.')';
         }
-        $sql1 = 'SELECT id, label, type ';
+        $sql1 = 'SELECT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
@@ -241,7 +246,7 @@ class AIT_Item extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -250,9 +255,10 @@ class AIT_Item extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);

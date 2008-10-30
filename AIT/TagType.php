@@ -59,17 +59,20 @@ class AIT_TagType extends AIT
      * @param integer $i identifiant du type d'item
      * @param PDO $pdo objet de connexion à la base
      * @param integer $id identifiant physique de l'élement (si déjà connu)
+     * @param array $row Propriétés de l'élément (si déja connu)
      */
-    function __construct($l, $i, PDO $pdo, $id = false)
+    function __construct($l, $i, PDO $pdo, $id = false, $row = false)
     {
         parent::__construct($pdo, 'TagType');
 
         if (!is_string($l) and !is_null($l) and $id !== false)
-            trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
         if (!is_null($i) && !is_int($i))
-            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a Integer, '.gettype($i).' given', E_USER_ERROR);
         if ($id !== false && !is_int($id))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a Integer, '.gettype($id).' given', E_USER_ERROR);
+        if ($row !== false && !is_array($row))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a Array, '.gettype($row).' given', E_USER_ERROR);
 
         $this->_label   = $l;
         $this->_type    = 2;
@@ -80,11 +83,13 @@ class AIT_TagType extends AIT
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tagtype"', E_USER_ERROR);
             }
             $this->_id = $this->_addTag($this->_label, 2);
-            $this->_addTagged($this->_id, $this->_item_id);
-
-            // Ne Pas incrémenter la fréquence, car elle sert à compter le nombre d'items
+            if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
+                $this->_addTagged($this->_id, $this->_item_id);
+                // Ne Pas incrémenter la fréquence, car elle sert à compter le nombre d'items
+            }
         }
         else {
+            if ($row !== false) $this->_fill($row);
             $this->_id = (int) $id;
             if (is_null($this->_label)) {
                 $r = $this->_getTagBySystemID($id);
@@ -147,7 +152,7 @@ class AIT_TagType extends AIT
             ",
             $this->_pdo->tag()
         );
-        self::debug($sql, $l, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
@@ -155,6 +160,7 @@ class AIT_TagType extends AIT
         settype($this->_id, 'integer');
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $l, $this->_id);
 
         if ($id > 0) {
             return new AIT_Tag($l, $this->_id, null, $this->_pdo, $id);
@@ -181,7 +187,7 @@ class AIT_TagType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label ';
+        $sql1 = 'SELECT id, label, space, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
@@ -190,7 +196,7 @@ class AIT_TagType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -198,9 +204,10 @@ class AIT_TagType extends AIT
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
@@ -256,7 +263,7 @@ class AIT_TagType extends AIT
             $query = call_user_func($this->_queryspace, $query, $this);
         }
         if ($query !== '') $query = 'AND '.$query;
-        $sql1 = 'SELECT id, label ';
+        $sql1 = 'SELECT id, label, space, score, frequency ';
         $sql2 = sprintf('
             FROM %1$s tag
             WHERE tag.type = ? %2$s
@@ -267,7 +274,7 @@ class AIT_TagType extends AIT
         $sql = $sql1.$sql2;
 
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id, $this->_id);
+        self::timer();
 
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -276,9 +283,10 @@ class AIT_TagType extends AIT
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
@@ -302,7 +310,7 @@ class AIT_TagType extends AIT
                 FROM %s
                 WHERE type = ?
                 ", $this->_pdo->tag());
-            self::debug($sql, $this->_id);
+            self::timer();
 
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -311,6 +319,7 @@ class AIT_TagType extends AIT
 
             $c = (int)$stmt->fetchColumn(0);
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
 
             return $c;
         }
@@ -324,10 +333,13 @@ class AIT_TagType extends AIT
     /**
      * Compte le nombre d'item atatché au tag du 'ytpe de tag courant
      *
+     * @param boolean $reload demande la valeur courante dans la base (et non la valeur trouvée à la création de l'objet)
+     *
      * @return integer
      */
-    function countItems()
+    function countItems($reload = false)
     {
+        if ($reload === true && isset($this->_data['frequency'])) unset($this->_data['frequency']);
         return (int) $this->_get('frequency');
     }
     // }}}

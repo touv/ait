@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-10-16</date>
+    <date>2008-10-27</date>
     <version>
-        <release>1.0.20</release>
+        <release>1.1</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,8 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + amélioration de LA requete SQL
-        + Le comptage des résulats n'est plus systèmatique
+        + Ajout d'un cache interne aux objets, évitant la relance de requete pour des infos déjà récupérées auparavant
+        + Optimisation pour la recherche d'items à partir d'un seul tag
     </notes>
     <contents>
         <dir name="/">
@@ -244,6 +244,52 @@
             <notes>
                 + refactoring (notamment pour la suppression)
                 + amélioration des requetes SQL
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-16</date>
+            <version>
+                <release>1.0.20</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + amélioration de LA requete SQL
+                + Le comptage des résulats n'est plus systèmatique
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-24</date>
+            <version>
+                <release>1.0.21</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Vérification des ajouts dans tagged
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-27</date>
+            <version>
+                <release>1.0.22</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Ajout d'un timer pour les requetes SQL
             </notes>
         </release>
     </changelog>

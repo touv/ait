@@ -59,8 +59,9 @@ class AIT_ItemType extends AIT
      * @param string $label nom du tupe d'item
      * @param PDOAIT $pdo objet de connexion à la base
      * @param integer $id Identifiant système de l'élement (si déjà connu).
+     * @param array $row Propriétés de l'élément (si déja connu)
      */
-    function __construct($l, PDOAIT $pdo, $id = false)
+    function __construct($l, PDOAIT $pdo, $id = false, $row = false)
     {
         parent::__construct($pdo, 'ItemType');
 
@@ -68,6 +69,8 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
         if ($id !== false && !is_int($id))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
+        if ($row !== false && !is_array($row))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a Array, '.gettype($row).' given', E_USER_ERROR);
 
 
         $this->_label = $l;
@@ -76,6 +79,7 @@ class AIT_ItemType extends AIT
             $this->_id = $this->_addTag($this->_label, $this->_type);
         }
         else {
+            if ($row !== false) $this->_fill($row);
             $this->_id = (int) $id;
             if (is_null($this->_label)) {
                 $r = $this->_getTagBySystemID($id);
@@ -126,8 +130,7 @@ class AIT_ItemType extends AIT
             $this->_pdo->tag(),
             $this->_pdo->tagged()
         );
-        self::debug($sql, $l, $this->_id);
-
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
@@ -135,6 +138,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $l, $this->_id);
 
         if ($id === 0)
             return null;
@@ -193,7 +197,7 @@ class AIT_ItemType extends AIT
             WHERE label = ? AND type = ?
             LIMIT 0,1
         ", $this->_pdo->tag());
-        self::debug($sql, $l, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
@@ -201,6 +205,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $l, $this->_id);
         
         if ($id > 0) {
             return new AIT_Item($l, $this->_id, $this->_pdo, $id);
@@ -227,14 +232,14 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label ';
+        $sql1 = 'SELECT id, label, space, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
             ", $this->_pdo->tag());
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -242,9 +247,10 @@ class AIT_ItemType extends AIT
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
@@ -295,7 +301,7 @@ class AIT_ItemType extends AIT
         }
         if ($n === 0) return new AITResult(array());
         
-        $sql1 = 'SELECT DISTINCT id, label, type ';
+        $sql1 = 'SELECT DISTINCT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s tagged LEFT JOIN %s tag ON tagged.item_id = tag.id
             WHERE %s AND type = ?
@@ -306,7 +312,7 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -315,13 +321,21 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id']);
+            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT count(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        if ($tags->count() > 1) {
+            $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        }
+        else {
+            // Pour un seul tag il est intule de faire un "count"
+            // alors que sa frequence contient le nombre exacte d'items
+            $r->setTotal($tags->offsetGet(0)->countItems());
+        }
 
         return $r;
     }
@@ -346,7 +360,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, type ';
+        $sql1 = 'SELECT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
@@ -357,7 +371,7 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -365,9 +379,10 @@ class AIT_ItemType extends AIT
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['id'], 'integer');
-            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id']);
+            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
@@ -401,7 +416,7 @@ class AIT_ItemType extends AIT
             $query = call_user_func($this->_queryspace, $query, $this);
         }
         if ($query !== '') $query = 'AND '.$query;
-        $sql1 = 'SELECT DISTINCT item.id, item.label ';
+        $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.space space, item.score score, item.frequency frequency';
         $sql2 = sprintf('
             FROM %1$s tag
             LEFT JOIN %2$s b ON tag.type=b.tag_id
@@ -416,7 +431,7 @@ class AIT_ItemType extends AIT
         $sql = $sql1.$sql2;
 
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id, $this->_id);
+        self::timer();
 
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -426,9 +441,10 @@ class AIT_ItemType extends AIT
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
-                $stmt->closeCursor();
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id, $this->_id);
 
         $sql = 'SELECT COUNT(DISTINCT item.id) '.$sql2;
         $r = new AITResult($ret);
@@ -479,7 +495,7 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $w = $query->getSQL();
-        $sql1 = 'SELECT id, label, type ';
+        $sql1 = 'SELECT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM (%s) temp
             LEFT JOIN %s b ON temp.item_id = b.id
@@ -490,7 +506,7 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -499,9 +515,10 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id']);
+            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
@@ -530,7 +547,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label ';
+        $sql1 = 'SELECT id, label, space, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = 1 
@@ -545,7 +562,7 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_ItemType($row['label'], $pdo, $row['id']);
+            $ret[] = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
         }
         $stmt->closeCursor();
 
@@ -571,8 +588,8 @@ class AIT_ItemType extends AIT
                 FROM %s
                 WHERE item_id = ?
                 ", $this->_pdo->tagged());
-            self::debug($sql, $this->_id);
 
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -580,6 +597,7 @@ class AIT_ItemType extends AIT
 
             $c = (int)$stmt->fetchColumn(0);
             $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
 
             return $c;
         }
@@ -593,10 +611,13 @@ class AIT_ItemType extends AIT
     /**
      * Compte le nombre d'items du type d'item courant
      *
+     * @param boolean $reload demande la valeur courante dans la base (et non la valeur trouvée à la création de l'objet)
+     *
      * @return integer
      */
-    function countItems()
+    function countItems($reload = false)
     {
+        if ($reload === true && isset($this->_data['frequency'])) unset($this->_data['frequency']);
         return (int) $this->_get('frequency');
     }
     // }}}

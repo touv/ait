@@ -60,8 +60,9 @@ class AIT_Tag extends AIT
      * @param integer $i Identifiant système de l'ITEM (si connu).
      * @param PDOAIT $pdo Instance de base AIT que l'on souhaite utiliser.
      * @param integer $id Identifiant système de l'élement (si déjà connu).
+     * @param array $row Propriétés de l'élément (si déja connu)
      */
-    function __construct($l, $t, $i, PDOAIT $pdo, $id = false)
+    function __construct($l, $t, $i, PDOAIT $pdo, $id = false, $row = false)
     {
         parent::__construct($pdo, 'Tag');
 
@@ -73,6 +74,8 @@ class AIT_Tag extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
         if ($id !== false && !is_int($id))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
+        if ($row !== false && !is_array($row))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a Array, '.gettype($row).' given', E_USER_ERROR);
 
         $this->_label    = $l;
         $this->_type     = $t;
@@ -84,12 +87,13 @@ class AIT_Tag extends AIT
                     "SELECT type FROM %s WHERE id=? LIMIT 0,1",
                     $this->_pdo->tag()
                 );
-                self::debug($sql, $i);
+                self::timer();
                 $stmt = $this->_pdo->prepare($sql);
                 $stmt->bindParam(1,  $i, PDO::PARAM_INT);
                 $stmt->execute();
                 $it = (int)$stmt->fetchColumn(0);
                 $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $i);
 
                 if (! $this->_checkTag($this->_type, 2)) {
                     trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_ERROR);
@@ -101,10 +105,11 @@ class AIT_Tag extends AIT
                     trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "type" that doesn\' exist', E_USER_ERROR);
                 }
                 $this->_id = $this->_addTag($this->_label, $this->_type);
-                $this->_addTagged($this->_id, $this->_item_id);
-
-                $this->_increaseFrequency($this->_id);
-                $this->_increaseFrequency($this->_type);
+                if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
+                    $this->_addTagged($this->_id, $this->_item_id);
+                    $this->_increaseFrequency($this->_id);
+                    $this->_increaseFrequency($this->_type);
+                }
             }
             catch (PDOException $e) {
                 self::catchError($e);
@@ -119,6 +124,7 @@ class AIT_Tag extends AIT
                 $this->_id = $this->_addTag($this->_label, $this->_type);
             }
             else {
+                if ($row !== false) $this->_fill($row);
                 $this->_id = (int) $id;
             }
         }
@@ -136,16 +142,17 @@ class AIT_Tag extends AIT
         try {
             $sql = sprintf(
                 "DELETE FROM %s WHERE tag_id=? AND item_id=?",
-                $this->_pdo->tagged()
+                $this->_pdo->tagged(true)
             );
-            self::debug($sql, $this->_id);
+            self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->bindParam(2, $this->_item_id, PDO::PARAM_INT);
             $stmt->execute();
-            $stmt->closeCursor();
             settype($this->_id, 'integer');
-            settype($this->_item_id, 'integer');
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
+
             $this->_item_id = null;
 
             $this->_decreaseFrequency($this->_id);
@@ -170,9 +177,11 @@ class AIT_Tag extends AIT
     function attach(AIT_Item $o)
     {
         $this->_item_id = $o->getSystemID();
-        $this->_addTagged($this->_id, $this->_item_id);
-        $this->_increaseFrequency($this->_id);
-        $this->_increaseFrequency($this->_type);
+        if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
+            $this->_addTagged($this->_id, $this->_item_id);
+            $this->_increaseFrequency($this->_id);
+            $this->_increaseFrequency($this->_type);
+        }
         return $this;
     }
     // }}}
@@ -229,7 +238,7 @@ class AIT_Tag extends AIT
             if ($n === 0) return new AITResult(array());
             else $w = ' AND ('.$w.')';
         }
-        $sql1 = 'SELECT DISTINCT id, label, type ';
+        $sql1 = 'SELECT DISTINCT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
@@ -242,7 +251,7 @@ class AIT_Tag extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
-        self::debug($sql, $this->_id);
+        self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -252,9 +261,10 @@ class AIT_Tag extends AIT
             if ($row['id'] == $this->_id) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_item_id, $this->_pdo, $row['id']);
+            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_item_id, $this->_pdo, $row['id'], $row);
         }
-                $stmt->closeCursor();
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
@@ -267,10 +277,13 @@ class AIT_Tag extends AIT
     /**
      * Compte le nombre de tags du type d'item courant
      *
+     * @param boolean $reload demande la valeur courante dans la base (et non la valeur trouvée à la création de l'objet)
+     *
      * @return integer
      */
-    function countItems()
+    function countItems($reload = false)
     {
+        if ($reload === true && isset($this->_data['frequency'])) unset($this->_data['frequency']);
         return (int) $this->_get('frequency');
     }
     // }}}

@@ -4,6 +4,7 @@
 error_reporting(E_ALL);
 ini_set('include_path', dirname(__FILE__).PATH_SEPARATOR.ini_get('include_path'));
 
+
 require_once 'AIT.php';
 require_once 'PHPUnit/Framework.php';
 
@@ -38,7 +39,6 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->db->exec("TRUNCATE ".$this->db->tagged());
         $this->db = null;
     }
-
     function test_itemtype()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
@@ -127,15 +127,24 @@ class AITTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($it->countItems(), 2);
         $this->assertEquals($tt->countItems(), 2);
+        
         $this->assertEquals($tt->countTags(),  1);
+        
         $this->assertEquals($t1->countItems(), 2);
+        
         $this->assertEquals($this->_d(), 7);
         $this->assertEquals($this->_q(), 3);
 
         $i2->del();
-        $this->assertEquals($it->countItems(), 1);
-        $this->assertEquals($tt->countItems(), 1);
-        $this->assertEquals($t1->countItems(), 1);
+        $this->assertEquals($it->countItems(), 2);
+        $this->assertEquals($it->countItems(true), 1);
+
+        $this->assertEquals($tt->countItems(), 2);
+        $this->assertEquals($tt->countItems(true), 1);
+
+        $this->assertEquals($t1->countItems(), 2);
+        $this->assertEquals($t1->countItems(true), 1);
+        
         $this->assertEquals($this->_d(), 6);
         $this->assertEquals($this->_q(), 2);
 
@@ -146,7 +155,6 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it->del();
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
-
     }
     function test_gettimestamps()
     {
@@ -267,11 +275,11 @@ class AITTest extends PHPUnit_Framework_TestCase
 
         $tags = $t1->getRelatedTags();
         $this->assertEquals($tags->count(), 1);
-        $this->assertEquals($tags[0], $t3);
+        $this->assertEquals($tags[0]->get(), $t3->get());
 
         $tags = $t2->getRelatedTags();
         $this->assertEquals($tags->count(), 1);
-        $this->assertEquals($tags[0], $t4);
+        $this->assertEquals($tags[0]->get(), $t4->get());
 
         $it->del();
         $this->assertEquals($this->_d(), 2);

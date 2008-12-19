@@ -268,6 +268,55 @@ Cette classe permet de manipuler un TAG.
 
 include::./AIT/Tag.txt[]
 
+Maintenance
+-----------
+
+Voici quelques requêtes SQL permettant de contrôler l'état d'un base AIT :
+
+Contrôler la cohérence de la base
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Voici quelques requêtes pour vérifier que des lignes les jointures entre tag soit toujours vrai.
+
+.État des jointures
+----------------------------
+SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.item_id=tag.id WHERE tag.id IS NULL 
+SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.tag_id=tag.id WHERE tag.id IS NULL 
+SELECT a.* FROM tag a LEFT JOIN tag b ON a.type=b.id WHERE a.id <> 1 and a.id <> 2 and b.id IS NULL 
+-----------------------------
+
+Visualiser les tags non utilisés
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.uniquement sur les fréquences 
+-----------------------------
+SELECT * 
+FROM tag a LEFT JOIN tag b ON a.type=b.id 
+WHERE b.type=2 and a.frequency=0
+-----------------------------
+
+.avec les fréquences et les associations
+-----------------------------
+SELECT * 
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id 
+WHERE b.type=2 and a.frequency=0 and item_id IS NULL
+-----------------------------
+
+.uniquement avec les associations
+-----------------------------
+SELECT * 
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id 
+WHERE b.type=2 and item_id IS NULL
+-----------------------------
+
+Visualiser les items non utilisés
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.uniquement avec les associations 
+-----------------------------
+SELECT * 
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.item_id 
+WHERE b.type=1 and c.tag_id IS NULL
+-----------------------------
 
 
 

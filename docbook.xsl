@@ -5,9 +5,18 @@
 
 	<xsl:param name="html.stylesheet" select="'../default.css ../docbook.css'"/>
 	<xsl:param name="section.autolabel" select="1" />
-	<xsl:param name="generate.chapter.toc" select="0" />
+	<xsl:param name="generate.chapter.toc" select="1" />
 	<xsl:param name="css.decoration" select="0" />
-	<xsl:param name="toc.max.depth" select="3" />
+	<xsl:param name="toc.max.depth" select="2" />
+	<!--    <xsl:param name="generate.section.toc.level" select="5" />-->
+<!--    <xsl:param name="toc.section.depth" select="1" />-->
+<xsl:param name="generate.toc">
+book      toc
+chapter   toc,title
+article   toc,title
+</xsl:param>
+
+
 
 	<xsl:template name="user.header.navigation">
 		<xsl:comment>#include virtual="../docbook.header.html"</xsl:comment>

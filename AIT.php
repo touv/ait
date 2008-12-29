@@ -1602,3 +1602,177 @@ class AITResult extends ArrayObject {
 }
 
 
+
+/**
+ * Objet représantant un ensemble de tags
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
+class AITTagsObject implements Countable, Iterator {
+
+    private $_tags;
+
+    // {{{ construct
+    /**
+     * Constructeur
+     *
+     * @param ArrayObject $tags
+     */
+    function __construct($tags = null) 
+    {
+        if (!is_null($tags)) $this->setTags($tags);
+    }
+    // }}}
+
+    // {{{ setTags
+    /**
+     * Remplie l'objet avec des tags en vrac
+     *
+     * @param ArrayObject $tags
+     */
+    function setTags(ArrayObject $tags) 
+    {
+        $this->_tags = array();
+        foreach($tags as $tag) {
+            if (! $tag instanceof AIT_Tag) continue;
+
+            $type = $tag->getTagType();
+            $name = $type->get();
+            if (!isset($this->_tags[$name])) {
+                $this->_tags[$name] = new ArrayObject();
+            }
+            $this->_tags[$name]->append($tag);
+        }
+    }
+    // }}}
+
+    // {{{ __set
+    /**
+     * Magic function to set value 
+     *
+     * @param string $name The variable name.
+     * @param mixed $val The variable value.
+     * @return void
+     */
+    public function __set($name, ArrayObject $val)
+    {
+        $this->_tags[$name] = $val;
+    }
+    // }}}
+
+    // {{{ __get
+    /**
+     * Retourne les tags d'un type donnée
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get($name) {
+        if (array_key_exists($name, $this->_tags))
+            return $this->_tags[$name];
+        else
+            return null;
+    }
+    // }}}
+    // {{{ count
+    /**
+     * Defined by Countable interface
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        return count($this->_tags);
+    }
+    // }}}
+
+    // {{{ valid
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function valid()
+    {
+        return array_key_exists(key($this->_tags),$this->_tags);
+    }
+// }}}
+
+    // {{{ next
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function next()
+    {
+        return next($this->_tags);
+    }
+// }}}
+
+    // {{{ rewind
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function rewind()
+    {
+        return reset($this->_tags);
+    }
+    // }}}
+
+    // {{{ key
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function key()
+    {
+        return key($this->_tags);
+    }
+// }}}
+
+    // {{{ current
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function current()
+    {
+        $k = key($this->_childs);
+        return($this->_tags[$k]);
+    }
+// }}}
+
+    // {{{ __isset
+    /**
+     * Magic function to test key
+     *
+     * @param string $key The variable name.
+     * @return boolean
+     */
+    public function __isset($key) 
+    {
+        return isset($this->_tags[$key]);
+    }
+// }}}
+        // {{{ __unset
+    /**
+     * Magic function to unset key
+     *
+     * @param string $key The variable name.
+     * @return boolean
+     */
+    public function __unset($key) 
+    {
+        unset($this->_tags[$key]);
+    }
+    // }}}
+
+}
+
+

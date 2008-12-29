@@ -715,6 +715,58 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 0);
     }
 
+    function test_gettype()
+    {
+        $itA = new AIT_ItemType('itemtype', $this->db);
+        $i = $itA->addItem('1');
+        $ttA = $itA->addTag('tagtype');
+        $a = $ttA->addTag('A');
+
+        $itB = $i->getItemType();
+        $this->assertEquals($itA->getSystemID(), $itB->getSystemID());
+        $this->assertEquals($itA->get(), $itB->get());
+
+        $ttB = $a->getTagType();
+        $this->assertEquals($ttA->getSystemID(), $ttB->getSystemID());
+        $this->assertEquals($ttA->get(), $ttB->get());
+
+        $itA->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+    function test_tagobject()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+//        $i2 = $it->addItem('2');
+//        $i3 = $it->addItem('3');
+//        $i4 = $it->addItem('4');
+//        $i5 = $it->addItem('5');
+        $tt1 = $it->addTag('tagtype1');
+        $a = $tt1->addTag('A');
+        $b = $tt1->addTag('B');
+        $tt2 = $it->addTag('tagtype2');
+        $c = $tt2->addTag('C');
+        $d = $tt2->addTag('D');
+//        $tt3 = $it->addTag('tagtype3');
+//        $e = $tt3->addTag('E');
+//        $f = $tt3->addTag('F');
+
+        $i1->attach($a)->attach($b)->attach($d);
+//        $i2->attach($a)->attach($b)->attach($d);
+//        $i3->attach($a)->attach($b)->attach($d);
+//        $i4->attach($a)->attach($c)->attach($e);
+//        $i5->attach($c)->attach($e)->attach($f);
+
+        $to = $i1->getTagsObject();
+        $this->assertEquals($to->tagtype1->count(), 2);
+        $this->assertEquals($to->tagtype2->count(), 1);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
 
 
     /**/

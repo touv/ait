@@ -243,5 +243,55 @@ Retour
 NULL.
 
 
+// ----------------------------------------------------------------------------
+getItemType
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_ItemType getItemType()
+
+Description
++++++++++++
+
+Retourne le type d'item associé à l'élément courant
+
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet AIT_ItemType représentant le type d'item associé.
+
+
+// ----------------------------------------------------------------------------
+getTagsObject
+^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AITTagsObject getTagsObject()
+
+Description
++++++++++++
+
+Retourne tous les tags de l'élement courant sous forme d'un objet.
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet AITTagsObject représentant un ensemble de tag trié par type
+
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

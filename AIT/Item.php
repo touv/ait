@@ -285,6 +285,32 @@ class AIT_Item extends AIT
         $this->_rmTag($this->_id);
     }
     // }}}
+    
+    // {{{ getItemType
+    /**
+     * Retourne le type de tag associé
+     */
+    public function getItemType()
+    {
+        $row = $this->_getTagBySystemID($this->_type);
+
+        if (is_array($row)) {
+            return new AIT_ItemType($row['label'], $this->_pdo, $this->_type, $row);
+        }
+    }
+    // }}}
+
+
+    // {{{ getTagsObject
+    /**
+     * Renvoit l'item sous form d'un objet avec des pointeurs sur ces tags
+     */
+    public function getTagsObject()
+    {
+        return new AITTagsObject($this->getTags());
+    }
+    // }}}
+
 }
 
 

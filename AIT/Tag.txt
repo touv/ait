@@ -200,5 +200,31 @@ Retour
 
 NULL.
 
+// ----------------------------------------------------------------------------
+getTagType
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_TagType getTagType()
+
+Description
++++++++++++
+
+Retourne le type de tag associé à l'élément courant
+
+
+Paramètres
+++++++++++
+
+Aucun.
+
+Retour
+++++++
+
+Un objet AIT_TagType représentant le type de tag associé.
+
+
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

@@ -302,6 +302,21 @@ class AIT_Tag extends AIT
     }
     // }}}
 
+
+    // {{{ getTagType
+    /**
+    * Retourne le type de tag associé
+    */
+    public function getTagType()
+    {
+        $row = $this->_getTagBySystemID($this->_type);
+
+        if (is_array($row)) {
+            return new AIT_TagType($row['label'], null, $this->_pdo, $this->_type, $row);
+        }
+    }
+    // }}}
+
 }
 
 

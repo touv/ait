@@ -532,6 +532,7 @@ class AIT_ItemType extends AIT
     /**
      * Récupére Tous les types d'items de la base
      *
+     * @param PDOAIT $pdo pointeur sur la base de données
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri

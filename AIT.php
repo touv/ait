@@ -453,7 +453,6 @@ class AIT
     */
     protected $_data  = array();
 
-
     const VERSION = '1.0.2';
     const ORDER_ASC = 2;
     const ORDER_DESC = 4;
@@ -462,7 +461,6 @@ class AIT
     const ORDER_BY_UPDATED = 32;
 	const ORDER_BY_CREATED = 64;
 	const ORDER_BY_FREQUENCY = 128;
-
 
     // {{{ __construct
     /**
@@ -610,7 +608,6 @@ class AIT
         }
     }
     // }}}
-
 
     // {{{ exists
     /**
@@ -787,8 +784,6 @@ class AIT
     }
     // }}}
 
-
-
     // {{{ _addTagged
     /**
     * Ajout d'une ligne dans la table tagged
@@ -952,7 +947,7 @@ class AIT
     }
     // }}}
 
-    // {{{ _addTag
+    // {{{ _getTagBySystemID
     /**
     * Retroune une ligne dans la table tag à partir de l'identifiant physique
     *
@@ -1028,19 +1023,20 @@ class AIT
 
     // {{{ _fill
     /**
-     * Méthode permettant de charger les propritétes de l'objet 
-     * à partir d'un atbleau de données
+    * Méthode permettant de charger les propritétes de l'objet 
+    * à partir d'un atbleau de données
     *
     * @param array $a
     */
     protected function _fill($a)
     {
         foreach($this->_cols as $n => $t)
-            if (isset($a[$n])) {
-                $this->_data[$n] = $a[$n];
-                settype($this->_data[$n], $t);
-            }
+        if (isset($a[$n])) {
+            $this->_data[$n] = $a[$n];
+            settype($this->_data[$n], $t);
+        }
     }
+    // }}}
 
     // {{{ _get
     /**
@@ -1180,11 +1176,70 @@ class AIT
     }
     // }}}
 
+    // {{{ getBySystemID
+    /**
+    * Récupère un objet quelque soit son type
+    *
+    * @param PDOAIT $pdo pointeur sur la base de données
+    * @param integer $id identifiant systéme
+    */
+    public static function getBySystemID(PDOAIT $pdo, $id)
+    {
+        if (!is_null($id) && !is_int($id))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
+
+            try {
+                $sql = sprintf("
+                    SELECT a.id id, a.label label, a.type type, b.type crtl
+                    FROM %s a
+                    LEFT JOIN %s b ON a.type=b.id
+                    WHERE a.id = ?
+                    LIMIT 0,1
+                    ",
+                    $pdo->tag(),
+                    $pdo->tag()
+                );
+                self::timer();
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(1, $id, PDO::PARAM_INT);
+                $stmt->execute();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $id);
+
+                if (is_array($row)) {
+                    settype($row['type'], 'integer');
+                    settype($row['id'], 'integer');
+                    settype($row['crtl'], 'integer');
+                }
+
+                $o = null;
+                if ($row['type'] === 1) {
+                    $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
+                }
+                elseif ($row['type'] === 2) {
+                    $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
+                }
+                elseif ($row['crtl'] === 1) {
+                    $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
+                }
+                elseif ($row['crtl'] === 2) {
+                    $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
+                }
+                return $o;
+            }
+            catch (PDOException $e) {
+                self::catchError($e);
+            }
+
+    }
+    // }}}
 
     // {{{ sqler
     /**
-    *Ajout les close ORDER et LIMIT à une requete sql
+    * Ajout les close ORDER et LIMIT à une requete sql
     *
+    * @param string  $sql chaine contenant du SQL
     * @param integer $offset décalage à parir du premier enregistrement
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
@@ -1198,15 +1253,15 @@ class AIT
             if ( (self::ORDER_BY_LABEL & $ordering) === self::ORDER_BY_LABEL)
             $sql .= ' label';
             elseif ( (self::ORDER_BY_SCORE & $ordering) === self::ORDER_BY_SCORE)
-                $sql .= ' score';
+            $sql .= ' score';
             elseif ( (self::ORDER_BY_UPDATED & $ordering) === self::ORDER_BY_UPDATED)
-                $sql .= ' updated';
+            $sql .= ' updated';
             elseif ( (self::ORDER_BY_CREATED & $ordering) === self::ORDER_BY_CREATED)
-                $sql .= ' created';
+            $sql .= ' created';
             elseif ( (self::ORDER_BY_FREQUENCY & $ordering) === self::ORDER_BY_FREQUENCY)
-                $sql .= ' frequency';
+            $sql .= ' frequency';
             else
-                $sql .= ' id';
+            $sql .= ' id';
 
             if ( (self::ORDER_ASC & $ordering) === self::ORDER_ASC)
             $sql .= ' ASC';
@@ -1231,14 +1286,14 @@ class AIT
             for ($i = 0; $i < $argc; $i++) {
                 $value = func_get_arg($i);
                 echo implode(' ', array_map('trim',explode("\n",$value))). ($i < $argc - 1 ? ' / ' : '');
-                
+
             }
             echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n" : "<br/>";
         }
     }
     // }}}
 
-    // {{{ debug
+    // {{{ timer
     /**
     * timer
     *
@@ -1259,8 +1314,6 @@ class AIT
     }
     // }}}
 
-
-
     // {{{ dump
     /**
     * Dump
@@ -1273,35 +1326,37 @@ class AIT
         $buf = '';
         if (!$r) {
             $buf .= '<pre>';
-        }
-        $buf .= $s;
-        $buf .= "\t [";
-        $buf .= $this->_element;
-        $buf .= "]\t #";
-        $buf .= $this->_id;
-        $buf .= "\t @";
-        $buf .= $this->_type;
-        $buf .= "\t (";
-        $buf .= $this->_label;
-        $buf .= ')';
-        if (!$r) {
-            $buf .= "\n";
-            $buf .= "</pre>";
+            }
+            $buf .= $s;
+            $buf .= "\t [";
+            $buf .= $this->_element;
+            $buf .= "]\t #";
+            $buf .= $this->_id;
+            $buf .= "\t @";
+            $buf .= $this->_type;
+            $buf .= "\t (";
+            $buf .= $this->_label;
+            $buf .= ')';
+            if (!$r) {
+                $buf .= "\n";
+                $buf .= "</pre>";
         }
         if ($r) return $buf;
         else echo $buf;
     }
     // }}}
 
+    // {{{ __call
     /**
-     * Traitement des méthodes ajoutées
-     *
-     * @param string $name
-     * @param array $arguments
-     */
+    * Traitement des méthodes ajoutées
+    *
+    * @param string $name
+    * @param array $arguments
+    */
     function __call($name, array $arguments)
     {
-        if (isset($this->_methods[$name]) &&
+        if (
+            isset($this->_methods[$name]) &&
             is_callable($this->_methods[$name])
         ) {
             array_unshift($arguments, $this);
@@ -1311,12 +1366,13 @@ class AIT
             trigger_error('Call to undefined method '.__CLASS__.'::'.$name, E_USER_ERROR);
         }
     }
+    // }}}
 
-
+    // {{{ __sleep
     /** 
-     * Avant serialization
-     *
-     */
+    * Avant serialization
+    *
+    */
     public function __sleep () 
     {
         $this->_pdo_opt = $this->_pdo->getOptions();
@@ -1324,11 +1380,13 @@ class AIT
         unset($vars[array_search('_pdo', $vars)]);
         return $vars;
     }
+    // }}}
 
+    // {{{ __wakeup
     /** 
-     * Avant unserialization
-     *
-     */
+    * Avant unserialization
+    *
+    */
     public function __wakeup() 
     {
         $this->_pdo = new PDOAIT(
@@ -1338,29 +1396,30 @@ class AIT
             $this->_pdo_opt['drvropts']
         );
         $this->_pdo->setOptions($this->_pdo_opt);
-     }
+    }
+    // }}}
 }
 
 
 
 /**
- * Objet représantant une requete au sens AIT
- *
- * @category  AIT
- * @package   AIT
- * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
- * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
- */
+* Objet représantant une requete au sens AIT
+*
+* @category  AIT
+* @package   AIT
+* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+* @copyright 2008 Nicolas Thouvenin
+* @license   http://opensource.org/licenses/lgpl-license.php LGPL
+* @link      http://www.pxxo.net/fr/ait
+*/
 class AITQuery {
 
 
     protected $sql = '';
 
     /**
-     * @var PDOAIT
-     */
+    * @var PDOAIT
+    */
     protected $_pdo;
 
     private $_step = array();
@@ -1368,10 +1427,10 @@ class AITQuery {
 
     // {{{ __construct
     /**
-     * Constructeur
-     *
-     * @param PDOAIT $pdo objet de connexion à la base
-     */
+    * Constructeur
+    *
+    * @param PDOAIT $pdo objet de connexion à la base
+    */
     function __construct(PDOAIT $pdo)
     {
         $this->_pdo = $pdo;
@@ -1381,10 +1440,10 @@ class AITQuery {
 
     // {{{ clean
     /**
-     * On efface tout et on recommence
-     *
-     * @return boolean 
-     */
+    * On efface tout et on recommence
+    *
+    * @return boolean 
+    */
     public function clean()
     {
         array_push($this->_step, 'start');
@@ -1395,12 +1454,12 @@ class AITQuery {
 
     // {{{ or
     /**
-     * Appique un Or entre 
-     *
-     * @param ArrayObject
-     *
-     * @return boolean 
-     */
+    * Appique un Or entre 
+    *
+    * @param ArrayObject
+    *
+    * @return boolean 
+    */
     public function eitheror()
     {
         if (end($this->_step) == 'eitheror') return;
@@ -1410,13 +1469,13 @@ class AITQuery {
 
     // {{{ all
     /**
-     * Recherche les items ayant tout les tags donnés en paramètres
-     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
-     *
-     * @param ArrayObject
-     *
-     * @return boolean 
-     */
+    * Recherche les items ayant tout les tags donnés en paramètres
+    * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+    *
+    * @param ArrayObject
+    *
+    * @return boolean 
+    */
     public function all(ArrayObject $tags)
     {
         array_push($this->_step, 'all');
@@ -1430,35 +1489,35 @@ class AITQuery {
             }
             if (empty($w))  {
                 $w = sprintf("tag_id = %s",
-                    $tag->getSystemID()
-                );
-            }
-            else {
-                $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-                    $tag->getSystemID(), 
-                    $this->_pdo->tagged(),
-                    $w
-                );
-
-            }
-            $n++;
+                $tag->getSystemID()
+            );
         }
-        if ($n === 0) return false;
+        else {
+            $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+            $tag->getSystemID(), 
+            $this->_pdo->tagged(),
+            $w
+        );
 
-        $this->_concat($w);
-        return true;
+    }
+    $n++;
+}
+if ($n === 0) return false;
+
+$this->_concat($w);
+return true;
     }
     // }}}
 
     // {{{ one
     /**
-     * Recherche les items ayant au moins l'un des tags passé en paramètres
-     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
-     *
-     * @param ArrayObject
-     *
-     * @return boolean 
-     */
+    * Recherche les items ayant au moins l'un des tags passé en paramètres
+    * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+    *
+    * @param ArrayObject
+    *
+    * @return boolean 
+    */
     public function one($tags)
     {
         array_push($this->_step, 'one');
@@ -1483,42 +1542,42 @@ class AITQuery {
 
     // {{{ getSQL
     /**
-     * Retourne le SQL correspondant à la requete 
-     *
-     * @return string
-     */
+    * Retourne le SQL correspondant à la requete 
+    *
+    * @return string
+    */
     public function getSQL()
     {
-         return sprintf('SELECT item_id FROM %s WHERE %s', $this->_pdo->tagged(), $this->sql);
+        return sprintf('SELECT item_id FROM %s WHERE %s', $this->_pdo->tagged(), $this->sql);
     }
     // }}}
 
 
     // {{{ _concat
     /**
-     * Ajoute une nouvelle condition SQL
-     *
-     * @return string
-     */
+    * Ajoute une nouvelle condition SQL
+    *
+    * @return string
+    */
     protected function _concat($sql)
     {
         array_pop($this->_step);
         if (end($this->_step) === 'eitheror') {
             if ($this->sql === '') 
-                $this->sql = $sql;
+            $this->sql = $sql;
             else 
-                $this->sql .= ' OR '.$sql;
+            $this->sql .= ' OR '.$sql;
         }
         else {
             if ($this->sql === '') 
-                $this->sql = $sql;
+            $this->sql = $sql;
             else 
-                $this->sql = sprintf(
-                    " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-                    $sql,
-                    $this->_pdo->tagged(),
-                    $this->sql
-                );
+            $this->sql = sprintf(
+                " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                $sql,
+                $this->_pdo->tagged(),
+                $this->sql
+            );
         }
     }
     // }}}
@@ -1527,15 +1586,15 @@ class AITQuery {
 
 
 /**
- * Objet représantant une requete au sens AIT
- *
- * @category  AIT
- * @package   AIT
- * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
- * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
- */
+* Objet représantant une requete au sens AIT
+*
+* @category  AIT
+* @package   AIT
+* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+* @copyright 2008 Nicolas Thouvenin
+* @license   http://opensource.org/licenses/lgpl-license.php LGPL
+* @link      http://www.pxxo.net/fr/ait
+*/
 class AITResult extends ArrayObject {
 
     private $_total = 0;
@@ -1545,10 +1604,10 @@ class AITResult extends ArrayObject {
 
     // {{{ setTotal 
     /**
-     * Fixe le nombre total de résultats trouvés
-     *
-     * @return string
-     */
+    * Fixe le nombre total de résultats trouvés
+    *
+    * @return string
+    */
     public function setTotal($i)
     {
         $this->_total = (int) $i;
@@ -1557,12 +1616,12 @@ class AITResult extends ArrayObject {
 
     // {{{ setQueryForTotal
     /**
-     * Fixe le nombre total de résultats trouvés
-     *
-     * @param string $sql la requete SQL 
-     * @param array $params les paramètres nécessaire à la requete
-     * @param pdo $pdo pointeur vers la base de données
-     */
+    * Fixe le nombre total de résultats trouvés
+    *
+    * @param string $sql la requete SQL 
+    * @param array $params les paramètres nécessaire à la requete
+    * @param pdo $pdo pointeur vers la base de données
+    */
     public function setQueryForTotal($sql,  $params, $pdo) 
     {
         $this->_sql = $sql;
@@ -1573,14 +1632,14 @@ class AITResult extends ArrayObject {
 
     // {{{ total 
     /**
-     * Retourne le nombre total de résultats trouvés
-     *
-     * @return string
-     */
+    * Retourne le nombre total de résultats trouvés
+    *
+    * @return string
+    */
     public function total()
     {
         if (is_null($this->_sql) or !is_array($this->_params))
-            return $this->_total;
+        return $this->_total;
 
         $time = AIT::timer();
         $stmt = $this->_pdo->prepare($this->_sql);
@@ -1604,25 +1663,25 @@ class AITResult extends ArrayObject {
 
 
 /**
- * Objet représantant un ensemble de tags
- *
- * @category  AIT
- * @package   AIT
- * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
- * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
- */
+* Objet représantant un ensemble de tags
+*
+* @category  AIT
+* @package   AIT
+* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+* @copyright 2008 Nicolas Thouvenin
+* @license   http://opensource.org/licenses/lgpl-license.php LGPL
+* @link      http://www.pxxo.net/fr/ait
+*/
 class AITTagsObject implements Countable, Iterator {
 
     private $_tags;
 
     // {{{ construct
     /**
-     * Constructeur
-     *
-     * @param ArrayObject $tags
-     */
+    * Constructeur
+    *
+    * @param ArrayObject $tags
+    */
     function __construct($tags = null) 
     {
         if (!is_null($tags)) $this->setTags($tags);
@@ -1631,10 +1690,10 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ setTags
     /**
-     * Remplie l'objet avec des tags en vrac
-     *
-     * @param ArrayObject $tags
-     */
+    * Remplie l'objet avec des tags en vrac
+    *
+    * @param ArrayObject $tags
+    */
     function setTags(ArrayObject $tags) 
     {
         $this->_tags = array();
@@ -1653,12 +1712,12 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ __set
     /**
-     * Magic function to set value 
-     *
-     * @param string $name The variable name.
-     * @param mixed $val The variable value.
-     * @return void
-     */
+    * Magic function to set value 
+    *
+    * @param string $name The variable name.
+    * @param mixed $val The variable value.
+    * @return void
+    */
     public function __set($name, ArrayObject $val)
     {
         $this->_tags[$name] = $val;
@@ -1667,25 +1726,25 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ __get
     /**
-     * Retourne les tags d'un type donnée
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
+    * Retourne les tags d'un type donnée
+    *
+    * @param string $name
+    *
+    * @return mixed
+    */
     public function __get($name) {
         if (array_key_exists($name, $this->_tags))
-            return $this->_tags[$name];
+        return $this->_tags[$name];
         else
-            return null;
+        return null;
     }
     // }}}
     // {{{ count
     /**
-     * Defined by Countable interface
-     *
-     * @return integer
-     */
+    * Defined by Countable interface
+    *
+    * @return integer
+    */
     public function count()
     {
         return count($this->_tags);
@@ -1694,31 +1753,31 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ valid
     /**
-     * Defined by Iterator interface
-     *
-     */
+    * Defined by Iterator interface
+    *
+    */
     public function valid()
     {
         return array_key_exists(key($this->_tags),$this->_tags);
     }
-// }}}
+    // }}}
 
     // {{{ next
     /**
-     * Defined by Iterator interface
-     *
-     */
+    * Defined by Iterator interface
+    *
+    */
     public function next()
     {
         return next($this->_tags);
     }
-// }}}
+    // }}}
 
     // {{{ rewind
     /**
-     * Defined by Iterator interface
-     *
-     */
+    * Defined by Iterator interface
+    *
+    */
     public function rewind()
     {
         return reset($this->_tags);
@@ -1727,46 +1786,46 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ key
     /**
-     * Defined by Iterator interface
-     *
-     */
+    * Defined by Iterator interface
+    *
+    */
     public function key()
     {
         return key($this->_tags);
     }
-// }}}
+    // }}}
 
     // {{{ current
     /**
-     * Defined by Iterator interface
-     *
-     */
+    * Defined by Iterator interface
+    *
+    */
     public function current()
     {
         $k = key($this->_childs);
         return($this->_tags[$k]);
     }
-// }}}
+    // }}}
 
     // {{{ __isset
     /**
-     * Magic function to test key
-     *
-     * @param string $key The variable name.
-     * @return boolean
-     */
+    * Magic function to test key
+    *
+    * @param string $key The variable name.
+    * @return boolean
+    */
     public function __isset($key) 
     {
         return isset($this->_tags[$key]);
     }
-// }}}
-        // {{{ __unset
+    // }}}
+    // {{{ __unset
     /**
-     * Magic function to unset key
-     *
-     * @param string $key The variable name.
-     * @return boolean
-     */
+    * Magic function to unset key
+    *
+    * @param string $key The variable name.
+    * @return boolean
+    */
     public function __unset($key) 
     {
         unset($this->_tags[$key]);

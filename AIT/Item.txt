@@ -293,5 +293,14 @@ Retour
 
 Un objet AITTagsObject représentant un ensemble de tag trié par type
 
+Exemple
++++++++
+
+[source,php]
+-------------------------------------------------
+include::../examples/AIT_Item-getTagsObject.php[]
+-------------------------------------------------
+
+
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

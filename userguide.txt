@@ -162,13 +162,12 @@ ou il est désactivé seront affichées.
 
 
 .Debug ponctuel
-[code,php]
--------------------------------------------------
 
+[source,php]
+-------------------------------------------------
 AIT::debugging = true;
 jazz = $schema->style->getTag('Jazz');
 AIT::debugging = false;
-
 -------------------------------------------------
 
 
@@ -278,6 +277,8 @@ Contrôler la cohérence de la base
 Voici quelques requêtes pour vérifier que des lignes les jointures entre tag soit toujours vrai.
 
 .État des jointures
+
+[source,sql]
 ----------------------------
 SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.item_id=tag.id WHERE tag.id IS NULL 
 SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.tag_id=tag.id WHERE tag.id IS NULL 
@@ -287,7 +288,11 @@ SELECT a.* FROM tag a LEFT JOIN tag b ON a.type=b.id WHERE a.id <> 1 and a.id <>
 Visualiser les tags non utilisés
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+C'est à dire les tags non associés à un item.
+
 .uniquement sur les fréquences 
+
+[source,sql]
 -----------------------------
 SELECT * 
 FROM tag a LEFT JOIN tag b ON a.type=b.id 
@@ -295,6 +300,8 @@ WHERE b.type=2 and a.frequency=0
 -----------------------------
 
 .avec les fréquences et les associations
+
+[source,sql]
 -----------------------------
 SELECT * 
 FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id 
@@ -302,6 +309,8 @@ WHERE b.type=2 and a.frequency=0 and item_id IS NULL
 -----------------------------
 
 .uniquement avec les associations
+
+[source,sql]
 -----------------------------
 SELECT * 
 FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id 
@@ -310,14 +319,19 @@ WHERE b.type=2 and item_id IS NULL
 
 Visualiser les items non utilisés
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C'est à dire les items ne possédant aucun tag.
 
 .uniquement avec les associations 
+
+[source,sql]
 -----------------------------
 SELECT * 
 FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.item_id 
 WHERE b.type=1 and c.tag_id IS NULL
 -----------------------------
 
+
+§§§
 
 
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

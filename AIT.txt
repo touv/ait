@@ -286,13 +286,44 @@ Paramètres
 string *$s*:: chaine de carat cure à afficher avant le contenu de l'objet.
 booelan *$r*:: si vrai a retourne la chaine à afficher plutôt que de l'afficher 
 
-
 Retour
 ++++++
 
 Retourne NULL ou une chaine de caractères (dépend du paramètre $r).
 
 
+// ----------------------------------------------------------------------------
+getBySystemID
+^^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    mixed AIT::getBySystemID(PDOAIT $pdo, $id)
+
+Description
++++++++++++
+
+Créé l'objet correspondant à un identifiant système
+
+Paramètres
+++++++++++
+
+PDOAIT *$pdo*:: pointeur sur la base de données
+integer *$id*:: identifiant systéme
+
+Retour
+++++++
+
+Retourne NULL ou une instance d'objet (AIT_ItemType, AIT_Item, AIT_TagType, AIT_Tag)
+
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::./examples/AIT-getBySystemID.php[]
+-------------------------------------------------
 
 
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

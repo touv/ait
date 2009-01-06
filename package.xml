@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2008-10-27</date>
+    <date>2009-01-06</date>
     <version>
-        <release>1.1</release>
+        <release>1.2</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,8 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + Ajout d'un cache interne aux objets, évitant la relance de requete pour des infos déjà récupérées auparavant
-        + Optimisation pour la recherche d'items à partir d'un seul tag
+        + Ajout la méthode statique getBySystemID
+        + Ajout de getTagsObject
     </notes>
     <contents>
         <dir name="/">
@@ -290,6 +290,22 @@
             <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
             <notes>
                 + Ajout d'un timer pour les requetes SQL
+            </notes>
+        </release>
+        <release>
+            <date>2008-10-27</date>
+            <version>
+                <release>1.1</release>
+                <api>1.0</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Ajout d'un cache interne aux objets, évitant la relance de requete pour des infos déjà récupérées auparavant
+                + Optimisation pour la recherche d'items à partir d'un seul tag
             </notes>
         </release>
     </changelog>

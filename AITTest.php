@@ -598,6 +598,22 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($ret[0]->get(), 'A');
         $this->assertEquals($ret[1]->get(), 'B');
 
+        $a = new AIT_ItemType('ItemType', $this->db);
+        $b = $a->addItem('Item');
+        $c = $a->addTag('TagType');
+        $d = $c->addTag('Tag');
+
+        $ret = AIT::getBySystemID($this->db, $a->getSystemID());
+        print_r($ret);
+        $ret = AIT::getBySystemID($this->db, $b->getSystemID());
+        print_r($ret);
+        $ret = AIT::getBySystemID($this->db, $c->getSystemID());
+        print_r($ret);
+        $ret = AIT::getBySystemID($this->db, $d->getSystemID());
+        print_r($ret);
+
+
+
         $it1->del();
         $it2->del();
         $this->assertEquals($this->_d(), 2);

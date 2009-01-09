@@ -1494,30 +1494,30 @@ class AITQuery {
         }
         else {
             $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-            $tag->getSystemID(), 
-            $this->_pdo->tagged(),
-            $w
-        );
+                $tag->getSystemID(), 
+                $this->_pdo->tagged(),
+                $w
+            );
 
-    }
-    $n++;
-}
-if ($n === 0) return false;
+        }
+            $n++;
+        }
+        if ($n === 0) return false;
 
-$this->_concat($w);
-return true;
+        $this->_concat($w);
+        return true;
     }
     // }}}
 
     // {{{ one
     /**
-    * Recherche les items ayant au moins l'un des tags passé en paramètres
-    * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
-    *
-    * @param ArrayObject
-    *
-    * @return boolean 
-    */
+     * Recherche les items ayant au moins l'un des tags passé en paramètres
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
     public function one($tags)
     {
         array_push($this->_step, 'one');
@@ -1542,10 +1542,10 @@ return true;
 
     // {{{ getSQL
     /**
-    * Retourne le SQL correspondant à la requete 
-    *
-    * @return string
-    */
+     * Retourne le SQL correspondant à la requete 
+     *
+     * @return string
+     */
     public function getSQL()
     {
         return sprintf('SELECT item_id FROM %s WHERE %s', $this->_pdo->tagged(), $this->sql);
@@ -1555,29 +1555,29 @@ return true;
 
     // {{{ _concat
     /**
-    * Ajoute une nouvelle condition SQL
-    *
-    * @return string
-    */
+     * Ajoute une nouvelle condition SQL
+     *
+     * @return string
+     */
     protected function _concat($sql)
     {
         array_pop($this->_step);
         if (end($this->_step) === 'eitheror') {
             if ($this->sql === '') 
-            $this->sql = $sql;
+                $this->sql = $sql;
             else 
-            $this->sql .= ' OR '.$sql;
+                $this->sql .= ' OR '.$sql;
         }
         else {
             if ($this->sql === '') 
-            $this->sql = $sql;
+                $this->sql = $sql;
             else 
-            $this->sql = sprintf(
-                " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-                $sql,
-                $this->_pdo->tagged(),
-                $this->sql
-            );
+                $this->sql = sprintf(
+                    " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                    $sql,
+                    $this->_pdo->tagged(),
+                    $this->sql
+                );
         }
     }
     // }}}
@@ -1586,15 +1586,15 @@ return true;
 
 
 /**
-* Objet représantant une requete au sens AIT
-*
-* @category  AIT
-* @package   AIT
-* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
-* @copyright 2008 Nicolas Thouvenin
-* @license   http://opensource.org/licenses/lgpl-license.php LGPL
-* @link      http://www.pxxo.net/fr/ait
-*/
+ * Objet représantant une requete au sens AIT
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
 class AITResult extends ArrayObject {
 
     private $_total = 0;
@@ -1604,10 +1604,10 @@ class AITResult extends ArrayObject {
 
     // {{{ setTotal 
     /**
-    * Fixe le nombre total de résultats trouvés
-    *
-    * @return string
-    */
+     * Fixe le nombre total de résultats trouvés
+     *
+     * @return string
+     */
     public function setTotal($i)
     {
         $this->_total = (int) $i;
@@ -1616,12 +1616,12 @@ class AITResult extends ArrayObject {
 
     // {{{ setQueryForTotal
     /**
-    * Fixe le nombre total de résultats trouvés
-    *
-    * @param string $sql la requete SQL 
-    * @param array $params les paramètres nécessaire à la requete
-    * @param pdo $pdo pointeur vers la base de données
-    */
+     * Fixe le nombre total de résultats trouvés
+     *
+     * @param string $sql la requete SQL 
+     * @param array $params les paramètres nécessaire à la requete
+     * @param pdo $pdo pointeur vers la base de données
+     */
     public function setQueryForTotal($sql,  $params, $pdo) 
     {
         $this->_sql = $sql;
@@ -1632,14 +1632,14 @@ class AITResult extends ArrayObject {
 
     // {{{ total 
     /**
-    * Retourne le nombre total de résultats trouvés
-    *
-    * @return string
-    */
+     * Retourne le nombre total de résultats trouvés
+     *
+     * @return string
+     */
     public function total()
     {
         if (is_null($this->_sql) or !is_array($this->_params))
-        return $this->_total;
+            return $this->_total;
 
         $time = AIT::timer();
         $stmt = $this->_pdo->prepare($this->_sql);
@@ -1663,25 +1663,25 @@ class AITResult extends ArrayObject {
 
 
 /**
-* Objet représantant un ensemble de tags
-*
-* @category  AIT
-* @package   AIT
-* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
-* @copyright 2008 Nicolas Thouvenin
-* @license   http://opensource.org/licenses/lgpl-license.php LGPL
-* @link      http://www.pxxo.net/fr/ait
-*/
+ * Objet représantant un ensemble de tags
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
 class AITTagsObject implements Countable, Iterator {
 
     private $_tags;
 
     // {{{ construct
     /**
-    * Constructeur
-    *
-    * @param ArrayObject $tags
-    */
+     * Constructeur
+     *
+     * @param ArrayObject $tags
+     */
     function __construct($tags = null) 
     {
         if (!is_null($tags)) $this->setTags($tags);
@@ -1690,10 +1690,10 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ setTags
     /**
-    * Remplie l'objet avec des tags en vrac
-    *
-    * @param ArrayObject $tags
-    */
+     * Remplie l'objet avec des tags en vrac
+     *
+     * @param ArrayObject $tags
+     */
     function setTags(ArrayObject $tags) 
     {
         $this->_tags = array();
@@ -1712,12 +1712,12 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ __set
     /**
-    * Magic function to set value 
-    *
-    * @param string $name The variable name.
-    * @param mixed $val The variable value.
-    * @return void
-    */
+     * Magic function to set value 
+     *
+     * @param string $name The variable name.
+     * @param mixed $val The variable value.
+     * @return void
+     */
     public function __set($name, ArrayObject $val)
     {
         $this->_tags[$name] = $val;
@@ -1726,25 +1726,26 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ __get
     /**
-    * Retourne les tags d'un type donnée
-    *
-    * @param string $name
-    *
-    * @return mixed
-    */
+     * Retourne les tags d'un type donnée
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
     public function __get($name) {
         if (array_key_exists($name, $this->_tags))
-        return $this->_tags[$name];
+            return $this->_tags[$name];
         else
-        return null;
+            return null;
     }
     // }}}
+
     // {{{ count
     /**
-    * Defined by Countable interface
-    *
-    * @return integer
-    */
+     * Defined by Countable interface
+     *
+     * @return integer
+     */
     public function count()
     {
         return count($this->_tags);
@@ -1753,9 +1754,9 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ valid
     /**
-    * Defined by Iterator interface
-    *
-    */
+     * Defined by Iterator interface
+     *
+     */
     public function valid()
     {
         return array_key_exists(key($this->_tags),$this->_tags);
@@ -1764,9 +1765,9 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ next
     /**
-    * Defined by Iterator interface
-    *
-    */
+     * Defined by Iterator interface
+     *
+     */
     public function next()
     {
         return next($this->_tags);
@@ -1775,9 +1776,9 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ rewind
     /**
-    * Defined by Iterator interface
-    *
-    */
+     * Defined by Iterator interface
+     *
+     */
     public function rewind()
     {
         return reset($this->_tags);
@@ -1786,9 +1787,9 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ key
     /**
-    * Defined by Iterator interface
-    *
-    */
+     * Defined by Iterator interface
+     *
+     */
     public function key()
     {
         return key($this->_tags);
@@ -1797,23 +1798,23 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ current
     /**
-    * Defined by Iterator interface
-    *
-    */
+     * Defined by Iterator interface
+     *
+     */
     public function current()
     {
-        $k = key($this->_childs);
+        $k = key($this->_tags);
         return($this->_tags[$k]);
     }
     // }}}
 
     // {{{ __isset
     /**
-    * Magic function to test key
-    *
-    * @param string $key The variable name.
-    * @return boolean
-    */
+     * Magic function to test key
+     *
+     * @param string $key The variable name.
+     * @return boolean
+     */
     public function __isset($key) 
     {
         return isset($this->_tags[$key]);
@@ -1821,11 +1822,11 @@ class AITTagsObject implements Countable, Iterator {
     // }}}
     // {{{ __unset
     /**
-    * Magic function to unset key
-    *
-    * @param string $key The variable name.
-    * @return boolean
-    */
+     * Magic function to unset key
+     *
+     * @param string $key The variable name.
+     * @return boolean
+     */
     public function __unset($key) 
     {
         unset($this->_tags[$key]);

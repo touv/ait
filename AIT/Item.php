@@ -104,6 +104,51 @@ class AIT_Item extends AIT
     }
     // }}}
 
+   // {{{ hasTag
+    /**
+     * Retourne un tag associé à l'item courant (si il existe)
+     *
+     * @param string $l nom du nouveau tag
+     * @param AIT_TagType $o Type de Tag
+     *
+     * @return AIT_Tag
+     */
+    function getTag($l, AIT_TagType $o)
+    {
+        if (!is_string($l))
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
+
+        $sql = sprintf(
+            "SELECT a.id id, label, type
+             FROM %s a
+             LEFT JOIN %s b ON a.id=b.tag_id
+             WHERE label = ? and type = ?  and item_id = ?
+             LIMIT 0,1
+             ",
+             $this->_pdo->tag(),
+             $this->_pdo->tagged()
+         );
+        self::timer();
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1,  $l, PDO::PARAM_STR);
+        $stmt->bindParam(2,  $o->getSystemID(), PDO::PARAM_INT);
+        $stmt->bindParam(3,  $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id'], $row);
+        }
+        else $ret = null;
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $l, $o->getSystemID());
+
+        return $ret;
+    }
+    // }}}
+
+
     // {{{ addTag
     /**
      * Ajout d'un tag à l'item courant
@@ -299,7 +344,6 @@ class AIT_Item extends AIT
         }
     }
     // }}}
-
 
     // {{{ getTagsObject
     /**

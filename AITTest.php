@@ -107,6 +107,14 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i1->attach($t1)->attach($t2);
         $i2->attach($t1);
 
+        $t1b = $i2->getTag('@1', $tt);
+        $t2b = $i1->getTag('@2', $tt);
+        $t3  = $i1->getTag('@3', $tt);
+
+        $this->assertEquals($t1, $t1b);
+        $this->assertEquals($t2, $t2b);
+        $this->assertNull($t3);
+
         $this->assertEquals($t1->countItems(), 2);
         $this->assertEquals($t2->countItems(), 1);
 

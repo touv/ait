@@ -22,6 +22,33 @@ integer *$id*:: Identifiant système de l'élément (si déjà connu).
 
 
 // ----------------------------------------------------------------------------
+getTag
+^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag getTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Retourne un tag associé à l'item courant (si il existe)
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du tag 
+AIT_TagType *$o*:: Type de Tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag existant, sinon retourne NULL.
+
+
+// ----------------------------------------------------------------------------
 addTag
 ^^^^^^
 

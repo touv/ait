@@ -9,11 +9,19 @@
 	<xsl:param name="css.decoration" select="0" />
 	<xsl:param name="toc.max.depth" select="2" />
 	<!--    <xsl:param name="generate.section.toc.level" select="5" />-->
-<!--    <xsl:param name="toc.section.depth" select="1" />-->
+    <!--    <xsl:param name="toc.section.depth" select="1" />-->
+
 <xsl:param name="generate.toc">
 book      toc
 chapter   toc,title
 article   toc,title
+sect1     toc
+sect2     toc
+sect3     toc
+sect4     toc
+sect5     toc
+section   toc
+set       toc,title
 </xsl:param>
 
 

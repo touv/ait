@@ -694,6 +694,47 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 0);
     }
 
+    function test_frequency2()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+        $i2 = $it->addItem('2');
+
+        $tt1 = $it->addTag('tagtype1');
+        $tt2 = $it->addTag('tagtype2');
+
+        $a = $tt1->addTag('A');
+        $b = $tt1->addTag('B');
+        $c = $tt1->addTag('C');
+        $d = $tt2->addTag('D');
+        $e = $tt2->addTag('E');
+
+        $i1->attach($a)->attach($b)->attach($c);
+        $i2->attach($a)->attach($b)->attach($c);
+
+        $i1->attach($d);
+        $i2->attach($e);
+       
+        $this->assertEquals($a->countItems(), 2);
+        $this->assertEquals($d->countItems(), 1);
+
+        $i2->del();
+        
+        $aa = $i1->getTag('A', $tt1);
+        $this->assertEquals($aa->countItems(), 1);
+
+        $this->assertEquals($a->countItems(), 2);
+//        $a->cleanCache();
+//        $this->assertEquals($a->countItems(), 1);
+
+        $this->assertEquals($e->countItems(), 0); // Ne doit plus exister ?
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+
+        }
+
     function test_fetchItems()
     {
         $it = new AIT_ItemType('itemtype', $this->db);

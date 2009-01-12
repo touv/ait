@@ -144,20 +144,17 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 3);
 
         $i2->del();
-        $this->assertEquals($it->countItems(), 2);
-        $this->assertEquals($it->countItems(true), 1);
+        $this->assertEquals($it->countItems(), 1);
 
-        $this->assertEquals($tt->countItems(), 2);
-        $this->assertEquals($tt->countItems(true), 1);
+        $this->assertEquals($tt->countItems(), 1);
 
-        $this->assertEquals($t1->countItems(), 2);
-        $this->assertEquals($t1->countItems(true), 1);
+        $this->assertEquals($t1->countItems(), 1);
         
         $this->assertEquals($this->_d(), 6);
         $this->assertEquals($this->_q(), 2);
 
         $i1->del();
-        $this->assertEquals($this->_d(), 5);
+        $this->assertEquals($this->_d(), 4);
         $this->assertEquals($this->_q(), 1);
 
         $it->del();
@@ -717,6 +714,7 @@ class AITTest extends PHPUnit_Framework_TestCase
         $d = $tt2->addTag('D');
         $e = $tt2->addTag('E');
 
+
         $i1->attach($a)->attach($b)->attach($c);
         $i2->attach($a)->attach($b)->attach($c);
 
@@ -730,19 +728,16 @@ class AITTest extends PHPUnit_Framework_TestCase
         
         $aa = $i1->getTag('A', $tt1);
         $this->assertEquals($aa->countItems(), 1);
+        $this->assertEquals($a->countItems(), 1);
 
-        $this->assertEquals($a->countItems(), 2);
-//        $a->cleanCache();
-//        $this->assertEquals($a->countItems(), 1);
-
-        $this->assertEquals($e->countItems(), 0); // Ne doit plus exister ?
+        $this->assertEquals($e->countItems(), 0); 
+        $this->assertFalse($e->exists()); 
 
         $it->del();
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
 
         }
-
     function test_fetchItems()
     {
         $it = new AIT_ItemType('itemtype', $this->db);

@@ -165,9 +165,9 @@ ou il est désactivé seront affichées.
 
 [source,php]
 -------------------------------------------------
-AIT::debugging = true;
+AIT::$debugging = true;
 jazz = $schema->style->getTag('Jazz');
-AIT::debugging = false;
+AIT::$debugging = false;
 -------------------------------------------------
 
 

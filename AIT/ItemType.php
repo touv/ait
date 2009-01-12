@@ -612,14 +612,11 @@ class AIT_ItemType extends AIT
     /**
      * Compte le nombre d'items du type d'item courant
      *
-     * @param boolean $reload demande la valeur courante dans la base (et non la valeur trouvée à la création de l'objet)
-     *
      * @return integer
      */
-    function countItems($reload = false)
+    function countItems()
     {
-        if ($reload === true && isset($this->_data['frequency'])) unset($this->_data['frequency']);
-        return (int) $this->_get('frequency');
+        return (int) $this->_get('frequency', true);
     }
     // }}}
 

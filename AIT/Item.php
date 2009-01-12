@@ -104,7 +104,7 @@ class AIT_Item extends AIT
     }
     // }}}
 
-   // {{{ hasTag
+   // {{{ getTag
     /**
      * Retourne un tag associé à l'item courant (si il existe)
      *
@@ -147,7 +147,6 @@ class AIT_Item extends AIT
         return $ret;
     }
     // }}}
-
 
     // {{{ addTag
     /**
@@ -324,6 +323,8 @@ class AIT_Item extends AIT
             if ($cascade) $tag->del();
             $this->_decreaseFrequency($tag->getSystemID());
             $this->_decreaseFrequency($tag->get('type'));
+
+            if ($tag->countItems() <= 0) $tag->del();
         }
         $this->_decreaseFrequency($this->_type);
         $this->_rmTagged(null, $this->_id);

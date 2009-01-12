@@ -732,28 +732,45 @@ class AIT
 
     // {{{ _increaseFrequency
     /**
-    * Incremente la frequence d'une ligne dans TAG
-    *
-    * @param string $t id
-    */
+     * Incremente la frequence d'une ligne dans TAG
+     *
+     * @param string $t id
+     */
     protected function _increaseFrequency($i)
     {
-        try {
-            if (isset($this->_data['frequency'])) unset($this->_data['frequency']);
+        try { 
             $sql = sprintf(
-                "UPDATE %s SET frequency=frequency+1 WHERE id = ?",
-                $this->_pdo->tag(true)
+                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->_pdo->tag()
             );
             self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+            $f = (int) $stmt->fetchColumn(0);
             $stmt->closeCursor();
             self::debug(self::timer(true), $sql, $i);
+
+            ++$f;
+            if ($f <= 0) $f = 1; // Control IMPORTANT
+
+            $sql = sprintf(
+                "UPDATE %s SET frequency = ? WHERE id = ?",
+                $this->_pdo->tag(true)
+            );
+            self::timer();
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $f, PDO::PARAM_INT);
+            $stmt->bindParam(2, $i, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($f, 'integer');
+            settype($i, 'integer');
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $f, $i);
         }
         catch (PDOException $e) {
             self::catchError($e);
-        }
+        }  
     }
     // }}}
 
@@ -766,17 +783,34 @@ class AIT
     protected function _decreaseFrequency($i)
     {
         try {
-            if (isset($this->_data['frequency'])) unset($this->_data['frequency']);
             $sql = sprintf(
-                "UPDATE %s SET frequency=frequency-1 WHERE id = ?",
-                $this->_pdo->tag(true)
+                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->_pdo->tag()
             );
             self::timer();
             $stmt = $this->_pdo->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
+            settype($i, 'integer');
+            $f = (int) $stmt->fetchColumn(0);
             $stmt->closeCursor();
             self::debug(self::timer(true), $sql, $i);
+
+            --$f;
+            if ($f <= 0) $f = 0; // Control IMPORTANT
+
+            $sql = sprintf(
+                "UPDATE %s SET frequency = ? WHERE id = ?",
+                $this->_pdo->tag(true)
+            );
+            self::timer();
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $f, PDO::PARAM_INT);
+            $stmt->bindParam(2, $i, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($f, 'integer');
+            settype($i, 'integer');
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $f, $i);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -1042,12 +1076,15 @@ class AIT
     /**
     * Méthode permettant d'accéder à la valeur d'une colonne
     *
-    * @param string $name nom de la colonne
+    * @param string $n nom de la colonne
+    * @param boolean $reload récupére la valeur en base et non celle du cache de l'objet
     *
     * @return mixed
     */
-    protected function _get($n)
+    protected function _get($n, $reload = false)
     {
+        if ($reload === true && isset($this->_data[$n])) unset($this->_data[$n]);
+
         if (!isset($this->_data[$n])) {
             try {
                 $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->_pdo->tag());

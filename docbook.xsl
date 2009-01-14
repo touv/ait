@@ -7,7 +7,7 @@
 	<xsl:param name="section.autolabel" select="1" />
 	<xsl:param name="generate.chapter.toc" select="1" />
 	<xsl:param name="css.decoration" select="0" />
-	<xsl:param name="toc.max.depth" select="2" />
+    <xsl:param name="toc.max.depth" select="3" />
 	<!--    <xsl:param name="generate.section.toc.level" select="5" />-->
     <!--    <xsl:param name="toc.section.depth" select="1" />-->
 

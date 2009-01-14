@@ -111,7 +111,7 @@ class AIT_Item extends AIT
      * @param string $l nom du nouveau tag
      * @param AIT_TagType $o Type de Tag
      *
-     * @return AIT_Tag
+     * @return AIT_Tag or null
      */
     function getTag($l, AIT_TagType $o)
     {
@@ -144,6 +144,25 @@ class AIT_Item extends AIT
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $o->getSystemID());
 
+        return $ret;
+    }
+    // }}}
+
+    // {{{ defTag
+    /**
+     * Récupére un tag associé à l'item courant.
+     * Si le tag n'existe pas il est automatiquement créé.
+     *
+     * @param string $l nom du tag
+     * @param AIT_TagType $o Type de Tag
+     *
+     * @return AIT_Tag
+     */
+    function defTag($l, AIT_TagType $o)
+    {
+        $ret = $this->getTag($l, $o);
+        if (is_null($ret))
+            $ret = new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->_pdo);
         return $ret;
     }
     // }}}

@@ -121,7 +121,7 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
         $sql = sprintf("
-            SELECT id
+            SELECT a.id id, label, type
             FROM %s a
             LEFT JOIN %s b ON a.id=b.tag_id
             WHERE label = ? and type = 2 and item_id = ?
@@ -136,14 +136,34 @@ class AIT_ItemType extends AIT
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
-        $id = (int)$stmt->fetchColumn(0);
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+        }
+        else $ret = null;
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $this->_id);
 
-        if ($id === 0)
-            return null;
-        else 
-            return new AIT_TagType($l, $this->_id, $this->_pdo, $id);
+        return $ret;
+    }
+    // }}}
+
+    // {{{ defTag
+    /**
+     * Récupére un type tag associé au type d'item courant.
+     * Si le tag n'existe pas il est automatiquement créé.
+     *
+     * @param string $l nom du tag
+     *
+     * @return AIT_Tag
+     */
+    function defTag($l)
+    {
+        $ret = $this->getTag($l);
+        if (is_null($ret))
+            $ret = new AIT_TagType($l, $this->_id, $this->_pdo);
+        return $ret;
     }
     // }}}
 
@@ -192,24 +212,47 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
         $sql = sprintf("
-            SELECT id
+            SELECT id, label, type
             FROM %s
             WHERE label = ? AND type = ?
             LIMIT 0,1
-        ", $this->_pdo->tag());
+            ", $this->_pdo->tag());
         self::timer();
         $stmt = $this->_pdo->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+        }
+        else $ret = null;
+
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $this->_id);
-        
-        if ($id > 0) {
-            return new AIT_Item($l, $this->_id, $this->_pdo, $id);
-        }
+
+        return $ret;
+    }
+    // }}}
+
+    // {{{ defItem
+    /**
+     * Récupére un item associé au type d'item courant.
+     * Si l'item n'existe pas il est automatiquement créé.
+     *
+     * @param string $l nom de l'item
+     *
+     * @return AIT_Item
+     */
+    function defItem($l)
+    {
+        $ret = $this->getItem($l);
+        if (is_null($ret))
+            $ret = new AIT_Item($l, $this->_id, $this->_pdo);
+        return $ret;
     }
     // }}}
 
@@ -262,15 +305,15 @@ class AIT_ItemType extends AIT
 
     // {{{ fetchItems
     /**
-    * Récupére les items possédant un ou plusieurs tags donnée en paramètres
-    *
-    * @param ArrayObject $tags Tableau de tag
-    * @param integer $offset décalage à parir du premier enregistrement
-    * @param integer $lines nombre de lignes à retourner
-    * @param integer $ordering flag permettant le tri
-    *
-    * @return	AITResult
-    */
+     * Récupére les items possédant un ou plusieurs tags donnée en paramètres
+     *
+     * @param ArrayObject $tags Tableau de tag
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return	AITResult
+     */
     function fetchItems(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
     {
         if (!is_null($offset) && !is_int($offset))
@@ -300,7 +343,7 @@ class AIT_ItemType extends AIT
             $n++;
         }
         if ($n === 0) return new AITResult(array());
-        
+
         $sql1 = 'SELECT DISTINCT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s tagged LEFT JOIN %s tag ON tagged.item_id = tag.id
@@ -392,7 +435,7 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-     // {{{ searchItems
+    // {{{ searchItems
     /**
      * Recherche des items du type courant
      *
@@ -456,11 +499,11 @@ class AIT_ItemType extends AIT
 
     // {{{ getItemBySystemID
     /**
-    * Récupère un Item
-    *
-    * @param integer $i
-    *
-    * @return AIT_Item
+     * Récupère un Item
+     *
+     * @param integer $i
+     *
+     * @return AIT_Item
      */
     function getItemBySystemID($i)
     {
@@ -474,17 +517,17 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-  // {{{ queryItems
+    // {{{ queryItems
     /**
-    * On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery
-    *
-    * @param AITQuery $query requete
-    * @param integer $offset décalage à parir du premier enregistrement
-    * @param integer $lines nombre de lignes à retourner
-    * @param integer $ordering flag permettant le tri
-    *
-    * @return	AITResult
-    */
+     * On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery
+     *
+     * @param AITQuery $query requete
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return	AITResult
+     */
     function queryItems(AITQuery $query, $offset = null, $lines = null, $ordering = null)
     {
         if (!is_null($offset) && !is_int($offset))
@@ -528,7 +571,7 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-   // {{{ getAll
+    // {{{ getAll
     /**
      * Récupére Tous les types d'items de la base
      *
@@ -608,7 +651,7 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-     // {{{ countItems
+    // {{{ countItems
     /**
      * Compte le nombre d'items du type d'item courant
      *

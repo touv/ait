@@ -55,6 +55,32 @@ include::../examples/AIT_TagType-newTag.php[]
 -------------------------------------------------
 
 // ----------------------------------------------------------------------------
+defTag
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag defTag(string $l)
+
+Description
++++++++++++
+
+Récupére un tag du type courant. Si le tag n'existe pas, il est automatiquement créé.
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag
+
+
+// ----------------------------------------------------------------------------
 addTag
 ^^^^^^
 
@@ -79,10 +105,10 @@ Retour
 
 Un objet AIT_Tag représentant le nouveau tag
 
-[source]
--------------------------------------------------
-include::../examples/AIT_TagType-newTag.php[]
--------------------------------------------------
+//[source]
+//-------------------------------------------------
+//include::../examples/AIT_TagType-addTag.php[]
+//-------------------------------------------------
 
 
 // ----------------------------------------------------------------------------
@@ -108,7 +134,7 @@ string *$l*:: nom du tag
 Retour
 ++++++
 
-Un objet AIT_Tag représentant le tag trouvé.
+Un objet AIT_Tag représentant le tag trouvé ou NULL si il n'existe pas.
 
 // ----------------------------------------------------------------------------
 getTags

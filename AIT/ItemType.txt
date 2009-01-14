@@ -20,13 +20,41 @@ PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser.
 
 
 // ----------------------------------------------------------------------------
+defTag
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_TagType defTag(string $l)
+
+Description
++++++++++++
+
+Retourne un type de tag associé au type d'item courant. 
+Si le Tag n'existe pas il est automatiquement créé.
+
+
+Paramètres
+++++++++++
+
+string *$l*:: label
+
+
+Retour
+++++++
+
+Un objet AIT_TagType représentant le type de tag
+
+
+// ----------------------------------------------------------------------------
 addTag
 ^^^^^^
 
 Synopsis
 ++++++++
 
-    AIT_Tag addTag(string $l)
+    AIT_TagType addTag(string $l)
 
 Description
 +++++++++++
@@ -67,7 +95,8 @@ string *$l*:: Le label.
 Retour
 ++++++
 
-Un objet AIT_TagType représentant le type de tag trouvé.
+Un objet AIT_Tag représentant le type de tag trouvé ou NULL si il n'existe pas.
+
 
 // ----------------------------------------------------------------------------
 newItem
@@ -150,6 +179,34 @@ Exemple
 -------------------------------------------------
 include::../examples/AIT_ItemType-getItem.php[]
 -------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+defItem
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item defItem(string $l)
+
+Description
++++++++++++
+
+Retourne un item associé au type d'item courant. 
+Si l'item n'existe pas il est automatiquement créé.
+
+
+Paramètres
+++++++++++
+
+string *$l*:: nom de l'item
+
+
+Retour
+++++++
+
+Un objet AIT_Item représentant l'item trouvé.
 
 
 // ----------------------------------------------------------------------------

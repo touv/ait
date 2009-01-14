@@ -20,6 +20,33 @@ integer *$t*:: Identifiant système du type d'item associé (si connu)
 PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser. 
 integer *$id*:: Identifiant système de l'élément (si déjà connu). 
 
+// ----------------------------------------------------------------------------
+defTag
+^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Tag defTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Retourne un tag associé à l'item courant. 
+Si le Tag n'existe pas il est automatiquement créé.
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du tag 
+AIT_TagType *$o*:: Type de Tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag.
+
 
 // ----------------------------------------------------------------------------
 getTag
@@ -45,7 +72,7 @@ AIT_TagType *$o*:: Type de Tag
 Retour
 ++++++
 
-Un objet AIT_Tag représentant le tag existant, sinon retourne NULL.
+Un objet AIT_Tag représentant le tag trouvé ou NULL si il n'existe pas.
 
 
 // ----------------------------------------------------------------------------

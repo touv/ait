@@ -143,9 +143,8 @@ class AIT_TagType extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
 
-
         $sql = sprintf("
-            SELECT id
+            SELECT id, label, type
             FROM %s
             WHERE label = ? AND type = ?
             LIMIT 0,1
@@ -158,13 +157,34 @@ class AIT_TagType extends AIT
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
-        $id = (int)$stmt->fetchColumn(0);
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+            $ret = new AIT_Tag($row['label'], $row['type'], null, $this->_pdo, $row['id'], $row);
+        }
+        else $ret = null;
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $this->_id);
 
-        if ($id > 0) {
-            return new AIT_Tag($l, $this->_id, null, $this->_pdo, $id);
-        }
+        return $ret;
+    }
+    // }}}
+
+    // {{{ defTag
+    /**
+     * Récupére un tag du type courant
+     * Si le tag n'existe pas il est automatiquement créé.
+     *
+     * @param string $l nom du tag
+     *
+     * @return AIT_Tag
+     */
+    function defTag($l)
+    {
+        $ret = $this->getTag($l);
+        if (is_null($ret))
+            $ret = new AIT_Tag($l, $this->_id, null, $this->_pdo);
+        return $ret;
     }
     // }}}
 

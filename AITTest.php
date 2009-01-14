@@ -123,6 +123,20 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it->del();
         $this->assertEquals($this->_d(), 2);
     }
+     function test_define()
+    {
+        $it = new AIT_ItemType('A', $this->db);
+        $t1 = $it->defTag('C')->defTag('D');
+        $t1->attach($it->defItem('B'));
+        $t2 = $it->defItem('B')->defTag('D', $it->defTag('C'));
+
+        $this->assertEquals($t2, $t1);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
     function test_tagging_shared()
     {
         $it = new AIT_ItemType('itemtype', $this->db);

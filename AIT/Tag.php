@@ -158,6 +158,8 @@ class AIT_Tag extends AIT
             $this->_decreaseFrequency($this->_id);
             $this->_decreaseFrequency($this->_type);
 
+            if ($this->countItems() <= 0) $this->del();
+
             return $this;
         }
         catch (PDOException $e) {

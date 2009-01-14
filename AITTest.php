@@ -847,7 +847,26 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 0);
     }
 
+    function test_detach()
+    {
+        $it = new AIT_ItemType('A', $this->db);
+        $tt = $it->addTag('tagtype1');
 
+        $it->defItem('B')->addTag('C', $tt);
+
+        $tags = $it->defItem('B')->getTypedTags($tt);
+
+        $this->assertEquals($tags->count(), 1);
+        $this->assertEquals($tags->offsetGet(0)->countItems(), 1);
+
+        $tags->offsetGet(0)->detach();
+
+        $this->assertFalse($tags->offsetGet(0)->exists());
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
 
     /**/
     private function _d()

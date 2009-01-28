@@ -136,7 +136,7 @@ class AIT_TagType extends AIT
      *
      * @param string $l nom du tag
      *
-     * @return AIT_Item
+     * @return AIT_Tag
      */
     function getTag($l)
     {

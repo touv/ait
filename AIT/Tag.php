@@ -206,10 +206,11 @@ class AIT_Tag extends AIT
 
     // {{{ fetchRelatedTags
     /**
-    * Récupére les tags associé au même item que le tag courant
-    * mais en filtrant sur une certain nombre de type de tag
+    * Récupére les tags associés au même item que le tag courant
+    *  - en filtrant avec un ou plusieurs type de tag
+    *  - en filtrant avec un ou plusierus tag
     *
-    * @param ArrayObject $tags Tableau de type de tag
+    * @param ArrayObject $tags Tableau de types de tag ou des tags
     * @param integer $offset décalage à parir du premier enregistrement
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
@@ -226,25 +227,39 @@ class AIT_Tag extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $n = 0;
-        $w  = '';
+        $w = $w1 = $w2 = $s = '';
         if ($tags->count() != 0) {
             foreach($tags as $tag) {
-                if (! $tag instanceof AIT_TagType) {
-                    trigger_error('Line 3 of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag, '.gettype($tag).' given and ignored', E_USER_NOTICE);
-                    continue;
+                if ($tag instanceof AIT_TagType) {
+                    if (!empty($w1)) $w1 .= ' OR ';
+                    $w1 = 'type = '. $tag->getSystemID();
                 }
-                if (!empty($w)) $w .= ' OR ';
-                $w = 'type = '. $tag->getSystemID();
+                elseif ($tag instanceof AIT_Tag) {
+                    if (!empty($w2)) $w2 .= ' OR ';
+                    $w2 = 'e.tag_id = '. $tag->getSystemID();
+                }
+                else {
+                    trigger_error('Line '.$n.' of Argument 1 passed to '.__METHOD__.' must be a instance of AIT_Tag or of AIT_TagType, '.gettype($tag).' given and ignored', E_USER_NOTICE);
+                }
                 $n++;
             }
             if ($n === 0) return new AITResult(array());
-            else $w = ' AND ('.$w.')';
+
+            if (!empty($w1)) $w = ' AND ('.$w1.')';
+            if (!empty($w2)) {
+                $w .= ' AND ('.$w2.')';
+                $s = sprintf('LEFT JOIN %s d ON d.tag_id=c.id LEFT JOIN %s e ON d.item_id=e.item_id', 
+                    $this->_pdo->tagged(),
+                    $this->_pdo->tagged()
+                );
+            }
         }
         $sql1 = 'SELECT DISTINCT id, label, space, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
-            LEFT JOIN %s c ON b.tag_id=c.id
+            LEFT JOIN %s c ON b.tag_id=c.id 
+            $s           
             WHERE a.tag_id = ? $w
             ",
             $this->_pdo->tagged(),

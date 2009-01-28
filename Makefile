@@ -13,12 +13,12 @@ apidoc : doxygen phpdocumentor
 webdoc : userguide docbook
 
 userguide : webdoc/userguide.pdf
-docbook : webdoc/docbook/index.html
+docbook : webdoc/docbook/index.html 
 
-webdoc/docbook/index.html: userguide.xml
+webdoc/docbook/index.html: userguide.xml docbook.xsl
 	$(XSLTPROC) --nonet  \
 		--stringparam base.dir "./webdoc/docbook/" \
-		docbook.xsl $?
+		docbook.xsl userguide.xml
 
 userguide.xml: userguide.txt
 	$(ASCIIDOC) --unsafe -b docbook -d book -o $@ $?

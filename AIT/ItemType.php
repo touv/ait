@@ -89,7 +89,7 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-    // {{{ addTag
+    // {{{ addTagType
     /**
      * Ajout d'un type de tag au type d'item courant
      *
@@ -97,17 +97,17 @@ class AIT_ItemType extends AIT
      *
      * @return AIT_TagType
      */
-    function addTag($l)
+    function addTagType($l)
     {
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
         return new AIT_TagType($l, $this->_id, $this->_pdo);
     }
-
+    function addTag($l) { return $this->addTagType($l); }
     // }}}
 
-    // {{{ getTag
+    // {{{ getTagType
     /**
      * Récupére un type de tag du type d'item courant
      *
@@ -115,7 +115,7 @@ class AIT_ItemType extends AIT
      *
      * @return AIT_TagType
      */
-    function getTag($l)
+    function getTagType($l)
     {
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
@@ -147,24 +147,112 @@ class AIT_ItemType extends AIT
 
         return $ret;
     }
+    function getTag($l) { return $this->getTagType($l); }
     // }}}
 
-    // {{{ defTag
+    // {{{ defTagType
     /**
      * Récupére un type tag associé au type d'item courant.
      * Si le tag n'existe pas il est automatiquement créé.
      *
      * @param string $l nom du tag
      *
-     * @return AIT_Tag
+     * @return AIT_TagType
      */
-    function defTag($l)
+    function defTagType($l)
     {
-        $ret = $this->getTag($l);
+        $ret = $this->getTagType($l);
         if (is_null($ret))
             $ret = new AIT_TagType($l, $this->_id, $this->_pdo);
         return $ret;
     }
+    function defTag($l) { return $this->defTagType($l); }
+    // }}}
+
+    // {{{ getTagTypes
+    /**
+     * Récupére tout les types de tags de l'item courant
+     *
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return AITResult
+     */
+    function getTagTypes($offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        $sql1 = 'SELECT id, label, space, score, frequency, type ';
+        $sql2 = sprintf("
+            FROM %s a
+            LEFT JOIN %s b ON a.tag_id=b.id
+            WHERE item_id = ?
+            ",
+            $this->_pdo->tagged(),
+            $this->_pdo->tag()
+        );
+        $sql = $sql1.$sql2;
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::timer();
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+        }
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        $r = new AITResult($ret);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
+        return $r;
+    }
+    function getTags($offset = null, $lines = null, $ordering = null) { return $this->getTagTypes($offset, $lines, $ordering); }
+    // }}}
+
+    // {{{ countTagTypes
+    /**
+     * Compte le nombre de tags associés au type d'item courant
+     *
+     * @return integer
+     */
+    function countTagTypes()
+    {
+        try {
+            $sql = sprintf("
+                SELECT count(*)
+                FROM %s
+                WHERE item_id = ?
+                ", $this->_pdo->tagged());
+
+            self::timer();
+            $stmt = $this->_pdo->prepare($sql);
+            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+            $stmt->execute();
+            settype($this->_id, 'integer');
+
+            $c = (int)$stmt->fetchColumn(0);
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $this->_id);
+
+            return $c;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
+    }
+    function countTags() { return $this->countTagTypes(); }
     // }}}
 
     // {{{ newItem
@@ -384,57 +472,6 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
-    // {{{ getTags
-    /**
-     * Récupére tout les types de tags de l'item courant
-     *
-     * @param integer $offset décalage à parir du premier enregistrement
-     * @param integer $lines nombre de lignes à retourner
-     * @param integer $ordering flag permettant le tri
-     *
-     * @return AITResult
-     */
-    function getTags($offset = null, $lines = null, $ordering = null)
-    {
-        if (!is_null($offset) && !is_int($offset))
-            trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
-        if (!is_null($lines) && !is_int($lines))
-            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
-        if (!is_null($ordering) && !is_int($ordering))
-            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
-
-        $sql1 = 'SELECT id, label, space, score, frequency, type ';
-        $sql2 = sprintf("
-            FROM %s a
-            LEFT JOIN %s b ON a.tag_id=b.id
-            WHERE item_id = ?
-            ",
-            $this->_pdo->tagged(),
-            $this->_pdo->tag()
-        );
-        $sql = $sql1.$sql2;
-        self::sqler($sql, $offset, $lines, $ordering);
-        self::timer();
-        $stmt = $this->_pdo->prepare($sql);
-        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->execute();
-        settype($this->_id, 'integer');
-        $ret = array();
-        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
-            settype($row['id'], 'integer');
-            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
-        }
-        $stmt->closeCursor();
-        self::debug(self::timer(true), $sql, $this->_id);
-
-        $sql = 'SELECT COUNT(*) '.$sql2;
-        $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
-
-        return $r;
-    }
-    // }}}
-
     // {{{ searchItems
     /**
      * Recherche des items du type courant
@@ -615,39 +652,6 @@ class AIT_ItemType extends AIT
         $r->setQueryForTotal($sql, array(), $pdo);
 
         return $r;
-    }
-    // }}}
-
-    // {{{ countTags
-    /**
-     * Compte le nombre de tags associés au type d'item courant
-     *
-     * @return integer
-     */
-    function countTags()
-    {
-        try {
-            $sql = sprintf("
-                SELECT count(*)
-                FROM %s
-                WHERE item_id = ?
-                ", $this->_pdo->tagged());
-
-            self::timer();
-            $stmt = $this->_pdo->prepare($sql);
-            $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-            $stmt->execute();
-            settype($this->_id, 'integer');
-
-            $c = (int)$stmt->fetchColumn(0);
-            $stmt->closeCursor();
-            self::debug(self::timer(true), $sql, $this->_id);
-
-            return $c;
-        }
-        catch (PDOException $e) {
-            self::catchError($e);
-        }
     }
     // }}}
 

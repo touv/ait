@@ -1695,6 +1695,7 @@ class AITResult extends ArrayObject {
         return $this->_total;
     }
     // }}}
+
 }
 
 

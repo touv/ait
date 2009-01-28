@@ -20,13 +20,13 @@ PDOAIT *$pdo*:: Instance de base AIT que l'on souhaite utiliser.
 
 
 // ----------------------------------------------------------------------------
-defTag
+defTagType
 ^^^^^^^^^^
 
 Synopsis
 ++++++++
 
-    AIT_TagType defTag(string $l)
+    AIT_TagType defTagType(string $l)
 
 Description
 +++++++++++
@@ -48,13 +48,13 @@ Un objet AIT_TagType représentant le type de tag
 
 
 // ----------------------------------------------------------------------------
-addTag
-^^^^^^
+addTagType
+^^^^^^^^^^^
 
 Synopsis
 ++++++++
 
-    AIT_TagType addTag(string $l)
+    AIT_TagType addTagType(string $l)
 
 Description
 +++++++++++
@@ -73,13 +73,13 @@ Retour
 Un objet AIT_TagType représentant le nouveau type de tag
 
 // ----------------------------------------------------------------------------
-getTag
-^^^^^^
+getTagType
+^^^^^^^^^^^
 
 Synopsis
 ++++++++
 
-    AIT_TagType getTag(string $l)
+    AIT_TagType getTagType(string $l)
 
 Description
 +++++++++++
@@ -95,7 +95,7 @@ string *$l*:: Le label.
 Retour
 ++++++
 
-Un objet AIT_Tag représentant le type de tag trouvé ou NULL si il n'existe pas.
+Un objet AIT_TagType représentant le type de tag trouvé ou NULL si il n'existe pas.
 
 
 // ----------------------------------------------------------------------------
@@ -282,13 +282,13 @@ include::../examples/AIT_ItemType-fetchItems.php[]
 
 
 // ----------------------------------------------------------------------------
-getTags
-^^^^^^^
+getTagTypes
+^^^^^^^^^^^
 
 Synopsis
 ++++++++
 
-    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTagTypes(integer $offset=null, integer $lines=null, integer $ordering=null)
 
 Description
 +++++++++++
@@ -439,8 +439,8 @@ include::../examples/AIT_ItemType-countItems.php[]
 -------------------------------------------------
 
 // ----------------------------------------------------------------------------
-countTags
-^^^^^^^^^
+countTagTypes
+^^^^^^^^^^^^^^
 
 Synopsis
 ++++++++

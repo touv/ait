@@ -304,6 +304,50 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+    function test_related2()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('1');
+        $i2 = $it->addItem('2');
+        $i3 = $it->addItem('3');           //        | 1 | 2 | 3 | 4 |
+        $i4 = $it->addItem('4');           //        +---------------+
+        $y1 = $it->addTag('#');            //     #  | A |   | A |   |
+        $t1 = $y1->addTag('A');            //        | B | B | B |   |
+        $t2 = $y1->addTag('B');            //        | C | C |   | C |
+        $t3 = $y1->addTag('C');            //        |   | D | D | D |
+        $t4 = $y1->addTag('D');            //        |   |   | E | E |
+        $t5 = $y1->addTag('E');            //    .....................
+        $y2 = $it->addTag('@');            //     @  | W | X | Y | Z |
+        $t6 = $y2->addTag('W');            //       
+        $t7 = $y2->addTag('X');
+        $t8 = $y2->addTag('Y');
+        $t9 = $y2->addTag('Z');
+
+        $i1->attach($t1)->attach($t2)->attach($t3)->attach($t6);
+        $i2->attach($t2)->attach($t3)->attach($t4)->attach($t7);
+        $i3->attach($t1)->attach($t2)->attach($t4)->attach($t5)->attach($t8);
+        $i4->attach($t3)->attach($t4)->attach($t5)->attach($t9);
+
+        $tags = $t2->fetchRelatedTags(new ArrayObject());
+        $str = ''; foreach($tags as $tag) $str .= $tag->get();
+        $this->assertEquals($tags->count(), 7);
+        $this->assertEquals($str, 'ACWDXEY');
+
+        $tags = $t2->fetchRelatedTags(new ArrayObject(array($y2)));
+        $str = ''; foreach($tags as $tag) $str .= $tag->get();
+        $this->assertEquals($tags->count(), 3);
+        $this->assertEquals($str, 'WXY');
+
+        $tags = $t2->fetchRelatedTags(new ArrayObject(array($y2, $t4)));
+        $str = ''; foreach($tags as $tag) $str .= $tag->get();
+        $this->assertEquals($tags->count(), 2);
+        $this->assertEquals($str, 'XY');
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
     function test_attachement()
     {
         $it = new AIT_ItemType('itemtype', $this->db);

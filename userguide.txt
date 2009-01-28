@@ -47,6 +47,22 @@ Il suffit de décompresser l'archive dans un répertoire
 et d'ajuster la variable PHP include_path en fonction du
 répertoire que vous avez choisi.
 
+Modéle de données
+-----------------
+
+AIT traite 4 concepts qui est important de bien comprendre. A chacun des ces quatres 
+concepts est associé une classe PHP :
+
+- Les types d'items (AIT_ItemType)
+- Les items (AIT_Item)
+- Les types de tags (AIT_TagType)
+- Les tags (AIT_Tag)
+
+Ces 4 concepts respectent le modèle de données conceptuel suivant :
+
+image:../vitrualmodel.png[Modéle de données virtuel]
+
+NOTE: Le modéle de données physique ne se présente pas de cette manière
 
 Constantes pré-définies
 -----------------------

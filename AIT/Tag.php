@@ -330,6 +330,57 @@ class AIT_Tag extends AIT
     }
     // }}}
 
+    // {{{ getItems
+    /**
+     * Récupére tous les items attachés au tag courrant
+     *
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return AITResult
+     */
+    function getItems($offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        $sql1 = 'SELECT id, label, space, score, frequency, type ';
+        $sql2 = sprintf("
+            FROM %s a
+            LEFT JOIN %s b ON a.item_id=b.id
+            WHERE tag_id = ? %s
+            ",
+            $this->_pdo->tagged(),
+            $this->_pdo->tag(),
+            $w
+        );
+        $sql = $sql1.$sql2;
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::timer();
+        $stmt = $this->_pdo->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+        }
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id);
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        $r = new AITResult($ret);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+
+        return $r;
+    }
+    // }}}
 }
 
 

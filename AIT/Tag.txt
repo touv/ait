@@ -225,6 +225,33 @@ Retour
 
 Un objet AIT_TagType représentant le type de tag associé.
 
+// ----------------------------------------------------------------------------
+getItems
+^^^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les items du tag courrant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
 
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

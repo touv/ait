@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-01-28</date>
+    <date>2009-02-23</date>
     <version>
-        <release>1.6</release>
+        <release>1.7</release>
         <api>1.0</api>
     </version>
     <stability>
@@ -23,8 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + plus de précision dans le nom des méthodes de AIT_ItemType
-        + amélioration de la méthode relatedTags dans AIT_Tag
+        + ajout de getItems dans Tag
     </notes>
     <contents>
         <dir name="/">
@@ -368,6 +367,22 @@
             <notes>
                 + Ajout des méthodes defTag et defItem
             </notes>
-        </release>
-    </changelog>
+		</release>
+		<release>
+			<date>2009-01-28</date>
+			<version>
+				<release>1.6</release>
+				<api>1.0</api>
+			</version>
+			<stability>
+				<release>stable</release>
+				<api>stable</api>
+			</stability>
+			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+			<notes>
+				+ plus de précision dans le nom des méthodes de AIT_ItemType
+				+ amélioration de la méthode relatedTags dans AIT_Tag
+			</notes>
+		</release>
+	</changelog>
 </package>

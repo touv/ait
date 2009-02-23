@@ -1,8 +1,0 @@
-table#<?php echo $ClassID ?> {
-		width :100%; 
-}
-table#<?php echo $ClassID ?> td,table#<?php echo $ClassID ?> th  {
-		vertical-align:top;
-		width: 33%;
-}
-

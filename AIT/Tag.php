@@ -353,11 +353,10 @@ class AIT_Tag extends AIT
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.id
-            WHERE tag_id = ? %s
+            WHERE tag_id = ? 
             ",
             $this->_pdo->tagged(),
-            $this->_pdo->tag(),
-            $w
+            $this->_pdo->tag()
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);

@@ -275,7 +275,7 @@ class AIT_Tag extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
-            if ($row['id'] == $this->_id) continue;
+            if (is_null($row['id']) or $row['id'] == $this->_id) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_item_id, $this->_pdo, $row['id'], $row);
@@ -367,6 +367,7 @@ class AIT_Tag extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }

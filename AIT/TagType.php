@@ -158,6 +158,7 @@ class AIT_TagType extends AIT
         $stmt->execute();
         settype($this->_id, 'integer');
         if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret = new AIT_Tag($row['label'], $row['type'], null, $this->_pdo, $row['id'], $row);
@@ -223,6 +224,7 @@ class AIT_TagType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id'], $row);
         }
@@ -302,6 +304,7 @@ class AIT_TagType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_Tag($row['label'], $this->_id, null, $this->_pdo, $row['id'], $row);
         }

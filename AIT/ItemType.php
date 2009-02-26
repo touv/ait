@@ -137,6 +137,7 @@ class AIT_ItemType extends AIT
         $stmt->execute();
         settype($this->_id, 'integer');
         if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
@@ -206,6 +207,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
@@ -312,6 +314,7 @@ class AIT_ItemType extends AIT
         $stmt->execute();
         settype($this->_id, 'integer');
         if (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
@@ -377,6 +380,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
@@ -450,6 +454,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
@@ -520,6 +525,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
         }
@@ -593,6 +599,7 @@ class AIT_ItemType extends AIT
         settype($this->_id, 'integer');
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
@@ -641,6 +648,7 @@ class AIT_ItemType extends AIT
         $stmt->execute();
         $ret = array();
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
             $ret[] = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);

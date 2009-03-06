@@ -60,7 +60,7 @@ class AIT_Extended_Fake extends AIT_Extended
     function __construct()
     {
         parent::__construct(array(
-            'class_callback' => array(
+            'callbacks' => array(
                 'ItemType'   => array(
                     'maMethod' => array($this, 'maMethod'),
                 ),

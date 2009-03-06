@@ -77,6 +77,7 @@ class AIT_ItemType extends AIT
         $this->_type  = 1;
         if ($id === false) {
             $this->_id = $this->_addTag($this->_label, $this->_type);
+            $this->callClassCallback('addHook', $this->_id);
         }
         else {
             if ($row !== false) $this->_fill($row);
@@ -102,7 +103,7 @@ class AIT_ItemType extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
-        return new AIT_TagType($l, $this->_id, $this->_pdo);
+        return new AIT_TagType($l, $this->_id, $this->getPDO());
     }
     function addTag($l) { return $this->addTagType($l); }
     // }}}
@@ -115,7 +116,7 @@ class AIT_ItemType extends AIT
      *
      * @return AIT_TagType
      */
-    function getTagType($l)
+    function getTagType($l)    
     {
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
@@ -127,11 +128,11 @@ class AIT_ItemType extends AIT
             WHERE label = ? and type = 2 and item_id = ?
             LIMIT 0,1
             ",
-            $this->_pdo->tag(),
-            $this->_pdo->tagged()
+            $this->getPDO()->tag(),
+            $this->getPDO()->tagged()
         );
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -140,7 +141,7 @@ class AIT_ItemType extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret = new AIT_TagType($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         else $ret = null;
         $stmt->closeCursor();
@@ -164,7 +165,7 @@ class AIT_ItemType extends AIT
     {
         $ret = $this->getTagType($l);
         if (is_null($ret))
-            $ret = new AIT_TagType($l, $this->_id, $this->_pdo);
+            $ret = new AIT_TagType($l, $this->_id, $this->getPDO());
         return $ret;
     }
     function defTag($l) { return $this->defTagType($l); }
@@ -195,13 +196,13 @@ class AIT_ItemType extends AIT
             LEFT JOIN %s b ON a.tag_id=b.id
             WHERE item_id = ?
             ",
-            $this->_pdo->tagged(),
-            $this->_pdo->tag()
+            $this->getPDO()->tagged(),
+            $this->getPDO()->tag()
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
@@ -209,14 +210,14 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
-            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_TagType($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
         return $r;
     }
@@ -236,10 +237,10 @@ class AIT_ItemType extends AIT
                 SELECT count(*)
                 FROM %s
                 WHERE item_id = ?
-                ", $this->_pdo->tagged());
+                ", $this->getPDO()->tagged());
 
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
             settype($this->_id, 'integer');
@@ -265,7 +266,7 @@ class AIT_ItemType extends AIT
      */
     function newItem()
     {
-        $o = new AIT_Item('NEW', $this->_id, $this->_pdo);
+        $o = new AIT_Item('NEW', $this->_id, $this->getPDO());
         $o->ren('#'.$o->getSystemID());
         return $o;
     }
@@ -284,7 +285,7 @@ class AIT_ItemType extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
-        return new AIT_Item($l, $this->_id, $this->_pdo);
+        return new AIT_Item($l, $this->_id, $this->getPDO());
     }
     // }}}
 
@@ -306,9 +307,9 @@ class AIT_ItemType extends AIT
             FROM %s
             WHERE label = ? AND type = ?
             LIMIT 0,1
-            ", $this->_pdo->tag());
+            ", $this->getPDO()->tag());
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -317,7 +318,7 @@ class AIT_ItemType extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret = new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         else $ret = null;
 
@@ -342,7 +343,7 @@ class AIT_ItemType extends AIT
     {
         $ret = $this->getItem($l);
         if (is_null($ret))
-            $ret = new AIT_Item($l, $this->_id, $this->_pdo);
+            $ret = new AIT_Item($l, $this->_id, $this->getPDO());
         return $ret;
     }
     // }}}
@@ -370,11 +371,17 @@ class AIT_ItemType extends AIT
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
-            ", $this->_pdo->tag());
+            ", $this->getPDO()->tag());
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'getItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
@@ -382,14 +389,17 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('getItemsCache', $cid, $r);
 
         return $r;
     }
@@ -428,7 +438,7 @@ class AIT_ItemType extends AIT
             }
             else {
                 $w .= sprintf(' AND EXISTS (SELECT null FROM %s t WHERE t.item_id = tagged.item_id and t.tag_id = %s)',
-                    $this->_pdo->tagged(),
+                    $this->getPDO()->tagged(),
                     $tag->getSystemID()
                 );
             }
@@ -441,14 +451,14 @@ class AIT_ItemType extends AIT
             FROM %s tagged LEFT JOIN %s tag ON tagged.item_id = tag.id
             WHERE %s AND type = ?
             ",
-            $this->_pdo->tagged(),
-            $this->_pdo->tag(),
+            $this->getPDO()->tagged(),
+            $this->getPDO()->tag(),
             $w
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
@@ -457,7 +467,7 @@ class AIT_ItemType extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_Item($row['label'], $row['type'], $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id);
@@ -465,7 +475,7 @@ class AIT_ItemType extends AIT
         $sql = 'SELECT count(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
         if ($tags->count() > 1) {
-            $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+            $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
         }
         else {
             // Pour un seul tag il est intule de faire un "count"
@@ -497,10 +507,10 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        if (is_callable($this->_queryspace)) {
-            $query = call_user_func($this->_queryspace, $query, $this);
-        }
-        if ($query !== '') $query = 'AND '.$query;
+        if ($this->isClassCallback('searchItemsHook'))
+            $query = $this->callClassCallback('searchItemsHook', $query, $this);
+
+        if ($query !== '' and $query !== false) $query = 'AND '.$query;
         $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.space space, item.score score, item.frequency frequency';
         $sql2 = sprintf('
             FROM %1$s tag
@@ -509,8 +519,8 @@ class AIT_ItemType extends AIT
             LEFT JOIN %1$s item ON d.item_id=item.id
             WHERE b.item_id = ? AND item.type = ? %3$s
             ',
-            $this->_pdo->tag(),
-            $this->_pdo->tagged(),
+            $this->getPDO()->tag(),
+            $this->getPDO()->tagged(),
             $query
         );
         $sql = $sql1.$sql2;
@@ -518,7 +528,7 @@ class AIT_ItemType extends AIT
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
 
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -527,14 +537,14 @@ class AIT_ItemType extends AIT
         while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
             if (is_null($row['id'])) continue;
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id, $this->_id);
 
         $sql = 'SELECT COUNT(DISTINCT item.id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
         return $r;
     }
@@ -555,7 +565,7 @@ class AIT_ItemType extends AIT
 
         $row = $this->_getTagBySystemID($i);
         if (is_array($row)) {
-            return new AIT_Item($row['label'], $this->_id, $this->_pdo, $row['id']);
+            return new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id']);
         }
     }
     // }}}
@@ -588,12 +598,12 @@ class AIT_ItemType extends AIT
             WHERE type = ?
             ",
             $w,
-            $this->_pdo->tag()
+            $this->getPDO()->tag()
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
@@ -602,14 +612,14 @@ class AIT_ItemType extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Item($row['label'], $row['type'], $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_Item($row['label'], $row['type'], $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
         return $r;
     }
@@ -692,6 +702,7 @@ class AIT_ItemType extends AIT
         $this->_rmTag($this->_id);
     }
     // }}}
+
 
 }
 

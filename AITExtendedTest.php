@@ -12,19 +12,21 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
     var $db;
     function setUp()
     {
+        $this->cnxstr = 'mysql:host=localhost;dbname=ait';
 //        $this->cnxstr = 'mysql:host=localhost;dbname=allistag';
-        $this->cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
+//        $this->cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
+        $this->db = AIT::connect($this->cnxstr, 'root');
     }
     function tearDown()
     {
-//        $this->db->exec("TRUNCATE ".$this->db->tag());
-//        $this->db->exec("TRUNCATE ".$this->db->tagged());
+        $this->db->exec("TRUNCATE ".$this->db->tag());
+        $this->db->exec("TRUNCATE ".$this->db->tagged());
         $this->db = null;
     }
     function test_search()
     {
         require_once 'AIT/Extended/Searching.php';
-        $this->db = AIT::connect($this->cnxstr, 'root');
+//        $this->db = AIT::connect($this->cnxstr, 'root');
         $this->db->setOption('prefix', 'search_');
         $this->db->checkup();
         $this->db->extendWith(new AIT_Extended_Searching());
@@ -78,7 +80,6 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
      function test_fake()
     {
         require_once 'AIT/Extended/Fake.php';
-        $this->db = AIT::connect($this->cnxstr, 'root');
         $this->db->setOption('prefix', 'search_');
         $this->db->checkup();
         $this->db->extendWith(new AIT_Extended_Fake());
@@ -100,18 +101,15 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
         require_once 'AIT/Extended/Searching.php';
 
         // Connexion à la base
-        $db = AIT::connect(
-            $this->cnxstr,
-            'root'
-        );
-        $db->checkup();
+//        $this->db = AIT::connect( $this->cnxstr, 'root');
+        $this->db->checkup();
 
         // Ajout d'un plugin
-        $db->extendWith(new AIT_Extended_Searching());
+        $this->db->extendWith(new AIT_Extended_Searching());
 
 
         // Définition d'un schéma de données
-        $sm = $db->registerSchema('Disques', array('titre', 'artiste', 'style'));
+        $sm = $this->db->registerSchema('Disques', array('titre', 'artiste', 'style'));
 
 
         // Ajout de quelques Tags génériques
@@ -148,7 +146,28 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
 
         $sm->disques->del();
 
-        $db = null;
+    }
+
+    function test_basic_cache()
+    {
+        require_once 'AIT/Extended/Caching/Basic.php';
+        $this->db->checkup();
+        $this->db->extendWith(new AIT_Extended_Caching_Basic());
+
+        $it = new AIT_ItemType('A', $this->db);
+        $i1 = $it->addItem('B');
+        $i2 = $it->addItem('C');
+
+
+        $r1 = $it->getItems();
+        $this->assertEquals($r1->count(), 2);
+
+        $i3 = $it->addItem('D');
+
+        $r1 = $it->getItems();
+
+        $this->assertEquals($r1->count(), 2);
+
     }
 
 

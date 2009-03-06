@@ -130,9 +130,7 @@ class PDOAIT extends PDO
         'opt'      => 'opt',
         'tag'      => 'tag',
         'tagged'   => 'tagged',
-        'space_callback' => array(),
-        'query_callback' => array(),
-        'class_callback' => array(),
+        'callbacks' => array(),
     );
 
     // {{{ __construct
@@ -316,14 +314,14 @@ class PDOAIT extends PDO
                         updated timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
                         created timestamp NOT NULL default '0000-00-00 00:00:00',
                         INDEX (label),
-                        FULLTEXT (space),
-                        INDEX (score),
-                        INDEX (type),
-                        INDEX (type,created),
-                        INDEX (type,updated),
-                        INDEX (type,score),
-                        INDEX (type,frequency)
-                    ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+                FULLTEXT (space),
+                INDEX (score),
+                INDEX (type),
+                INDEX (type,created),
+                INDEX (type,updated),
+                INDEX (type,score),
+                INDEX (type,frequency)
+            ) ENGINE=MYISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
                 ", $this->tag(true)));
                 $this->exec(sprintf("
                     CREATE TABLE %s (
@@ -380,6 +378,74 @@ class PDOAIT extends PDO
 
 }
 
+/**
+ * Objet Racine
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
+abstract class AITRoot
+{
+    /**
+     * @var PDOAIT
+     */
+    private $_pdo;
+    /**
+     * @var array
+     */
+    protected $_pdo_opt;
+
+    // {{{ getPDO
+    /**
+     * Renvoit l'objet PDO utilisé
+     *
+     * @return PDO
+     */
+    public function getPDO()
+    {
+        if (is_null($this->_pdo)) {
+            $this->_pdo = new PDOAIT(
+                $this->_pdo_opt['dsn'],
+                $this->_pdo_opt['username'],
+                $this->_pdo_opt['password'],
+                $this->_pdo_opt['drvropts']
+            );
+        }
+        $this->_pdo->setOptions($this->_pdo_opt);
+        return $this->_pdo;
+    }
+    // }}}
+
+    // {{{ setPDO
+    /**
+     * Fixe l'objet PDO utilisé
+     *
+     * @param PDOAIT
+     */
+    public function setPDO(PDOAIT $pdo)
+    {
+        $this->_pdo = $pdo;
+        $this->_pdo_opt = $pdo->getOptions();
+    }
+    // }}}
+    // {{{ __sleep
+    /** 
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        $this->_pdo_opt = $this->getPDO()->getOptions();
+        $vars = array_keys(get_object_vars($this));
+        unset($vars[array_search('_pdo', $vars)]);
+        return $vars;
+    }
+    // }}}
+}
 
 
 /**
@@ -394,7 +460,7 @@ class PDOAIT extends PDO
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @link      http://www.pxxo.net/fr/ait
  */
-class AIT
+class AIT extends AITRoot
 {
     /**
      * @var boolean
@@ -404,14 +470,6 @@ class AIT
      * @var integer
      */
     static $time = 0;
-    /**
-     * @var PDOAIT
-     */
-    protected $_pdo;
-    /**
-     * @var array
-     */
-    protected $_pdo_opt;
     /**
      * @var integer
      */
@@ -429,28 +487,16 @@ class AIT
      */
     protected $_type;
     /**
-     * @var callback
+     * @var array
      */
-    protected $_fillspace;
-    /**
-     * @var callback
-     */
-    protected $_queryspace;
-    /**
-     * @var callback
-     */
-    protected $_findspace;
-    /**
-    * @var array
-    */
     protected $_methods = array();
     /**
-    * @var array
-    */
+     * @var array
+     */
     protected $_cols  = array('space' => 'string', 'score' => 'integer', 'frequency' => 'integer',);
     /**
-    * @var array
-    */
+     * @var array
+     */
     protected $_data  = array();
 
     const VERSION = '1.0.2';
@@ -459,51 +505,34 @@ class AIT
     const ORDER_BY_LABEL = 8;
     const ORDER_BY_SCORE = 16;
     const ORDER_BY_UPDATED = 32;
-	const ORDER_BY_CREATED = 64;
-	const ORDER_BY_FREQUENCY = 128;
+    const ORDER_BY_CREATED = 64;
+    const ORDER_BY_FREQUENCY = 128;
 
     // {{{ __construct
     /**
-    * Constructeur
-    *
-    * @param PDOAIT $pdo objet de connexion à la base
-    */
+     * Constructeur
+     *
+     * @param PDOAIT $pdo objet de connexion à la base
+     */
     function __construct(PDOAIT $pdo, $element)
     {
-        $this->_pdo = $pdo;
+        $this->setPDO($pdo);
         $this->_element = $element;
 
-        $scb = $this->_pdo->getOption('space_callback');
-        if (isset($scb[$element])) $this->setSpaceCallback($scb[$element]);
-        $qcb = $this->_pdo->getOption('query_callback');
-        if (isset($qcb[$element])) $this->setSearchCallback($qcb[$element]);
-        $ccb = $this->_pdo->getOption('class_callback');
-        if (isset($ccb[$element])) $this->setClassCallback($ccb[$element]);
-
-    }
-    // }}}
-
-    // {{{ getPDO
-    /**
-    * Renvoit l'objet PDO utilisé
-    *
-    * @return PDO
-    */
-    public function getPDO()
-    {
-        return $this->_pdo;
+        $cb = $this->getPDO()->getOption('callbacks');
+        if (isset($cb[$element])) $this->setClassCallback($cb[$element]);
     }
     // }}}
 
     // {{{ catchError
     /**
-    * Attrape toutes les erreurs de l'objet
-    *
-    * @param integer $m identifiant du tag
-    * @param integer $i identifiant du tag
-    *
-    * @return boolean
-    */
+     * Attrape toutes les erreurs de l'objet
+     *
+     * @param integer $m identifiant du tag
+     * @param integer $i identifiant du tag
+     *
+     * @return boolean
+     */
     public static function catchError(PDOException $e)
     {
         trigger_error($e->getMessage(), E_USER_ERROR);
@@ -512,16 +541,16 @@ class AIT
 
     // {{{ connect
     /**
-    *  Connection à la base
-    *
-    * @param string $dsn chaine de connexion
-    * @param string $username user de connexion
-    * @param string $password mot de passe de connexion
-    * @param array $driver_options options pour pdo
-    * @param array $ait_options options pour pdo
-    *
-    *  @return PDO
-    */
+     *  Connection à la base
+     *
+     * @param string $dsn chaine de connexion
+     * @param string $username user de connexion
+     * @param string $password mot de passe de connexion
+     * @param array $driver_options options pour pdo
+     * @param array $ait_options options pour pdo
+     *
+     *  @return PDO
+     */
     public static function connect($dsn, $username = 'root', $password = '', array $driver_options = array(), array $ait_options = array())
     {
         try {
@@ -537,88 +566,91 @@ class AIT
 
     // {{{ setClassCallback
     /**
-    * Fixe des callback de class cad l'ajout de nouvelle méthode
-    *
-    * @access	public
-    */
+     * Fixe des callback de class cad l'ajout de nouvelle méthode
+     *
+     * @access	public
+     */
     function setClassCallback(array $a)
     {
-        $this->_methods = $a;
-    }
-    // }}}
-
-    // {{{ setSpaceCallback
-    /**
-    * Fixe la callback de remplissage du champ space
-    *
-    * @param callback $c 
-    *
-    * @access	public
-    */
-    function setSpaceCallback($c)
-    {
-        if (is_callable($c, true)) {
-            $this->_fillspace = $c;
-        }
-        else {
-            trigger_error('Argument 1 passed to '.__METHOD__.' must be a valid callback', E_USER_ERROR);
+        foreach($a as $n => $c) {
+            if (is_callable($c, true)) {
+                $this->_methods[$n] = $c;
+            }
+            else {
+                trigger_error($n.' passed to '.__METHOD__.' must be a valid callback', E_USER_ERROR);
+            }
         }
     }
+
     // }}}
 
-    // {{{ setSearchCallback
+    // {{{ isClassCallback
     /**
-     * Fixe la callback de traitement du paramètre query des méthodes searchXXX
+     * Test si la callback est définie
      *
-     * @param callback $c 
-    *
-    * @access	public
-    */
-    function setSearchCallback($c)
+     * @access	public
+     */
+    function isClassCallback($c)
     {
-        if (is_callable($c, true)) {
-            $this->_queryspace = $c;
+        if (isset($this->_methods[$c])) 
+            return true;
+        else 
+            return false;
+    }
+    // }}}
+
+    // {{{ callClassCallback
+    /**
+     * Lance une callback
+     *
+     * @param string name
+     * @access	public
+     */
+    function callClassCallback()
+    {
+        $c = func_get_arg(0);
+        $r = func_get_args();
+        array_shift($r);
+        if ($this->isClassCallback($c)) {
+            return call_user_func_array($this->_methods[$c], $r);
         }
-        else {
-            trigger_error('Argument 1 passed to '.__METHOD__.' must be a valid callback', E_USER_ERROR);
-        }
+        else 
+            return false;
     }
     // }}}
 
     // {{{ ren
     /**
-    * Renomme l'élement courrant
-    *
-    * @param string $l nouveau label
-    */
+     * Renomme l'élement courrant
+     *
+     * @param string $l nouveau label
+     */
     function ren($l)
     {
         if ($l !== $this->_label) {
             $this->_label = $l;
             $this->_set('label', $this->_label);
             $s = '';
-            if (is_callable($this->_fillspace)) {
-                $s = call_user_func($this->_fillspace, $l, $this);
-            }
-            if (!is_string($s)) {
+
+            $s = $this->callClassCallback('fillSpace', $l, $this);
+            if ($s !== false and !is_string($s)) {
                 trigger_error('fillspace callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
             }
             $this->_set('space', $s);
-
         }
     }
     // }}}
 
     // {{{ exists
     /**
-    * Verifie l'existence de l'élement courrant
-    */
+     * Verifie l'existence de l'élement courrant
+     */
     function exists()
     {
         try {
-            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->_pdo->tag());
+            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
 
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
             settype($this->_id, 'integer');
@@ -636,20 +668,20 @@ class AIT
 
     // {{{ _checkTag
     /**
-    * Vérifie l'existance et le type d'un tag
-    * retourne  false en cas de problème
-    *
-    * @param integer $i identifiant du tag
-    * @param integer $t identifiant de son type
-    *
-    * @return boolean
-    */
+     * Vérifie l'existance et le type d'un tag
+     * retourne  false en cas de problème
+     *
+     * @param integer $i identifiant du tag
+     * @param integer $t identifiant de son type
+     *
+     * @return boolean
+     */
     protected function _checkTag($i, $t)
     {
         try {
-            $sql = sprintf("SELECT count(*) n FROM %s WHERE id=? AND type=? LIMIT 0,1", $this->_pdo->tag());
+            $sql = sprintf("SELECT count(*) n FROM %s WHERE id=? AND type=? LIMIT 0,1", $this->getPDO()->tag());
 
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->bindParam(2, $t, PDO::PARAM_INT);
             $stmt->execute();
@@ -669,18 +701,18 @@ class AIT
 
     // {{{ _checkType
     /**
-    * Vérifie l'existance d'un type d'un tag
-    *
-    * @param integer $t identifiant de son type
-    *
-    * @return boolean
-    */
+     * Vérifie l'existance d'un type d'un tag
+     *
+     * @param integer $t identifiant de son type
+     *
+     * @return boolean
+     */
     protected function _checkType($t)
     {
         try {
-            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->_pdo->tag());
+            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
 
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $t, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -697,22 +729,22 @@ class AIT
 
     // {{{ _checkTagged
     /**
-    * Vérifie l'existance de l'association d'un tag et d'un item
-    *
-    * @param integer $m identifiant du tag
-    * @param integer $i identifiant de l'item
-    *
-    * @return boolean
-    */
+     * Vérifie l'existance de l'association d'un tag et d'un item
+     *
+     * @param integer $m identifiant du tag
+     * @param integer $i identifiant de l'item
+     *
+     * @return boolean
+     */
     protected function _checkTagged($m, $i)
     {
         try {
             $sql = sprintf(
                 "SELECT count(*) n FROM %s WHERE tag_id=? and item_id=? LIMIT 0,1",
-                $this->_pdo->tagged()
+                $this->getPDO()->tagged()
             );
 
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $m, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
@@ -740,10 +772,10 @@ class AIT
     {
         try { 
             $sql = sprintf(
-                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->_pdo->tag()
+                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->getPDO()->tag()
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
             settype($i, 'integer');
@@ -756,10 +788,10 @@ class AIT
 
             $sql = sprintf(
                 "UPDATE %s SET frequency = ? WHERE id = ?",
-                $this->_pdo->tag(true)
+                $this->getPDO()->tag(true)
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $f, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
@@ -776,18 +808,18 @@ class AIT
 
     // {{{ _decreaseFrequency
     /**
-    * Incremente la frequence d'une ligne dans TAG
-    *
-    * @param string $t id
-    */
+     * Incremente la frequence d'une ligne dans TAG
+     *
+     * @param string $t id
+     */
     protected function _decreaseFrequency($i)
     {
         try {
             $sql = sprintf(
-                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->_pdo->tag()
+                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->getPDO()->tag()
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
             settype($i, 'integer');
@@ -800,10 +832,10 @@ class AIT
 
             $sql = sprintf(
                 "UPDATE %s SET frequency = ? WHERE id = ?",
-                $this->_pdo->tag(true)
+                $this->getPDO()->tag(true)
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $f, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
@@ -820,20 +852,20 @@ class AIT
 
     // {{{ _addTagged
     /**
-    * Ajout d'une ligne dans la table tagged
-    *
-    * @param string $t tag id
-    * @param string $i item id
-    */
+     * Ajout d'une ligne dans la table tagged
+     *
+     * @param string $t tag id
+     * @param string $i item id
+     */
     protected function _addTagged($t, $i)
     {
         try {
             $sql = sprintf(
                 "INSERT INTO %s VALUES (?, ?);",
-                $this->_pdo->tagged(true)
+                $this->getPDO()->tagged(true)
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $t, PDO::PARAM_INT);
             $stmt->bindParam(2, $i, PDO::PARAM_INT);
             $stmt->execute();
@@ -848,11 +880,11 @@ class AIT
 
     // {{{ _rmTagged
     /**
-    * Supprime une ligne dans la table tagged
-    *
-    * @param string $t tag id
-    * @param string $i item id
-    */
+     * Supprime une ligne dans la table tagged
+     *
+     * @param string $t tag id
+     * @param string $i item id
+     */
     protected function _rmTagged($t, $i)
     {
         try {
@@ -869,11 +901,11 @@ class AIT
 
             $sql = sprintf(
                 "DELETE FROM %s WHERE %s=?",
-                $this->_pdo->tagged(true),
+                $this->getPDO()->tagged(true),
                 $field
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $value, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->closeCursor();
@@ -887,19 +919,19 @@ class AIT
 
     // {{{ _rmTag
     /**
-    * Suppression d'une ligne dans tag
-    *
-    * @param string $i id
-    */
+     * Suppression d'une ligne dans tag
+     *
+     * @param string $i id
+     */
     protected function _rmTag($i)
     {
         try {
             $sql = sprintf(
                 "DELETE FROM %s WHERE id=?", 
-                $this->_pdo->tag(true)
+                $this->getPDO()->tag(true)
             );
             self::timer();
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
             settype($this->_id, 'integer');
@@ -916,19 +948,19 @@ class AIT
 
     // {{{ _addTag
     /**
-    * Ajout d'une ligne dans la table tag
-    *
-    * @param string $l label
-    * @param string $t type
-    *
-    * @return integer
-    */
+     * Ajout d'une ligne dans la table tag
+     *
+     * @param string $l label
+     * @param string $t type
+     *
+     * @return integer
+     */
     protected function _addTag($l, $t = null)
     {
         try {
-            $sql = sprintf("SELECT id FROM %s WHERE label=? and type=?  LIMIT 0,1", $this->_pdo->tag());
+            $sql = sprintf("SELECT id FROM %s WHERE label=? and type=?  LIMIT 0,1", $this->getPDO()->tag());
 
-            $stmt = $this->_pdo->prepare($sql);
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $l, PDO::PARAM_STR);
             $stmt->bindParam(2, $t, PDO::PARAM_INT);
             $stmt->execute();
@@ -939,11 +971,8 @@ class AIT
 
             if ($id !== false) return (int) $id;
 
-            $s = '';
-            if (is_callable($this->_fillspace)) {
-                $s = call_user_func($this->_fillspace, $l, $this);
-            }
-            if (!is_string($s)) {
+            $s = $this->callClassCallback('fillSpace', $l, $this);
+            if ($s !== false and !is_string($s)) {
                 trigger_error('fillspace callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
             }
 
@@ -951,18 +980,18 @@ class AIT
             if (is_null($t)) {
                 $sql = sprintf(
                     "INSERT INTO %s (label, space, updated, created) VALUES (?, ?, now(), now());",
-                    $this->_pdo->tag(true)
+                    $this->getPDO()->tag(true)
                 );
-                $stmt = $this->_pdo->prepare($sql);
+                $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
                 $stmt->bindParam(2, $s, PDO::PARAM_STR);
             }
             else {
                 $sql = sprintf(
                     "INSERT INTO %s (label, space, type, updated, created) VALUES (?, ?, ?, now(), now());",
-                    $this->_pdo->tag(true)
+                    $this->getPDO()->tag(true)
                 );
-                $stmt = $this->_pdo->prepare($sql);
+                $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
                 $stmt->bindParam(2, $s, PDO::PARAM_STR);
                 $stmt->bindParam(3, $t, PDO::PARAM_INT);
@@ -971,7 +1000,7 @@ class AIT
             $stmt->closeCursor();
             self::debug(self::timer(true), $sql, $l, $s, $t);
 
-            $id = (int) $this->_pdo->lastInsertId();
+            $id = (int) $this->getPDO()->lastInsertId();
 
         }
         catch (PDOException $e) {
@@ -983,58 +1012,58 @@ class AIT
 
     // {{{ _getTagBySystemID
     /**
-    * Retroune une ligne dans la table tag à partir de l'identifiant physique
-    *
-    * @param integer $i
-    *
-    * @return array
+     * Retroune une ligne dans la table tag à partir de l'identifiant physique
+     *
+     * @param integer $i
+     *
+     * @return array
      */
     protected function _getTagBySystemID($i)
     {
         try {
-                $sql = sprintf("
-                    SELECT id, label, type
-                    FROM %s
-                    WHERE id = ?
-                    LIMIT 0,1
-                    ",
-                    $this->_pdo->tag()
-                );
-                self::timer();
-                $stmt = $this->_pdo->prepare($sql);
-                $stmt->bindParam(1, $i, PDO::PARAM_INT);
-                $stmt->execute();
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $stmt->closeCursor();
-                self::debug(self::timer(true), $sql, $i);
+            $sql = sprintf("
+                SELECT id, label, type
+                FROM %s
+                WHERE id = ?
+                LIMIT 0,1
+                ",
+                $this->getPDO()->tag()
+            );
+            self::timer();
+            $stmt = $this->getPDO()->prepare($sql);
+            $stmt->bindParam(1, $i, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $i);
 
-                if (is_array($row)) {
-                    settype($row['type'], 'integer');
-                    settype($row['id'], 'integer');
-                }
+            if (is_array($row)) {
+                settype($row['type'], 'integer');
+                settype($row['id'], 'integer');
+            }
 
-                return $row;
-            }
-            catch (PDOException $e) {
-                self::catchError($e);
-            }
+            return $row;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
     }
     // }}}
 
     // {{{ _set
     /**
-    * Méthode permettant de changer la valeur d'une colonne
-    *
-    * @param string $name nom de la colonne
-    * @param mixed $value valeur de la colonne
-    */
+     * Méthode permettant de changer la valeur d'une colonne
+     *
+     * @param string $name nom de la colonne
+     * @param mixed $value valeur de la colonne
+     */
     protected function _set($n, $v)
     {
         $this->_data[$n] = $v;
         try {
             self::timer();
-            $sql = sprintf("UPDATE %s set %s=? WHERE id=?", $this->_pdo->tag(true), $n);
-            $stmt = $this->_pdo->prepare($sql);
+            $sql = sprintf("UPDATE %s set %s=? WHERE id=?", $this->getPDO()->tag(true), $n);
+            $stmt = $this->getPDO()->prepare($sql);
             $typ = gettype($v);
             if ($typ === 'string')
                 $stmt->bindParam(1, $v, PDO::PARAM_STR);
@@ -1057,39 +1086,39 @@ class AIT
 
     // {{{ _fill
     /**
-    * Méthode permettant de charger les propritétes de l'objet 
-    * à partir d'un atbleau de données
-    *
-    * @param array $a
-    */
+     * Méthode permettant de charger les propritétes de l'objet 
+     * à partir d'un atbleau de données
+     *
+     * @param array $a
+     */
     protected function _fill($a)
     {
         foreach($this->_cols as $n => $t)
-        if (isset($a[$n])) {
-            $this->_data[$n] = $a[$n];
-            settype($this->_data[$n], $t);
-        }
+            if (isset($a[$n])) {
+                $this->_data[$n] = $a[$n];
+                settype($this->_data[$n], $t);
+            }
     }
     // }}}
 
     // {{{ _get
     /**
-    * Méthode permettant d'accéder à la valeur d'une colonne
-    *
-    * @param string $n nom de la colonne
-    * @param boolean $reload récupére la valeur en base et non celle du cache de l'objet
-    *
-    * @return mixed
-    */
+     * Méthode permettant d'accéder à la valeur d'une colonne
+     *
+     * @param string $n nom de la colonne
+     * @param boolean $reload récupére la valeur en base et non celle du cache de l'objet
+     *
+     * @return mixed
+     */
     protected function _get($n, $reload = false)
     {
         if ($reload === true && isset($this->_data[$n])) unset($this->_data[$n]);
 
         if (!isset($this->_data[$n])) {
             try {
-                $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->_pdo->tag());
+                $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->getPDO()->tag());
                 self::timer();
-                $stmt = $this->_pdo->prepare($sql);
+                $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
                 $stmt->execute();
                 settype($this->_id, 'integer');
@@ -1107,10 +1136,10 @@ class AIT
 
     // {{{ getSystemID
     /**
-    * getSystemID
-    *
-    * @return	integer
-    */
+     * getSystemID
+     *
+     * @return	integer
+     */
     public function getSystemID()
     {
         return $this->_id;
@@ -1119,12 +1148,12 @@ class AIT
 
     // {{{ get
     /**
-    * Getter
-    *
-    * @param string $name nom de l'attribut
-    *
-    * @return	mixed
-    */
+     * Getter
+     *
+     * @param string $name nom de l'attribut
+     *
+     * @return	mixed
+     */
     public function get($name = 'label')
     {
         $attr = array(
@@ -1146,15 +1175,15 @@ class AIT
 
     // {{{ getTimestamps
     /**
-    * getTimestamps
-    *
-    * @return ArrayObject
-    */
+     * getTimestamps
+     *
+     * @return ArrayObject
+     */
     public function getTimestamps()
     {
         try {
-            $sql = sprintf("SELECT UNIX_TIMESTAMP(updated), UNIX_TIMESTAMP(created) FROM %s WHERE id=? LIMIT 0,1", $this->_pdo->tag());
-            $stmt = $this->_pdo->prepare($sql);
+            $sql = sprintf("SELECT UNIX_TIMESTAMP(updated), UNIX_TIMESTAMP(created) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
+            $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
             settype($this->_id, 'integer');
@@ -1175,10 +1204,10 @@ class AIT
 
     // {{{ getScore
     /**
-    * Revoit le score de l'élement
-    *
-    * @return integer
-    */
+     * Revoit le score de l'élement
+     *
+     * @return integer
+     */
     public function getScore()
     {
         return (int) $this->_get('score');
@@ -1187,123 +1216,123 @@ class AIT
 
     // {{{ setScore
     /**
-    * Revoit le score de l'élement
-    *
-    * @param integer $i
-    */
+     * Revoit le score de l'élement
+     *
+     * @param integer $i
+     */
     public function setScore($i)
     {
         if (!is_int($i))
-        trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
         $this->_set('score', $i);
     }
     // }}}
 
     // {{{ setScore
     /**
-    * Renvoit la frequence de l'élement
-    *
-    * @param integer $i
-    */
+     * Renvoit la frequence de l'élement
+     *
+     * @param integer $i
+     */
     public function setFrequency($i)
     {
         if (!is_int($i))
-        trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
+            trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
         $this->_set('frequency', $i);
     }
     // }}}
 
     // {{{ getBySystemID
     /**
-    * Récupère un objet quelque soit son type
-    *
-    * @param PDOAIT $pdo pointeur sur la base de données
-    * @param integer $id identifiant systéme
-    */
+     * Récupère un objet quelque soit son type
+     *
+     * @param PDOAIT $pdo pointeur sur la base de données
+     * @param integer $id identifiant systéme
+     */
     public static function getBySystemID(PDOAIT $pdo, $id)
     {
         if (!is_null($id) && !is_int($id))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
 
-            try {
-                $sql = sprintf("
-                    SELECT a.id id, a.label label, a.type type, b.type crtl
-                    FROM %s a
-                    LEFT JOIN %s b ON a.type=b.id
-                    WHERE a.id = ?
-                    LIMIT 0,1
-                    ",
-                    $pdo->tag(),
-                    $pdo->tag()
-                );
-                self::timer();
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(1, $id, PDO::PARAM_INT);
-                $stmt->execute();
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $stmt->closeCursor();
-                self::debug(self::timer(true), $sql, $id);
+        try {
+            $sql = sprintf("
+                SELECT a.id id, a.label label, a.type type, b.type crtl
+                FROM %s a
+                LEFT JOIN %s b ON a.type=b.id
+                WHERE a.id = ?
+                LIMIT 0,1
+                ",
+                $pdo->tag(),
+                $pdo->tag()
+            );
+            self::timer();
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(1, $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $id);
 
-                if (is_array($row)) {
-                    settype($row['type'], 'integer');
-                    settype($row['id'], 'integer');
-                    settype($row['crtl'], 'integer');
-                }
+            if (is_array($row)) {
+                settype($row['type'], 'integer');
+                settype($row['id'], 'integer');
+                settype($row['crtl'], 'integer');
+            }
 
-                $o = null;
-                if ($row['type'] === 1) {
-                    $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
-                }
-                elseif ($row['type'] === 2) {
-                    $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
-                }
-                elseif ($row['crtl'] === 1) {
-                    $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
-                }
-                elseif ($row['crtl'] === 2) {
-                    $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
-                }
-                return $o;
+            $o = null;
+            if ($row['type'] === 1) {
+                $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
             }
-            catch (PDOException $e) {
-                self::catchError($e);
+            elseif ($row['type'] === 2) {
+                $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
             }
+            elseif ($row['crtl'] === 1) {
+                $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
+            }
+            elseif ($row['crtl'] === 2) {
+                $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
+            }
+            return $o;
+        }
+        catch (PDOException $e) {
+            self::catchError($e);
+        }
 
     }
     // }}}
 
     // {{{ sqler
     /**
-    * Ajout les close ORDER et LIMIT à une requete sql
-    *
-    * @param string  $sql chaine contenant du SQL
-    * @param integer $offset décalage à parir du premier enregistrement
-    * @param integer $lines nombre de lignes à retourner
-    * @param integer $ordering flag permettant le tri
-    *
-    * @return string
-    */
+     * Ajout les close ORDER et LIMIT à une requete sql
+     *
+     * @param string  $sql chaine contenant du SQL
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return string
+     */
     public static function sqler(&$sql, $offset, $lines, $ordering)
     {
         if (!is_null($ordering)) {
             $sql .= ' ORDER BY';
             if ( (self::ORDER_BY_LABEL & $ordering) === self::ORDER_BY_LABEL)
-            $sql .= ' label';
+                $sql .= ' label';
             elseif ( (self::ORDER_BY_SCORE & $ordering) === self::ORDER_BY_SCORE)
-            $sql .= ' score';
+                $sql .= ' score';
             elseif ( (self::ORDER_BY_UPDATED & $ordering) === self::ORDER_BY_UPDATED)
-            $sql .= ' updated';
+                $sql .= ' updated';
             elseif ( (self::ORDER_BY_CREATED & $ordering) === self::ORDER_BY_CREATED)
-            $sql .= ' created';
+                $sql .= ' created';
             elseif ( (self::ORDER_BY_FREQUENCY & $ordering) === self::ORDER_BY_FREQUENCY)
-            $sql .= ' frequency';
+                $sql .= ' frequency';
             else
-            $sql .= ' id';
+                $sql .= ' id';
 
             if ( (self::ORDER_ASC & $ordering) === self::ORDER_ASC)
-            $sql .= ' ASC';
+                $sql .= ' ASC';
             elseif ( (self::ORDER_DESC & $ordering) === self::ORDER_DESC)
-            $sql .= ' DESC';
+                $sql .= ' DESC';
         }
         if (!is_null($offset) && !is_null($lines)) {
             $sql .= sprintf(' LIMIT %d,%d', (int)$offset, (int)$lines);
@@ -1313,9 +1342,9 @@ class AIT
 
     // {{{ debug
     /**
-    * DEBUG
-    *
-    */
+     * DEBUG
+     *
+     */
     public static function debug()
     {
         if (self::$debugging === true)  {
@@ -1332,9 +1361,9 @@ class AIT
 
     // {{{ timer
     /**
-    * timer
-    *
-    */
+     * timer
+     *
+     */
     public static function timer($compute = false)
     {
         static $t = 0;
@@ -1353,43 +1382,60 @@ class AIT
 
     // {{{ dump
     /**
-    * Dump
-    *
-    * @param string $s chaine de caratcère à afficher
-    * @param booelan $r si vrai a retrouren la chaine à afficher plutot que de l'afficher
-    */
+     * Dump
+     *
+     * @param string $s chaine de caratcère à afficher
+     * @param booelan $r si vrai a retrouren la chaine à afficher plutot que de l'afficher
+     */
     public function dump($s = '', $r = false)
     {
         $buf = '';
         if (!$r) {
             $buf .= '<pre>';
-            }
-            $buf .= $s;
-            $buf .= "\t [";
-            $buf .= $this->_element;
-            $buf .= "]\t #";
-            $buf .= $this->_id;
-            $buf .= "\t @";
-            $buf .= $this->_type;
-            $buf .= "\t (";
-            $buf .= $this->_label;
-            $buf .= ')';
-            if (!$r) {
-                $buf .= "\n";
-                $buf .= "</pre>";
+        }
+        $buf .= $s;
+        $buf .= "\t [";
+        $buf .= $this->_element;
+        $buf .= "]\t #";
+        $buf .= $this->_id;
+        $buf .= "\t @";
+        $buf .= $this->_type;
+        $buf .= "\t (";
+        $buf .= $this->_label;
+        $buf .= ')';
+        if (!$r) {
+            $buf .= "\n";
+            $buf .= "</pre>";
         }
         if ($r) return $buf;
         else echo $buf;
     }
     // }}}
 
+    // {{{ str2cid
+    /**
+     * DEBUG
+     *
+     */
+    public static function str2cid()
+    {
+        $ret = '';
+        $argc = func_num_args();
+        for ($i = 0; $i < $argc; $i++) {
+            $arg = func_get_arg($i);
+            if (is_string($arg)) $ret .= $arg;
+        }
+        return md5($ret);
+    }
+    // }}}
+
     // {{{ __call
     /**
-    * Traitement des méthodes ajoutées
-    *
-    * @param string $name
-    * @param array $arguments
-    */
+     * Traitement des méthodes ajoutées
+     *
+     * @param string $name
+     * @param array $arguments
+     */
     function __call($name, array $arguments)
     {
         if (
@@ -1405,82 +1451,45 @@ class AIT
     }
     // }}}
 
-    // {{{ __sleep
-    /** 
-    * Avant serialization
-    *
-    */
-    public function __sleep () 
-    {
-        $this->_pdo_opt = $this->_pdo->getOptions();
-        $vars = array_keys(get_object_vars($this));
-        unset($vars[array_search('_pdo', $vars)]);
-        return $vars;
-    }
-    // }}}
-
-    // {{{ __wakeup
-    /** 
-    * Avant unserialization
-    *
-    */
-    public function __wakeup() 
-    {
-        $this->_pdo = new PDOAIT(
-            $this->_pdo_opt['dsn'],
-            $this->_pdo_opt['username'],
-            $this->_pdo_opt['password'],
-            $this->_pdo_opt['drvropts']
-        );
-        $this->_pdo->setOptions($this->_pdo_opt);
-    }
-    // }}}
 }
 
 
 
 /**
-* Objet représantant une requete au sens AIT
-*
-* @category  AIT
-* @package   AIT
-* @author    Nicolas Thouvenin <nthouvenin@gmail.com>
-* @copyright 2008 Nicolas Thouvenin
-* @license   http://opensource.org/licenses/lgpl-license.php LGPL
-* @link      http://www.pxxo.net/fr/ait
-*/
-class AITQuery {
-
+ * Objet représantant une requete au sens AIT
+ *
+ * @category  AIT
+ * @package   AIT
+ * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
+ * @copyright 2008 Nicolas Thouvenin
+ * @license   http://opensource.org/licenses/lgpl-license.php LGPL
+ * @link      http://www.pxxo.net/fr/ait
+ */
+class AITQuery extends AITRoot {
 
     protected $sql = '';
 
-    /**
-    * @var PDOAIT
-    */
-    protected $_pdo;
-
-    private $_step = array();
-
+    protected $_step = array();
 
     // {{{ __construct
     /**
-    * Constructeur
-    *
-    * @param PDOAIT $pdo objet de connexion à la base
-    */
+     * Constructeur
+     *
+     * @param PDOAIT $pdo objet de connexion à la base
+     */
     function __construct(PDOAIT $pdo)
     {
-        $this->_pdo = $pdo;
+        $this->setPDO($pdo);
         $this->clean();
     }
     // }}}
 
     // {{{ clean
     /**
-    * On efface tout et on recommence
-    *
-    * @return boolean 
-    */
+     * On efface tout et on recommence
+     *
+     * @return boolean 
+     */
     public function clean()
     {
         array_push($this->_step, 'start');
@@ -1488,15 +1497,14 @@ class AITQuery {
     }
     // }}}
 
-
     // {{{ or
     /**
-    * Appique un Or entre 
-    *
-    * @param ArrayObject
-    *
-    * @return boolean 
-    */
+     * Appique un Or entre 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
     public function eitheror()
     {
         if (end($this->_step) == 'eitheror') return;
@@ -1506,13 +1514,13 @@ class AITQuery {
 
     // {{{ all
     /**
-    * Recherche les items ayant tout les tags donnés en paramètres
-    * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
-    *
-    * @param ArrayObject
-    *
-    * @return boolean 
-    */
+     * Recherche les items ayant tout les tags donnés en paramètres
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     *
+     * @param ArrayObject
+     *
+     * @return boolean 
+     */
     public function all(ArrayObject $tags)
     {
         array_push($this->_step, 'all');
@@ -1526,17 +1534,17 @@ class AITQuery {
             }
             if (empty($w))  {
                 $w = sprintf("tag_id = %s",
-                $tag->getSystemID()
-            );
-        }
-        else {
-            $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-                $tag->getSystemID(), 
-                $this->_pdo->tagged(),
-                $w
-            );
+                    $tag->getSystemID()
+                );
+            }
+            else {
+                $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                    $tag->getSystemID(), 
+                    $this->getPDO()->tagged(),
+                    $w
+                );
 
-        }
+            }
             $n++;
         }
         if ($n === 0) return false;
@@ -1585,10 +1593,9 @@ class AITQuery {
      */
     public function getSQL()
     {
-        return sprintf('SELECT item_id FROM %s WHERE %s', $this->_pdo->tagged(), $this->sql);
+        return sprintf('SELECT item_id FROM %s WHERE %s', $this->getPDO()->tagged(), $this->sql);
     }
     // }}}
-
 
     // {{{ _concat
     /**
@@ -1612,7 +1619,7 @@ class AITQuery {
                 $this->sql = sprintf(
                     " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
                     $sql,
-                    $this->_pdo->tagged(),
+                    $this->getPDO()->tagged(),
                     $this->sql
                 );
         }
@@ -1632,12 +1639,113 @@ class AITQuery {
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @link      http://www.pxxo.net/fr/ait
  */
-class AITResult extends ArrayObject {
+class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
 
-    private $_total = 0;
-    private $_sql = null;
-    private $_params = array();
-    private $_pdo = null;
+    protected $_total = 0;
+    protected $_sql = null;
+    protected $_params = array();
+    protected $_array = array();
+
+    // {{{ __construct
+    /**
+     * Constructeur
+     *
+     * @param PDOAIT $pdo objet de connexion à la base
+     */
+    function __construct($a)
+    {
+        $this->_array = $a;
+    }
+    // }}}
+
+    // {{{ Interfaces ...
+    /**
+     * Defined by Countable interface
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->_array);
+    }
+    /**
+     * Defined by Iterator interface
+     *
+     * @return mixed
+     */
+    public function current()
+    {
+        $k = key($this->_array);
+        return($this->_array[$k]);
+    }
+    /**
+     * Defined by Iterator interface
+     *
+     * @return mixed
+     */
+    public function key()
+    {
+        return key($this->_array);
+    }
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function next()
+    {
+        return next($this->_array);
+    }
+    /**
+     * Defined by Iterator interface
+     *
+     */
+    public function rewind()
+    {
+        return reset($this->_array);
+    }
+    /**
+     * Defined by Iterator interface
+     *
+     * @return boolean
+     */
+    public function valid()
+    {
+        return array_key_exists(key($this->_array),$this->_array);
+    }
+    /**
+     * Defined by ArrayAccess interface
+     *
+     */
+    public function offsetExists ($offset)
+    {
+        return array_key_exists($offset, $this->_array);
+    }
+    /**
+     * Defined by ArrayAccess interface
+     *
+     */
+    public function offsetGet($offset)
+    {
+        if ($this->offsetExists($offset))
+            return $this->_array[$offset];
+    }
+    /**
+     * Defined by ArrayAccess interface
+     *
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->_array[$offset] = $value;
+    }
+    /**
+     * Defined by ArrayAccess interface
+     *
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->_array[$offset]);
+    }
+    // }}}
 
     // {{{ setTotal 
     /**
@@ -1663,7 +1771,7 @@ class AITResult extends ArrayObject {
     {
         $this->_sql = $sql;
         $this->_params = $params;
-        $this->_pdo = $pdo;
+        $this->setPDO($pdo);
     }
     // }}}
 
@@ -1679,7 +1787,7 @@ class AITResult extends ArrayObject {
             return $this->_total;
 
         $time = AIT::timer();
-        $stmt = $this->_pdo->prepare($this->_sql);
+        $stmt = $this->getPDO()->prepare($this->_sql);
         $i = 1;
         foreach($this->_params as $k => $v) {
             $stmt->bindParam($i++, $k, $v);
@@ -1712,13 +1820,13 @@ class AITResult extends ArrayObject {
  */
 class AITTagsObject implements Countable, Iterator {
 
-    private $_tags;
+    protected $_tags;
 
     // {{{ construct
     /**
      * Constructeur
      *
-     * @param ArrayObject $tags
+     * @param AITResult $tags
      */
     function __construct($tags = null) 
     {
@@ -1730,9 +1838,9 @@ class AITTagsObject implements Countable, Iterator {
     /**
      * Remplie l'objet avec des tags en vrac
      *
-     * @param ArrayObject $tags
+     * @param AITResult $tags
      */
-    function setTags(ArrayObject $tags) 
+    function setTags(AITResult $tags) 
     {
         $this->_tags = array();
         foreach($tags as $tag) {
@@ -1858,6 +1966,7 @@ class AITTagsObject implements Countable, Iterator {
         return isset($this->_tags[$key]);
     }
     // }}}
+
     // {{{ __unset
     /**
      * Magic function to unset key

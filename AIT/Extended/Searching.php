@@ -77,17 +77,19 @@ class AIT_Extended_Searching extends AIT_Extended
         $this->tn_mode = Text_Normalize::Uppercase;
 
         parent::__construct(array(
-            'space_callback' => array(
-                'ItemType'   => array($this, 'spaceHook'),
-                'Item'       => array($this, 'spaceHook'),
-                'TagType'    => array($this, 'spaceHook'),
-                'Tag'        => array($this, 'spaceHook'),
-            ),
-            'search_callback' => array(
-                'ItemType'   => array($this, 'queryHook'),
-                'Item'       => array($this, 'queryHook'),
-                'TagType'    => array($this, 'queryHook'),
-                'Tag'        => array($this, 'queryHook'),
+            'callbacks' => array(
+                'ItemType' => array(
+                    'searchItemsHook' => array($this, 'queryHook'),
+                ),
+                'Item' => array(
+                    'fillSpace' => array($this, 'spaceHook'),
+                ),
+                'TagType' => array(
+                    'searchTagsHook' => array($this, 'queryHook'),
+                ),
+                'Tag' => array(
+                    'fillSpace' => array($this, 'spaceHook'),
+                ),
             ),
         ));
     }

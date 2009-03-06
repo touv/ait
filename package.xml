@@ -12,10 +12,10 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-02-26</date>
+    <date>2009-03-06</date>
     <version>
-        <release>1.7.2</release>
-        <api>1.0</api>
+        <release>2.0.0</release>
+        <api>2.0</api>
     </version>
     <stability>
         <release>stable</release>
@@ -23,7 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + ajout de getItems dans Tag
+		+ Uniformisation du mécanisme de plugin/hook
     </notes>
     <contents>
         <dir name="/">
@@ -34,6 +34,11 @@
                 <file name="Tag.php" role="php" />
                 <file name="Extended.php" role="php" />
                 <dir name="Extended">
+					<file name="Caching.php" role="php" />
+					<dir name="Caching">
+						<file name="Basic.php" role="php" />
+						<file name="APC.php" role="php" />
+					</dir>
                     <file name="Searching.php" role="php" />
                     <file name="Fake.php" role="php" />
                 </dir>
@@ -382,6 +387,21 @@
 			<notes>
 				+ plus de précision dans le nom des méthodes de AIT_ItemType
 				+ amélioration de la méthode relatedTags dans AIT_Tag
+			</notes>
+		</release>
+		<release>
+			<date>2009-02-26</date>
+			<version>
+				<release>1.7.2</release>
+				<api>1.0</api>
+			</version>
+			<stability>
+				<release>stable</release>
+				<api>stable</api>
+			</stability>
+			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+			<notes>
+				+ ajout de getItems dans Tag
 			</notes>
 		</release>
 	</changelog>

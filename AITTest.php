@@ -22,11 +22,19 @@ class AITTest extends PHPUnit_Framework_TestCase
 //        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',
-            'space_callback' => array(
-                'ItemType'   => 'cb1',
-                'Item'       => 'cb2',
-                'TagType'    => 'cb3',
-                'Tag'        => 'cb4',
+            'callbacks' => array(
+                'ItemType' =>array(
+                    'fillSpace' => 'cb1'
+                ),
+                'Item' => array (
+                    'fillSpace' => 'cb2'
+                ),
+                'TagType' => array(
+                    'fillSpace' => 'cb3'
+                ),
+                'Tag' => array(
+                    'fillSpace' => 'cb4'
+                ),
             ),
         );
         $this->db = AIT::connect($cnxstr, 'root');
@@ -311,13 +319,13 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i2 = $it->addItem('2');
         $i3 = $it->addItem('3');           //        | 1 | 2 | 3 | 4 |
         $i4 = $it->addItem('4');           //        +---------------+
-        $y1 = $it->addTag('#');            //     #  | A |   | A |   |
+        $y1 = $it->addTag('Y1');            //   y1  | A |   | A |   |
         $t1 = $y1->addTag('A');            //        | B | B | B |   |
         $t2 = $y1->addTag('B');            //        | C | C |   | C |
         $t3 = $y1->addTag('C');            //        |   | D | D | D |
         $t4 = $y1->addTag('D');            //        |   |   | E | E |
         $t5 = $y1->addTag('E');            //    .....................
-        $y2 = $it->addTag('@');            //     @  | W | X | Y | Z |
+        $y2 = $it->addTag('y2');            //    Y2 | W | X | Y | Z |
         $t6 = $y2->addTag('W');            //       
         $t7 = $y2->addTag('X');
         $t8 = $y2->addTag('Y');
@@ -639,12 +647,18 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('#1');
         $i2 = $it->addItem('#2');
+        $ar = $it->getItems(1, 10);
+        
         $this->assertEquals($this->_d(), 5);
 
         $si1 = unserialize(serialize($i1));
+        $sar = unserialize(serialize($ar));
 
         $this->assertEquals($i1->get(), $si1->get());
         $this->assertEquals($i1->getSystemID(), $si1->getSystemID());
+        $this->assertEquals($ar->count(), $sar->count());
+        $this->assertEquals($ar[0]->get(), $sar[0]->get());
+        $this->assertEquals($ar->total(), $sar->total());
 
         $it->del();
         $this->assertEquals($this->_d(), 2);

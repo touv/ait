@@ -99,6 +99,7 @@ class AIT_Item extends AIT
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "typeitem" ', E_USER_ERROR);
             }
             $this->_id = $this->_addTag($this->_label, $this->_type);
+            $this->callClassCallback('addHook', $this->_id);
             $this->_increaseFrequency($this->_type);
         }
     }
@@ -125,11 +126,11 @@ class AIT_Item extends AIT
              WHERE label = ? and type = ?  and item_id = ?
              LIMIT 0,1
              ",
-             $this->_pdo->tag(),
-             $this->_pdo->tagged()
+             $this->getPDO()->tag(),
+             $this->getPDO()->tagged()
          );
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1,  $l, PDO::PARAM_STR);
         $stmt->bindParam(2,  $o->getSystemID(), PDO::PARAM_INT);
         $stmt->bindParam(3,  $this->_id, PDO::PARAM_INT);
@@ -139,7 +140,7 @@ class AIT_Item extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         else $ret = null;
         $stmt->closeCursor();
@@ -163,7 +164,7 @@ class AIT_Item extends AIT
     {
         $ret = $this->getTag($l, $o);
         if (is_null($ret))
-            $ret = new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->_pdo);
+            $ret = new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->getPDO());
         return $ret;
     }
     // }}}
@@ -179,7 +180,7 @@ class AIT_Item extends AIT
      */
     function addTag($l, AIT_TagType $o)
     {
-        return new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->_pdo);
+        return new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->getPDO());
     }
     // }}}
 
@@ -195,7 +196,7 @@ class AIT_Item extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
-        $o = new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->_pdo);
+        $o = new AIT_Tag($l, $o->getSystemID(), $this->_id, $this->getPDO());
         $o->del();
     }
     // }}}
@@ -304,14 +305,14 @@ class AIT_Item extends AIT
             LEFT JOIN %s b ON a.tag_id=b.id
             WHERE item_id = ? %s
             ",
-            $this->_pdo->tagged(),
-            $this->_pdo->tag(),
+            $this->getPDO()->tagged(),
+            $this->getPDO()->tag(),
             $w
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
-        $stmt = $this->_pdo->prepare($sql);
+        $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
@@ -320,14 +321,14 @@ class AIT_Item extends AIT
             if (is_null($row['id'])) continue;
             settype($row['type'], 'integer');
             settype($row['id'], 'integer');
-            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->_pdo, $row['id'], $row);
+            $ret[] = new AIT_Tag($row['label'], $row['type'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->_pdo);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
         return $r;
     }
@@ -362,7 +363,7 @@ class AIT_Item extends AIT
         $row = $this->_getTagBySystemID($this->_type);
 
         if (is_array($row)) {
-            return new AIT_ItemType($row['label'], $this->_pdo, $this->_type, $row);
+            return new AIT_ItemType($row['label'], $this->getPDO(), $this->_type, $row);
         }
     }
     // }}}

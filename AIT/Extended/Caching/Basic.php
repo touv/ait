@@ -61,7 +61,7 @@ class AIT_Extended_Caching_Basic extends AIT_Extended_Caching
      */
     function fetch($id)
     {
-        return isset(self::$buffer[$id]) ? unserialize(self::$buffer[$id]) : false;
+        return isset(self::$buffer[$id]) ? $this->decode(self::$buffer[$id]) : false;
     }
     // }}}
 
@@ -75,7 +75,7 @@ class AIT_Extended_Caching_Basic extends AIT_Extended_Caching
      */
     function store($id, $data)
     {
-        self::$buffer[$id] = serialize($data);
+        self::$buffer[$id] = $this->encode($data);
         return true;
     }
     // }}}

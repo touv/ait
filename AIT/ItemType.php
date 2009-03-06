@@ -201,6 +201,12 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+        
+        if (($r = $this->callClassCallback(
+            'getTagTypesCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -218,6 +224,9 @@ class AIT_ItemType extends AIT
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('getTagTypesCache', $cid, $r);
 
         return $r;
     }
@@ -457,6 +466,12 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'fetchItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -482,6 +497,8 @@ class AIT_ItemType extends AIT
             // alors que sa frequence contient le nombre exacte d'items
             $r->setTotal($tags->offsetGet(0)->countItems());
         }
+        if (isset($cid))
+            $this->callClassCallback('fetchItemsCache', $cid, $r);
 
         return $r;
     }
@@ -526,6 +543,12 @@ class AIT_ItemType extends AIT
         $sql = $sql1.$sql2;
 
         self::sqler($sql, $offset, $lines, $ordering);
+        
+        if (($r = $this->callClassCallback(
+            'searchItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
 
         $stmt = $this->getPDO()->prepare($sql);
@@ -545,6 +568,9 @@ class AIT_ItemType extends AIT
         $sql = 'SELECT COUNT(DISTINCT item.id) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('searchItemsCache', $cid, $r);
 
         return $r;
     }
@@ -602,6 +628,12 @@ class AIT_ItemType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+        
+        if (($r = $this->callClassCallback(
+            'queryItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -620,6 +652,9 @@ class AIT_ItemType extends AIT
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('queryItemsCache', $cid, $r);
 
         return $r;
     }

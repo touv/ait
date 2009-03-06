@@ -119,6 +119,32 @@ class AIT_Extended_Caching extends AIT_Extended
     }
     // }}}
 
+    // {{{ encode
+    /**
+     * encode
+     *
+     * @param $data string données à stocker
+     * @return string
+     */
+    function encode($data)
+    {
+        return gzcompress(serialize($data));
+    }
+    // }}}
+
+    // {{{ decode
+    /**
+     * decode
+     *
+     * @param $data string données à stocker
+     * @return string
+     */
+    function decode($data)
+    {
+        return unserialize(gzuncompress($data));
+    }
+    // }}}
+
 }
 
 

@@ -62,16 +62,17 @@ class AIT_Extended_Caching extends AIT_Extended
         parent::__construct(array(
             'callbacks' => array(
                 'ItemType' => array(
-                    'getItemsCache' => array($this, 'cacher'),
+                    'getItemsCache'    => array($this, 'cacher'),
+                    'fetchItemsCache'  => array($this, 'cacher'),
+                    'searchItemsCache' => array($this, 'cacher'),
+                    'queryItemsCache'  => array($this, 'cacher'),
+                    'getTagTypesCache' => array($this, 'cacher'),
                 ),
-                'Item' => array(
-                    ),
-                    'TagType' => array(
-                        ),
-                        'Tag' => array(
-                            ),
-                        ),
-                    ));
+                'Item' => array(),
+                'TagType' => array(),
+                'Tag' => array(),
+            ),
+        ));
     }
     // }}}
 

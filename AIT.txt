@@ -115,7 +115,7 @@ Description
 +++++++++++
 
 Retourne la valeur d'une propriété de l'élément. 
-Les propriétés accessibles sont : type, label, space
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix 
 
 Paramètres
 ++++++++++

@@ -82,13 +82,13 @@ class AIT_Extended_Searching extends AIT_Extended
                     'searchItemsHook' => array($this, 'queryHook'),
                 ),
                 'Item' => array(
-                    'fillSpace' => array($this, 'spaceHook'),
+                    'fillBuffer' => array($this, 'bufferHook'),
                 ),
                 'TagType' => array(
                     'searchTagsHook' => array($this, 'queryHook'),
                 ),
                 'Tag' => array(
-                    'fillSpace' => array($this, 'spaceHook'),
+                    'fillBuffer' => array($this, 'bufferHook'),
                 ),
             ),
         ));
@@ -112,16 +112,16 @@ class AIT_Extended_Searching extends AIT_Extended
     // }}}
 
 
-    // {{{ spaceHook
+    // {{{ bufferHook
     /**
-     * Callback pour alimenter le champ space
+     * Callback pour alimenter le champ buffer 
      *
      *  @param string $s valeur du label
      *  @param AIT $o objet appelant
      *
      *  @return string
      */
-    function spaceHook($s, $o)
+    function bufferHook($s, $o)
     {
         $str = $this->_normalize($s);
         $buf .= $str;
@@ -298,7 +298,7 @@ class AIT_Extended_Searching extends AIT_Extended
 
                 if ($ok !== 0) $sql .= ' '.$ov.' ';
                 $va = ' +'.$va;
-                $sql .= sprintf('MATCH (tag.space) AGAINST(\'%s\' IN BOOLEAN MODE)', $va);
+                $sql .= sprintf('MATCH (tag.buffer) AGAINST(\'%s\' IN BOOLEAN MODE)', $va);
             }
         } // fin parcours opérateurs
 

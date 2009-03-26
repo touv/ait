@@ -107,6 +107,11 @@ class AIT_Tag extends AIT
                 $this->_id = $this->_addTag($this->_label, $this->_type);
                 $this->callClassCallback('addHook', $this->_id);
 
+                if ($row !== false) 
+                    foreach($this->_cols as $n => $t)
+                        if (isset($row[$n])) 
+                            $this->_set($n, $row[$n]);
+
                 if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
                     $this->_addTagged($this->_id, $this->_item_id);
                     $this->_increaseFrequency($this->_id);
@@ -125,6 +130,11 @@ class AIT_Tag extends AIT
                 }
                 $this->_id = $this->_addTag($this->_label, $this->_type);
                 $this->callClassCallback('addHook', $this->_id);
+
+                if ($row !== false) 
+                    foreach($this->_cols as $n => $t)
+                        if (isset($row[$n])) 
+                            $this->_set($n, $row[$n]);
             }
             else {
                 if ($row !== false) $this->_fill($row);
@@ -257,7 +267,7 @@ class AIT_Tag extends AIT
                 );
             }
         }
-        $sql1 = 'SELECT DISTINCT id, label, space, score, frequency, type ';
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
@@ -352,7 +362,7 @@ class AIT_Tag extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, space, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.id

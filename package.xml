@@ -12,10 +12,10 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-03-06</date>
+    <date>2009-03-26</date>
     <version>
-        <release>2.0.0</release>
-        <api>2.0</api>
+        <release>2.1.0</release>
+        <api>2.1</api>
     </version>
     <stability>
         <release>stable</release>
@@ -23,7 +23,8 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-		+ Uniformisation du mécanisme de plugin/hook
+		+ Space devient Buffer
+		+ Ajout de suffix et prefix
     </notes>
     <contents>
         <dir name="/">
@@ -402,6 +403,21 @@
 			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
 			<notes>
 				+ ajout de getItems dans Tag
+			</notes>
+		</release>
+		<release>
+			<date>2009-03-06</date>
+			<version>
+				<release>2.0.0</release>
+				<api>2.0</api>
+			</version>
+			<stability>
+				<release>stable</release>
+				<api>stable</api>
+			</stability>
+			<license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+			<notes>
+				+ Uniformisation du mécanisme de plugin/hook
 			</notes>
 		</release>
 	</changelog>

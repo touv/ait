@@ -19,21 +19,21 @@ class AITTest extends PHPUnit_Framework_TestCase
     function setUp()
     {
         $cnxstr = 'mysql:host=localhost;dbname=ait';
-//        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
+        //        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',
             'callbacks' => array(
                 'ItemType' =>array(
-                    'fillSpace' => 'cb1'
+                    'fillBuffer' => 'cb1'
                 ),
                 'Item' => array (
-                    'fillSpace' => 'cb2'
+                    'fillBuffer' => 'cb2'
                 ),
                 'TagType' => array(
-                    'fillSpace' => 'cb3'
+                    'fillBuffer' => 'cb3'
                 ),
                 'Tag' => array(
-                    'fillSpace' => 'cb4'
+                    'fillBuffer' => 'cb4'
                 ),
             ),
         );
@@ -131,7 +131,85 @@ class AITTest extends PHPUnit_Framework_TestCase
         $it->del();
         $this->assertEquals($this->_d(), 2);
     }
-     function test_define()
+    function test_fix()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db, false, array(
+            'prefix' => 'A',
+            'suffix' => 'B',
+            'buffer' => 'AB',
+        ));
+
+        $itt = AIT::getBySystemID($this->db, $it->getSystemID());
+        $this->assertEquals($itt->get('prefix'), 'A');
+        $this->assertEquals($itt->get('suffix'), 'B');
+        $this->assertEquals($itt->get('buffer'), 'AB');
+
+        $tt = $it->addTag('tagtype', array(
+            'prefix' => 'C',
+            'suffix' => 'D',
+            'buffer' => 'CD',
+        ));
+
+        $ttt = AIT::getBySystemID($this->db, $tt->getSystemID());
+        $this->assertEquals($ttt->get('prefix'), 'C');
+        $this->assertEquals($ttt->get('suffix'), 'D');
+        $this->assertEquals($ttt->get('buffer'), 'CD');
+
+
+        $t1 = $tt->addTag('@1', array(
+            'prefix' => 'E',
+            'suffix' => 'F',
+            'buffer' => 'EF',
+        ));
+
+        $t1t = AIT::getBySystemID($this->db, $t1->getSystemID());
+        $this->assertEquals($t1t->get('prefix'), 'E');
+        $this->assertEquals($t1t->get('suffix'), 'F');
+        $this->assertEquals($t1t->get('buffer'), 'EF');
+
+
+        $t2 = $tt->addTag('@2', array(
+            'prefix' => 'G',
+            'suffix' => 'H',
+            'buffer' => 'GH',
+        ));
+
+        $t2t = AIT::getBySystemID($this->db, $t2->getSystemID());
+        $this->assertEquals($t2t->get('prefix'), 'G');
+        $this->assertEquals($t2t->get('suffix'), 'H');
+        $this->assertEquals($t2t->get('buffer'), 'GH');
+
+        $i1 = $it->addItem('#1', array(
+            'prefix' => 'I',
+            'suffix' => 'J',
+            'buffer' => 'IJ',
+        ));
+
+        $i1t = AIT::getBySystemID($this->db, $i1->getSystemID());
+        $this->assertEquals($i1t->get('prefix'), 'I');
+        $this->assertEquals($i1t->get('suffix'), 'J');
+        $this->assertEquals($i1t->get('buffer'), 'IJ');
+
+
+        $i2 = $it->addItem('#2', array(
+            'prefix' => 'K',
+            'suffix' => 'L',
+            'buffer' => 'KL',
+        ));
+
+        $i2t = AIT::getBySystemID($this->db, $i2->getSystemID());
+        $this->assertEquals($i2t->get('prefix'), 'K');
+        $this->assertEquals($i2t->get('suffix'), 'L');
+        $this->assertEquals($i2t->get('buffer'), 'KL');
+
+
+        $tt->del();
+        $this->assertEquals($this->_d(), 5);
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+    }
+
+    function test_define()
     {
         $it = new AIT_ItemType('A', $this->db);
         $t1 = $it->defTag('C')->defTag('D');
@@ -157,11 +235,11 @@ class AITTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($it->countItems(), 2);
         $this->assertEquals($tt->countItems(), 2);
-        
+
         $this->assertEquals($tt->countTags(),  1);
-        
+
         $this->assertEquals($t1->countItems(), 2);
-        
+
         $this->assertEquals($this->_d(), 7);
         $this->assertEquals($this->_q(), 3);
 
@@ -171,7 +249,7 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($tt->countItems(), 1);
 
         $this->assertEquals($t1->countItems(), 1);
-        
+
         $this->assertEquals($this->_d(), 6);
         $this->assertEquals($this->_q(), 2);
 
@@ -511,16 +589,16 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 0);
     }
 
-    function test_fillspace()
+    function test_fill_buffer()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
-        $this->assertEquals($it->get('space'), 'cb1');
+        $this->assertEquals($it->get('buffer'), 'cb1');
         $i1 = $it->addItem('A');
-        $this->assertEquals($i1->get('space'), 'cb2');
+        $this->assertEquals($i1->get('buffer'), 'cb2');
         $tt = $it->addTag('tagtype');
-        $this->assertEquals($tt->get('space'), 'cb3');
+        $this->assertEquals($tt->get('buffer'), 'cb3');
         $t1 = $tt->addTag('C');
-        $this->assertEquals($t1->get('space'), 'cb4');
+        $this->assertEquals($t1->get('buffer'), 'cb4');
 
         $it->del();
         $this->assertEquals($this->_d(), 2);
@@ -648,7 +726,7 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i1 = $it->addItem('#1');
         $i2 = $it->addItem('#2');
         $ar = $it->getItems(1, 10);
-        
+
         $this->assertEquals($this->_d(), 5);
 
         $si1 = unserialize(serialize($i1));
@@ -792,12 +870,12 @@ class AITTest extends PHPUnit_Framework_TestCase
 
         $i1->attach($d);
         $i2->attach($e);
-       
+
         $this->assertEquals($a->countItems(), 2);
         $this->assertEquals($d->countItems(), 1);
 
         $i2->del();
-        
+
         $aa = $i1->getTag('A', $tt1);
         $this->assertEquals($aa->countItems(), 1);
         $this->assertEquals($a->countItems(), 1);
@@ -809,7 +887,7 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
 
-        }
+    }
     function test_fetchItems()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
@@ -876,25 +954,25 @@ class AITTest extends PHPUnit_Framework_TestCase
     {
         $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('1');
-//        $i2 = $it->addItem('2');
-//        $i3 = $it->addItem('3');
-//        $i4 = $it->addItem('4');
-//        $i5 = $it->addItem('5');
+        //        $i2 = $it->addItem('2');
+        //        $i3 = $it->addItem('3');
+        //        $i4 = $it->addItem('4');
+        //        $i5 = $it->addItem('5');
         $tt1 = $it->addTag('tagtype1');
         $a = $tt1->addTag('A');
         $b = $tt1->addTag('B');
         $tt2 = $it->addTag('tagtype2');
         $c = $tt2->addTag('C');
         $d = $tt2->addTag('D');
-//        $tt3 = $it->addTag('tagtype3');
-//        $e = $tt3->addTag('E');
-//        $f = $tt3->addTag('F');
+        //        $tt3 = $it->addTag('tagtype3');
+        //        $e = $tt3->addTag('E');
+        //        $f = $tt3->addTag('F');
 
         $i1->attach($a)->attach($b)->attach($d);
-//        $i2->attach($a)->attach($b)->attach($d);
-//        $i3->attach($a)->attach($b)->attach($d);
-//        $i4->attach($a)->attach($c)->attach($e);
-//        $i5->attach($c)->attach($e)->attach($f);
+        //        $i2->attach($a)->attach($b)->attach($d);
+        //        $i3->attach($a)->attach($b)->attach($d);
+        //        $i4->attach($a)->attach($c)->attach($e);
+        //        $i5->attach($c)->attach($e)->attach($f);
 
         $to = $i1->getTagsObject();
         $this->assertEquals($to->tagtype1->count(), 2);

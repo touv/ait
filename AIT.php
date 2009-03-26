@@ -306,15 +306,17 @@ class PDOAIT extends PDO
                 $this->exec(sprintf("
                     CREATE TABLE %s (
                         id INTEGER(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        prefix VARCHAR(200) COLLATE latin1_general_cs NULL,
                         label VARCHAR(200) COLLATE latin1_general_cs NOT NULL,
-                        space VARCHAR(200) COLLATE latin1_general_cs NULL,
+                        suffix VARCHAR(200) COLLATE latin1_general_cs NULL,
+                        buffer VARCHAR(200) COLLATE latin1_general_cs NULL,
                         score INTEGER(10) NOT NULL default '0',
                         frequency INTEGER(10) UNSIGNED NOT NULL default '0',
                         type INT NULL,
                         updated timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
                         created timestamp NOT NULL default '0000-00-00 00:00:00',
                         INDEX (label),
-                FULLTEXT (space),
+                FULLTEXT (buffer),
                 INDEX (score),
                 INDEX (type),
                 INDEX (type,created),
@@ -362,11 +364,11 @@ class PDOAIT extends PDO
     {
         try {
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (1, 'item', null, 0, 0, null, now(), now());",
+                "INSERT INTO %s VALUES (1, null, 'item', null, null, 0, 0, null, now(), now());",
                 $this->tag(true)
             ));
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (2, 'tag', null, 0, 0, null, now(), now());",
+                "INSERT INTO %s VALUES (2, null, 'tag', null, null, 0, 0, null, now(), now());",
                 $this->tag(true)
             ));
         }
@@ -493,7 +495,13 @@ class AIT extends AITRoot
     /**
      * @var array
      */
-    protected $_cols  = array('space' => 'string', 'score' => 'integer', 'frequency' => 'integer',);
+    protected $_cols = array(
+        'prefix' => 'string', 
+        'suffix' => 'string', 
+        'buffer' => 'string', 
+        'score' => 'integer', 
+        'frequency' => 'integer', // à supprimer probablement ...
+    );
     /**
      * @var array
      */
@@ -632,11 +640,11 @@ class AIT extends AITRoot
             $this->_set('label', $this->_label);
             $s = '';
 
-            $s = $this->callClassCallback('fillSpace', $l, $this);
+            $s = $this->callClassCallback('fillBuffer', $l, $this);
             if ($s !== false and !is_string($s)) {
-                trigger_error('fillspace callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
+                trigger_error('fillBuffer callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
             }
-            $this->_set('space', $s);
+            $this->_set('buffer', $s);
         }
     }
     // }}}
@@ -971,15 +979,15 @@ class AIT extends AITRoot
 
             if ($id !== false) return (int) $id;
 
-            $s = $this->callClassCallback('fillSpace', $l, $this);
+            $s = $this->callClassCallback('fillBuffer', $l, $this);
             if ($s !== false and !is_string($s)) {
-                trigger_error('fillspace callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
+                trigger_error('fillBuffer callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
             }
 
             self::timer();
             if (is_null($t)) {
                 $sql = sprintf(
-                    "INSERT INTO %s (label, space, updated, created) VALUES (?, ?, now(), now());",
+                    "INSERT INTO %s (label, buffer, updated, created) VALUES (?, ?, now(), now());",
                     $this->getPDO()->tag(true)
                 );
                 $stmt = $this->getPDO()->prepare($sql);
@@ -988,7 +996,7 @@ class AIT extends AITRoot
             }
             else {
                 $sql = sprintf(
-                    "INSERT INTO %s (label, space, type, updated, created) VALUES (?, ?, ?, now(), now());",
+                    "INSERT INTO %s (label, buffer, type, updated, created) VALUES (?, ?, ?, now(), now());",
                     $this->getPDO()->tag(true)
                 );
                 $stmt = $this->getPDO()->prepare($sql);
@@ -1087,7 +1095,7 @@ class AIT extends AITRoot
     // {{{ _fill
     /**
      * Méthode permettant de charger les propritétes de l'objet 
-     * à partir d'un atbleau de données
+     * à partir d'un tableau de données
      *
      * @param array $a
      */

@@ -87,6 +87,11 @@ class AIT_TagType extends AIT
             $this->_id = $this->_addTag($this->_label, 2);
             $this->callClassCallback('addHook', $this->_id);
 
+            if ($row !== false) 
+                foreach($this->_cols as $n => $t)
+                    if (isset($row[$n])) 
+                        $this->_set($n, $row[$n]);
+
             if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
                 $this->_addTagged($this->_id, $this->_item_id);
                 // Ne Pas incrémenter la fréquence, car elle sert à compter le nombre d'items
@@ -125,12 +130,12 @@ class AIT_TagType extends AIT
      *
      * @return AIT_Item
      */
-    function addTag($l)
+    function addTag($l, $r = false)
     {
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
 
-        return new AIT_Tag($l, $this->_id, null, $this->getPDO());
+        return new AIT_Tag($l, $this->_id, null, $this->getPDO(), false, $r);
     }
     // }}}
 
@@ -212,7 +217,7 @@ class AIT_TagType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, space, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
@@ -289,7 +294,7 @@ class AIT_TagType extends AIT
             $query = $this->callClassCallback('searchTagsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT id, label, space, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
         $sql2 = sprintf('
             FROM %1$s tag
             WHERE tag.type = ? %2$s

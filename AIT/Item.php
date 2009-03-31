@@ -305,7 +305,7 @@ class AIT_Item extends AIT
             if ($n === 0) return new AITResult(array());
             else $w = ' AND ('.$w.')';
         }
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id

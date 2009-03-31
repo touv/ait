@@ -306,15 +306,17 @@ class PDOAIT extends PDO
                 $this->exec(sprintf("
                     CREATE TABLE %s (
                         id INTEGER(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                        prefix VARCHAR(200) COLLATE latin1_general_cs NULL,
                         label VARCHAR(200) COLLATE latin1_general_cs NOT NULL,
-                        suffix VARCHAR(200) COLLATE latin1_general_cs NULL,
-                        buffer VARCHAR(200) COLLATE latin1_general_cs NULL,
-                        score INTEGER(10) NOT NULL default '0',
                         frequency INTEGER(10) UNSIGNED NOT NULL default '0',
-                        type INT NULL,
+                        type INTEGER(11) UNSIGNED NOT NULL default '0',
                         updated timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
                         created timestamp NOT NULL default '0000-00-00 00:00:00',
+                        score INTEGER(10) NOT NULL default '0',
+                        language VARCHAR(5) COLLATE latin1_general_cs NULL,
+                        scheme VARCHAR(10) COLLATE latin1_general_cs NULL,
+                        prefix VARCHAR(50) COLLATE latin1_general_cs NULL,
+                        suffix VARCHAR(50) COLLATE latin1_general_cs NULL,
+                        buffer VARCHAR(200) COLLATE latin1_general_cs NULL,
                         INDEX (label),
                 FULLTEXT (buffer),
                 INDEX (score),
@@ -364,11 +366,11 @@ class PDOAIT extends PDO
     {
         try {
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (1, null, 'item', null, null, 0, 0, null, now(), now());",
+                "INSERT INTO %s (id, label, created) VALUES (1, 'item', now());",
                 $this->tag(true)
             ));
             $this->exec(sprintf(
-                "INSERT INTO %s VALUES (2, null, 'tag', null, null, 0, 0, null, now(), now());",
+                "INSERT INTO %s (id, label, created) VALUES (2, 'tag', now());",
                 $this->tag(true)
             ));
         }
@@ -496,11 +498,13 @@ class AIT extends AITRoot
      * @var array
      */
     protected $_cols = array(
-        'prefix' => 'string', 
-        'suffix' => 'string', 
-        'buffer' => 'string', 
-        'score' => 'integer', 
-        'frequency' => 'integer', // à supprimer probablement ...
+        'language'   => 'string', 
+        'scheme'     => 'string', 
+        'prefix'     => 'string', 
+        'suffix'     => 'string', 
+        'buffer'     => 'string', 
+        'score'      => 'integer', 
+        'frequency'  => 'integer', // à supprimer probablement ...
     );
     /**
      * @var array
@@ -1846,9 +1850,9 @@ class AITTagsObject implements Countable, Iterator {
     /**
      * Remplie l'objet avec des tags en vrac
      *
-     * @param AITResult $tags
+     * @param $tags
      */
-    function setTags(AITResult $tags) 
+    function setTags($tags) 
     {
         $this->_tags = array();
         foreach($tags as $tag) {

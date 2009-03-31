@@ -195,7 +195,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.tag_id=b.id
@@ -381,7 +381,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
@@ -460,7 +460,7 @@ class AIT_ItemType extends AIT
         }
         if ($n === 0) return new AITResult(array());
 
-        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s tagged LEFT JOIN %s tag ON tagged.item_id = tag.id
             WHERE %s AND type = ?
@@ -533,7 +533,7 @@ class AIT_ItemType extends AIT
             $query = $this->callClassCallback('searchItemsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.prefix prefix, item.suffix suffix, item.buffer buffer, item.score score, item.frequency frequency';
+        $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.prefix prefix, item.suffix suffix, item.buffer buffer, item.scheme scheme, item.language language, item.score score, item.frequency frequency';        
         $sql2 = sprintf('
             FROM %1$s tag
             LEFT JOIN %2$s b ON tag.type=b.tag_id
@@ -622,7 +622,7 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $w = $query->getSQL();
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf("
             FROM (%s) temp
             LEFT JOIN %s b ON temp.item_id = b.id
@@ -685,7 +685,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = 1 

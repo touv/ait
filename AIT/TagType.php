@@ -73,7 +73,7 @@ class AIT_TagType extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a Integer, '.gettype($id).' given', E_USER_ERROR);
         if ($row !== false && !is_array($row))
             trigger_error('Argument 5 passed to '.__METHOD__.' must be a Array, '.gettype($row).' given', E_USER_ERROR);
-        if (!preg_match(',[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*,',$l))
+        if (!empty($l) and !preg_match(',[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*,',$l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be compatible with PHP variable names , `'.$l.'` given', E_USER_ERROR);
 
         $this->_label   = $l;
@@ -217,7 +217,7 @@ class AIT_TagType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf("
             FROM %s
             WHERE type = ?
@@ -294,7 +294,7 @@ class AIT_TagType extends AIT
             $query = $this->callClassCallback('searchTagsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf('
             FROM %1$s tag
             WHERE tag.type = ? %2$s

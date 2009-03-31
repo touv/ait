@@ -267,7 +267,7 @@ class AIT_Tag extends AIT
                 );
             }
         }
-        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
@@ -362,7 +362,7 @@ class AIT_Tag extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language score, frequency, type ';
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.id

@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-03-26</date>
+    <date>2009-03-31</date>
     <version>
-        <release>2.1.0</release>
+        <release>2.1.1</release>
         <api>2.1</api>
     </version>
     <stability>
@@ -24,7 +24,7 @@
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
 		+ Space devient Buffer
-		+ Ajout de suffix et prefix
+		+ Ajout de suffix, prefix, scheme et language
     </notes>
     <contents>
         <dir name="/">

@@ -303,7 +303,6 @@ class AIT_TagType extends AIT
             $query
         );
         $sql = $sql1.$sql2;
-
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
 

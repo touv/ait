@@ -325,8 +325,8 @@ Recherche des items du type courant
 Paramètres
 ++++++++++
 
-string *$query*:: requete (le format dépend de la search_callback) sans callback c'est une chaine de caractères contenant du SQL 
-integer *$offset*:: décalage à parir du premier enregistrement 
+string *$query*:: requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL 
+integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
 

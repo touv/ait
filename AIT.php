@@ -437,11 +437,11 @@ abstract class AITRoot
     }
     // }}}
     // {{{ __sleep
-    /** 
+    /**
      * Avant serialization
      *
      */
-    public function __sleep () 
+    public function __sleep ()
     {
         $this->_pdo_opt = $this->getPDO()->getOptions();
         $vars = array_keys(get_object_vars($this));
@@ -498,12 +498,12 @@ class AIT extends AITRoot
      * @var array
      */
     protected $_cols = array(
-        'language'   => 'string', 
-        'scheme'     => 'string', 
-        'prefix'     => 'string', 
-        'suffix'     => 'string', 
-        'buffer'     => 'string', 
-        'score'      => 'integer', 
+        'language'   => 'string',
+        'scheme'     => 'string',
+        'prefix'     => 'string',
+        'suffix'     => 'string',
+        'buffer'     => 'string',
+        'score'      => 'integer',
         'frequency'  => 'integer', // à supprimer probablement ...
     );
     /**
@@ -604,9 +604,9 @@ class AIT extends AITRoot
      */
     function isClassCallback($c)
     {
-        if (isset($this->_methods[$c])) 
+        if (isset($this->_methods[$c]))
             return true;
-        else 
+        else
             return false;
     }
     // }}}
@@ -626,7 +626,7 @@ class AIT extends AITRoot
         if ($this->isClassCallback($c)) {
             return call_user_func_array($this->_methods[$c], $r);
         }
-        else 
+        else
             return false;
     }
     // }}}
@@ -776,7 +776,7 @@ class AIT extends AITRoot
      */
     protected function _increaseFrequency($i)
     {
-        try { 
+        try {
             $sql = sprintf(
                 "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->getPDO()->tag()
             );
@@ -808,7 +808,7 @@ class AIT extends AITRoot
         }
         catch (PDOException $e) {
             self::catchError($e);
-        }  
+        }
     }
     // }}}
 
@@ -933,7 +933,7 @@ class AIT extends AITRoot
     {
         try {
             $sql = sprintf(
-                "DELETE FROM %s WHERE id=?", 
+                "DELETE FROM %s WHERE id=?",
                 $this->getPDO()->tag(true)
             );
             self::timer();
@@ -1110,7 +1110,7 @@ class AIT extends AITRoot
 
     // {{{ _fill
     /**
-     * Méthode permettant de charger les propritétes de l'objet 
+     * Méthode permettant de charger les propritétes de l'objet
      * à partir d'un tableau de données
      *
      * @param array $a
@@ -1217,7 +1217,6 @@ class AIT extends AITRoot
     }
     // }}}
 
-
     // {{{ getTimestamps
     /**
      * getTimestamps
@@ -1234,7 +1233,7 @@ class AIT extends AITRoot
             settype($this->_id, 'integer');
             $ret = $stmt->fetch();
             $stmt->closeCursor();
-            return new ArrayObject( 
+            return new ArrayObject(
                 array(
                     'updated' => (int) $ret[0],
                     'created' => (int) $ret[1],
@@ -1287,6 +1286,100 @@ class AIT extends AITRoot
     }
     // }}}
 
+    // {{{ search
+    /**
+     * Recherche un objet quelque soit sont type
+     *
+     * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     *
+     * @return AITResult
+     */
+    public function search($query, $offset = null, $lines = null, $ordering = null)
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+
+        if ($this->isClassCallback('searchHook'))
+            $query = $this->callClassCallback('searchHook', $query, $this);
+
+        if ($query !== '' and $query !== false) $query = 'AND '.$query;
+        $sql1 = 'SELECT tag.id id, tag.label label, tag.type type, tag.prefix prefix, tag.suffix suffix, tag.buffer buffer, tag.scheme scheme, tag.language language, tag.score score, tag.frequency frequency, b.type crtl';
+        $sql2 = sprintf('
+            FROM %1$s tag 
+            LEFT JOIN %1$s b ON tag.type=b.id
+            WHERE tag.type != 0 %2$s
+            ',
+            $this->getPDO()->tag(),
+            $query
+        );
+        $sql = $sql1.$sql2;
+
+        self::sqler($sql, $offset, $lines, $ordering);
+        self::timer();
+
+        $stmt = $this->getPDO()->prepare($sql);
+        $stmt->execute();
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
+            $ret[] = self::factory($this->getPDO(), $row);
+        }
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id, $this->_id);
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        $r = new AITResult($ret);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        return $r;
+    }
+    // }}}
+
+     // {{{ factory
+    /**
+     * Créer un objet à partir d'un tableau de donnée
+     *
+     * @param PDOAIT $pdo pointeur sur la base de données
+     * @param array  $row
+     *
+     * @return mixed
+     */
+    public static function factory(PDOAIT $pdo, $row)
+    {
+        if (!is_array($row))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a array, '.gettype($row).' given', E_USER_ERROR);
+
+        if (!isset($row['type']) or !isset($row['id']) or !isset($row['crtl']) or !isset($row['label']))
+            trigger_error('Argument 2 passed to '.__METHOD__.' has one or more keys missing (id, label, type, crtl)', E_USER_ERROR);
+
+        settype($row['type'], 'integer');
+        settype($row['id'], 'integer');
+        settype($row['crtl'], 'integer');
+
+        $o = null;
+        if ($row['type'] === 1) {
+            $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
+        }
+        elseif ($row['type'] === 2) {
+            $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
+        }
+        elseif ($row['crtl'] === 1) {
+            $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
+        }
+        elseif ($row['crtl'] === 2) {
+            $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
+        }
+        return $o;
+    }
+    // }}}
+
     // {{{ getBySystemID
     /**
      * Récupère un objet quelque soit son type
@@ -1318,26 +1411,7 @@ class AIT extends AITRoot
             $stmt->closeCursor();
             self::debug(self::timer(true), $sql, $id);
 
-            if (is_array($row)) {
-                settype($row['type'], 'integer');
-                settype($row['id'], 'integer');
-                settype($row['crtl'], 'integer');
-            }
-
-            $o = null;
-            if ($row['type'] === 1) {
-                $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
-            }
-            elseif ($row['type'] === 2) {
-                $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
-            }
-            elseif ($row['crtl'] === 1) {
-                $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
-            }
-            elseif ($row['crtl'] === 2) {
-                $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
-            }
-            return $o;
+            return self::factory($pdo, $row);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -1533,7 +1607,7 @@ class AITQuery extends AITRoot {
     /**
      * On efface tout et on recommence
      *
-     * @return boolean 
+     * @return boolean
      */
     public function clean()
     {
@@ -1544,11 +1618,11 @@ class AITQuery extends AITRoot {
 
     // {{{ or
     /**
-     * Appique un Or entre 
+     * Appique un Or entre
      *
      * @param ArrayObject
      *
-     * @return boolean 
+     * @return boolean
      */
     public function eitheror()
     {
@@ -1560,11 +1634,11 @@ class AITQuery extends AITRoot {
     // {{{ all
     /**
      * Recherche les items ayant tout les tags donnés en paramètres
-     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true.
      *
      * @param ArrayObject
      *
-     * @return boolean 
+     * @return boolean
      */
     public function all(ArrayObject $tags)
     {
@@ -1584,7 +1658,7 @@ class AITQuery extends AITRoot {
             }
             else {
                 $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
-                    $tag->getSystemID(), 
+                    $tag->getSystemID(),
                     $this->getPDO()->tagged(),
                     $w
                 );
@@ -1602,11 +1676,11 @@ class AITQuery extends AITRoot {
     // {{{ one
     /**
      * Recherche les items ayant au moins l'un des tags passé en paramètres
-     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true. 
+     * Renvoit false si aucun tag n'a été trouvé dans le tableau d'entrée sinon true.
      *
      * @param ArrayObject
      *
-     * @return boolean 
+     * @return boolean
      */
     public function one($tags)
     {
@@ -1632,7 +1706,7 @@ class AITQuery extends AITRoot {
 
     // {{{ getSQL
     /**
-     * Retourne le SQL correspondant à la requete 
+     * Retourne le SQL correspondant à la requete
      *
      * @return string
      */
@@ -1652,15 +1726,15 @@ class AITQuery extends AITRoot {
     {
         array_pop($this->_step);
         if (end($this->_step) === 'eitheror') {
-            if ($this->sql === '') 
+            if ($this->sql === '')
                 $this->sql = $sql;
-            else 
+            else
                 $this->sql .= ' OR '.$sql;
         }
         else {
-            if ($this->sql === '') 
+            if ($this->sql === '')
                 $this->sql = $sql;
-            else 
+            else
                 $this->sql = sprintf(
                     " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
                     $sql,
@@ -1792,7 +1866,7 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
     }
     // }}}
 
-    // {{{ setTotal 
+    // {{{ setTotal
     /**
      * Fixe le nombre total de résultats trouvés
      *
@@ -1808,11 +1882,11 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
     /**
      * Fixe le nombre total de résultats trouvés
      *
-     * @param string $sql la requete SQL 
+     * @param string $sql la requete SQL
      * @param array $params les paramètres nécessaire à la requete
      * @param pdo $pdo pointeur vers la base de données
      */
-    public function setQueryForTotal($sql,  $params, $pdo) 
+    public function setQueryForTotal($sql,  $params, $pdo)
     {
         $this->_sql = $sql;
         $this->_params = $params;
@@ -1820,7 +1894,7 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
     }
     // }}}
 
-    // {{{ total 
+    // {{{ total
     /**
      * Retourne le nombre total de résultats trouvés
      *
@@ -1873,7 +1947,7 @@ class AITTagsObject implements Countable, Iterator {
      *
      * @param AITResult $tags
      */
-    function __construct($tags = null) 
+    function __construct($tags = null)
     {
         if (!is_null($tags)) $this->setTags($tags);
     }
@@ -1885,7 +1959,7 @@ class AITTagsObject implements Countable, Iterator {
      *
      * @param $tags
      */
-    function setTags($tags) 
+    function setTags($tags)
     {
         $this->_tags = array();
         foreach($tags as $tag) {
@@ -1897,11 +1971,11 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ addTag
     /**
-     * Ajout un Tag 
+     * Ajout un Tag
      *
      * @param $tag
      */
-    function addTag(AIT_Tag $tag) 
+    function addTag(AIT_Tag $tag)
     {
         $type = $tag->getTagType();
         $name = $type->get();
@@ -1915,7 +1989,7 @@ class AITTagsObject implements Countable, Iterator {
 
     // {{{ __set
     /**
-     * Magic function to set value 
+     * Magic function to set value
      *
      * @param string $name The variable name.
      * @param mixed $val The variable value.
@@ -2018,7 +2092,7 @@ class AITTagsObject implements Countable, Iterator {
      * @param string $key The variable name.
      * @return boolean
      */
-    public function __isset($key) 
+    public function __isset($key)
     {
         return isset($this->_tags[$key]);
     }
@@ -2031,7 +2105,7 @@ class AITTagsObject implements Countable, Iterator {
      * @param string $key The variable name.
      * @return boolean
      */
-    public function __unset($key) 
+    public function __unset($key)
     {
         unset($this->_tags[$key]);
     }

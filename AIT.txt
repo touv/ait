@@ -129,6 +129,62 @@ Retour
 mixed 
 
 // ----------------------------------------------------------------------------
+set
+^^^
+
+Synopsis
+++++++++
+
+    mixed  set(string $value, string $name= 'label')
+
+Description
++++++++++++
+
+Fixe la valeur d'une propriété de l'élément. 
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix 
+
+Paramètres
+++++++++++
+
+string *$value*:: valeur de la propriété
+string *$name*:: nom de la propriété
+
+
+Retour
+++++++
+
+Aucun.
+
+
+// ----------------------------------------------------------------------------
+search
+^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult search(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Recherche des éléments (quelque soit le type)
+
+Paramètres
+++++++++++
+
+string *$query*:: requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+un objet AITResult (ArrayObject) contenant des objets AIT_Tag ou AIT_Item ou AIT_TagType ou AIT_ItemType.
+
+// ----------------------------------------------------------------------------
 getTimestamps
 ^^^^^^^^^^^^^
 

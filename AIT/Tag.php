@@ -51,6 +51,7 @@ require_once 'AIT.php';
 class AIT_Tag extends AIT
 {
     protected $_item_id;
+
     // {{{ __construct
     /**
      * Le constructeur de la classe.

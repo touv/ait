@@ -14,8 +14,8 @@
     </lead>
     <date>2009-04-02</date>
     <version>
-        <release>2.2.0</release>
-        <api>2.2</api>
+        <release>2.3.0</release>
+        <api>2.3</api>
     </version>
     <stability>
         <release>stable</release>
@@ -23,8 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-		+ Space devient Buffer
-		+ Ajout de suffix, prefix, scheme et language
+		+ Ajout de search
     </notes>
     <contents>
         <dir name="/">
@@ -419,6 +418,22 @@
 			<notes>
 				+ Uniformisation du mécanisme de plugin/hook
 			</notes>
-		</release>
-	</changelog>
+        </release>
+        <release>
+            <date>2009-04-02</date>
+            <version>
+                <release>2.2.1</release>
+                <api>2.2</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Space devient Buffer
+                + Ajout de suffix, prefix, scheme et language
+            </notes>
+        </release>
+    </changelog>
 </package>

@@ -283,6 +283,16 @@ Cette classe permet de manipuler un TAG.
 
 include::./AIT/Tag.txt[]
 
+
+// ============================================================================
+AIT
+~~~
+
+Cette classe posséde quelques méthodes statiques
+
+//include::./AIT/Tag.txt[]
+
+
 Maintenance
 -----------
 

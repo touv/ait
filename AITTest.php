@@ -574,9 +574,9 @@ class AITTest extends PHPUnit_Framework_TestCase
     function test_search()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
-        $i1 = $it->addItem('A');
-        $i2 = $it->addItem('B');
-        $i3 = $it->addItem('C');
+        $i1 = $it->addItem('a');
+        $i2 = $it->addItem('b');
+        $i3 = $it->addItem('c');
         $tt = $it->addTag('tagtype');
         $t1 = $tt->addTag('abcde');
         $t2 = $tt->addTag('bcdef');
@@ -588,11 +588,17 @@ class AITTest extends PHPUnit_Framework_TestCase
         $items = $it->searchItems('');
         $this->assertEquals($items->count(), 3);
 
-        $items = $it->searchItems('item.label=\'A\'');
+        $items = $it->searchItems('item.label=\'a\'');
         $this->assertEquals($items->count(), 1);
 
         $items = $it->searchItems('tag.label=\'abcde\'');
         $this->assertEquals($items->count(), 2);
+
+        $misc = $it->search('tag.label=\'abcde\'');
+        $this->assertEquals($misc->count(), 1);
+
+        $misc = $it->search('tag.label like \'a%\'');
+        $this->assertEquals($misc->count(), 2);
 
         $it->del();
         $this->assertEquals($this->_d(), 2);

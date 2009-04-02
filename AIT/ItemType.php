@@ -76,8 +76,8 @@ class AIT_ItemType extends AIT
         $this->_label = $l;
         $this->_type  = 1;
         if ($id === false) {
-            $this->_id = $this->_addTag($this->_label, $this->_type);
-            $this->callClassCallback('addHook', $this->_id);
+            $this->_id = $this->_addTag($this->_label, $this->_type, $row);
+            $this->callClassCallback('addHook', $this);
 
             if ($row !== false) 
                 foreach($this->_cols as $n => $t)

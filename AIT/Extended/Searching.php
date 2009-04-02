@@ -37,7 +37,7 @@
  */
 require_once 'AIT.php';
 require_once 'AIT/Extended.php';
-require_once 'Text/Normalize.php';
+
 
 
 /**
@@ -53,13 +53,9 @@ require_once 'Text/Normalize.php';
 class AIT_Extended_Searching extends AIT_Extended
 {
     /**
-     * @var Text_Normalize
+     * @var callback
      */
-    public $tn;
-    /**
-     * @var integer
-     */
-    public $tn_mode;
+    private $callback;
 
     /**
      * @var string
@@ -69,26 +65,28 @@ class AIT_Extended_Searching extends AIT_Extended
     // {{{ __construct
     /**
      * Constructeur
-     *
+     * @param callback 
      */
-    function __construct()
+    function __construct($callback)
     {
-        $this->tn = new Text_Normalize('', 'fr');
-        $this->tn_mode = Text_Normalize::Uppercase;
+        if (!is_callable($callback)) 
+            die('It\'s not a valid Callback');
+        $this->callback = $callback;
 
+      
         parent::__construct(array(
             'callbacks' => array(
                 'ItemType' => array(
                     'searchItemsHook' => array($this, 'queryHook'),
                 ),
                 'Item' => array(
-                    'fillBuffer' => array($this, 'bufferHook'),
+                    'addHook' => array($this, 'bufferHook'),
                 ),
                 'TagType' => array(
                     'searchTagsHook' => array($this, 'queryHook'),
                 ),
                 'Tag' => array(
-                    'fillBuffer' => array($this, 'bufferHook'),
+                    'addHook' => array($this, 'bufferHook'),
                 ),
             ),
         ));
@@ -106,8 +104,7 @@ class AIT_Extended_Searching extends AIT_Extended
      */
     private function _normalize($s, $la = 'en')
     {
-        $this->tn->set($s, $l);
-        return $this->tn->get($this->tn_mode);
+        return call_user_func($this->callback, $s, $la);
     }
     // }}}
 
@@ -116,20 +113,19 @@ class AIT_Extended_Searching extends AIT_Extended
     /**
      * Callback pour alimenter le champ buffer 
      *
-     *  @param string $s valeur du label
      *  @param AIT $o objet appelant
      *
      *  @return string
      */
-    function bufferHook($s, $o)
+    function bufferHook($o)
     {
-        $str = $this->_normalize($s);
+        $str = $this->_normalize($o->get());
         $buf .= $str;
         $buf .= ' ';
-        $buf .= $this->_separator.$s;
+        $buf .= $this->_separator.$str;
         $buf .= ' ';
-        $buf .= implode('',array_reverse(str_split($s)));
-        return trim($buf);
+        $buf .= implode('',array_reverse(str_split($str)));
+        $o->set(trim($buf), 'buffer');
     }
     // }}}
 

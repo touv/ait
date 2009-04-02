@@ -98,8 +98,8 @@ class AIT_Item extends AIT
             if (! $this->_checkTag($t, 1)) {
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "typeitem" ', E_USER_ERROR);
             }
-            $this->_id = $this->_addTag($this->_label, $this->_type);
-            $this->callClassCallback('addHook', $this->_id);
+            $this->_id = $this->_addTag($this->_label, $this->_type, $row);
+            $this->callClassCallback('addHook', $this);
 
             if ($row !== false) 
                 foreach($this->_cols as $n => $t)

@@ -6,6 +6,18 @@ ini_set('include_path', dirname(__FILE__).PATH_SEPARATOR.ini_get('include_path')
 require_once 'PHPUnit/Framework.php';
 require_once 'AIT.php';
 
+function normalize($s, $l) {
+    static $tn = null;
+    if (is_null($tn)) {
+        include_once 'Text/Normalize.php';
+        $tn = new Text_Normalize('', 'fr');
+    }
+    $tn->set($s, $l);
+    return $tn->get(Text_Normalize::Uppercase);
+}
+
+
+
 class AITExtendedTest extends PHPUnit_Framework_TestCase
 {
     var $cnxstr;
@@ -29,7 +41,7 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
 //        $this->db = AIT::connect($this->cnxstr, 'root');
         $this->db->setOption('prefix', 'search_');
         $this->db->checkup();
-        $this->db->extendWith(new AIT_Extended_Searching());
+        $this->db->extendWith(new AIT_Extended_Searching('normalize'));
 
         $it = new AIT_ItemType('itemtype', $this->db);
         $i1 = $it->addItem('A');
@@ -105,7 +117,7 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
         $this->db->checkup();
 
         // Ajout d'un plugin
-        $this->db->extendWith(new AIT_Extended_Searching());
+        $this->db->extendWith(new AIT_Extended_Searching('normalize'));
 
 
         // Définition d'un schéma de données

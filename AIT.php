@@ -642,13 +642,7 @@ class AIT extends AITRoot
         if ($l !== $this->_label) {
             $this->_label = $l;
             $this->_set('label', $this->_label);
-            $s = '';
-
-            $s = $this->callClassCallback('fillBuffer', $l, $this);
-            if ($s !== false and !is_string($s)) {
-                trigger_error('fillBuffer callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
-            }
-            $this->_set('buffer', $s);
+            $this->callClassCallback('renHook', $this->_id);
         }
     }
     // }}}
@@ -964,10 +958,11 @@ class AIT extends AITRoot
      *
      * @param string $l label
      * @param string $t type
+     * @param array  $r champ associé
      *
      * @return integer
      */
-    protected function _addTag($l, $t = null)
+    protected function _addTag($l, $t = null, $r = false)
     {
         try {
             $sql = sprintf("SELECT id FROM %s WHERE label=? and type=?  LIMIT 0,1", $this->getPDO()->tag());
@@ -983,34 +978,51 @@ class AIT extends AITRoot
 
             if ($id !== false) return (int) $id;
 
-            $s = $this->callClassCallback('fillBuffer', $l, $this);
-            if ($s !== false and !is_string($s)) {
-                trigger_error('fillBuffer callback must return string, `'.gettype($s).'` is given', E_USER_ERROR);
+            $sqlA = $sqlB = '';
+            $fields = array();
+            foreach($this->_cols as $name => $typage) {
+                if (isset($r[$name])) {
+                    settype($r[$name], $typage);
+                    $fields[] = $this->_data[$name] = $r[$name];
+                    $sqlA .= ','.$name;
+                    $sqlB .= ',?';
+                }
             }
 
             self::timer();
             if (is_null($t)) {
                 $sql = sprintf(
-                    "INSERT INTO %s (label, buffer, updated, created) VALUES (?, ?, now(), now());",
-                    $this->getPDO()->tag(true)
+                    "INSERT INTO %s (label, updated, created %s) VALUES (?, now(), now() %s);",
+                    $this->getPDO()->tag(true),
+                    $sqlA,
+                    $sqlB
                 );
                 $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
-                $stmt->bindParam(2, $s, PDO::PARAM_STR);
+                $n = 2;
             }
             else {
                 $sql = sprintf(
-                    "INSERT INTO %s (label, buffer, type, updated, created) VALUES (?, ?, ?, now(), now());",
-                    $this->getPDO()->tag(true)
+                    "INSERT INTO %s (label, type, updated, created %s) VALUES (?, ?, now(), now() %s);",
+                    $this->getPDO()->tag(true),
+                    $sqlA,
+                    $sqlB
                 );
                 $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $l, PDO::PARAM_STR);
-                $stmt->bindParam(2, $s, PDO::PARAM_STR);
-                $stmt->bindParam(3, $t, PDO::PARAM_INT);
+                $stmt->bindParam(2, $t, PDO::PARAM_INT);
+                $n = 3;
+            }
+            foreach($fields as $k => $field) {
+                $typage = gettype($field);
+                if ($typage === 'integer')
+                    $stmt->bindParam($k + $n, $field, PDO::PARAM_INT);
+                elseif ($typage === 'string')
+                    $stmt->bindParam($k + $n, $field, PDO::PARAM_STR);
             }
             $ret = $stmt->execute();
             $stmt->closeCursor();
-            self::debug(self::timer(true), $sql, $l, $s, $t);
+            self::debug(self::timer(true), $sql, $l, $t, $r);
 
             $id = (int) $this->getPDO()->lastInsertId();
 
@@ -1184,6 +1196,27 @@ class AIT extends AITRoot
         }
     }
     // }}}
+
+    // {{{ set
+    /**
+     * Setter
+     *
+     * @param string $value
+     * @param string $name nom de l'attribut
+     *
+     * @return	mixed
+     */
+    public function set($value, $name = 'label')
+    {
+        if ($name === 'label') {
+            return $this->ren($value);
+        }
+        elseif (isset($this->_cols[$name])) {
+            return $this->_set($name, $value);
+        }
+    }
+    // }}}
+
 
     // {{{ getTimestamps
     /**
@@ -1857,16 +1890,28 @@ class AITTagsObject implements Countable, Iterator {
         $this->_tags = array();
         foreach($tags as $tag) {
             if (! $tag instanceof AIT_Tag) continue;
-
-            $type = $tag->getTagType();
-            $name = $type->get();
-            if (!isset($this->_tags[$name])) {
-                $this->_tags[$name] = new ArrayObject();
-            }
-            $this->_tags[$name]->append($tag);
+            $this->addTag($tag);
         }
     }
     // }}}
+
+    // {{{ addTag
+    /**
+     * Ajout un Tag 
+     *
+     * @param $tag
+     */
+    function addTag(AIT_Tag $tag) 
+    {
+        $type = $tag->getTagType();
+        $name = $type->get();
+        if (!isset($this->_tags[$name])) {
+            $this->_tags[$name] = new ArrayObject();
+        }
+        $this->_tags[$name]->append($tag);
+    }
+    // }}}
+
 
     // {{{ __set
     /**

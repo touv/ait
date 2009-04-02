@@ -8,10 +8,6 @@ ini_set('include_path', dirname(__FILE__).PATH_SEPARATOR.ini_get('include_path')
 require_once 'AIT.php';
 require_once 'PHPUnit/Framework.php';
 
-function cb1($a, $e) { return 'cb1'; }
-function cb2($a, $e) { return 'cb2'; }
-function cb3($a, $e) { return 'cb3'; }
-function cb4($a, $e) { return 'cb4'; }
 
 class AITTest extends PHPUnit_Framework_TestCase
 {
@@ -22,20 +18,6 @@ class AITTest extends PHPUnit_Framework_TestCase
         //        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',
-            'callbacks' => array(
-                'ItemType' =>array(
-                    'fillBuffer' => 'cb1'
-                ),
-                'Item' => array (
-                    'fillBuffer' => 'cb2'
-                ),
-                'TagType' => array(
-                    'fillBuffer' => 'cb3'
-                ),
-                'Tag' => array(
-                    'fillBuffer' => 'cb4'
-                ),
-            ),
         );
         $this->db = AIT::connect($cnxstr, 'root');
         $this->db->setOptions($options);
@@ -49,7 +31,7 @@ class AITTest extends PHPUnit_Framework_TestCase
     }
     function test_itemtype()
     {
-        $it = new AIT_ItemType('itemtype', $this->db);
+        $it = new AIT_ItemType('itemtype', $this->db);        
         $this->assertEquals($this->_d(), 3);
         $this->assertEquals($this->_q(), 0);
         $it->del();
@@ -589,21 +571,6 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_q(), 0);
     }
 
-    function test_fill_buffer()
-    {
-        $it = new AIT_ItemType('itemtype', $this->db);
-        $this->assertEquals($it->get('buffer'), 'cb1');
-        $i1 = $it->addItem('A');
-        $this->assertEquals($i1->get('buffer'), 'cb2');
-        $tt = $it->addTag('tagtype');
-        $this->assertEquals($tt->get('buffer'), 'cb3');
-        $t1 = $tt->addTag('C');
-        $this->assertEquals($t1->get('buffer'), 'cb4');
-
-        $it->del();
-        $this->assertEquals($this->_d(), 2);
-        $this->assertEquals($this->_q(), 0);
-    }
     function test_search()
     {
         $it = new AIT_ItemType('itemtype', $this->db);
@@ -747,6 +714,9 @@ class AITTest extends PHPUnit_Framework_TestCase
     {
         $it1 = new AIT_ItemType('A', $this->db);
         $it2 = new AIT_ItemType('B', $this->db);
+
+        $this->assertEquals($this->_d(), 4);
+
 
         $ret = AIT_ItemType::getAll($this->db);
         $this->assertEquals($ret->count(), 2);

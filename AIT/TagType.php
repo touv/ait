@@ -84,8 +84,8 @@ class AIT_TagType extends AIT
             if (! $this->_checkTag($this->_item_id, 1)) {
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tagtype"', E_USER_ERROR);
             }
-            $this->_id = $this->_addTag($this->_label, 2);
-            $this->callClassCallback('addHook', $this->_id);
+            $this->_id = $this->_addTag($this->_label, 2, $row);
+            $this->callClassCallback('addHook', $this);
 
             if ($row !== false) 
                 foreach($this->_cols as $n => $t)

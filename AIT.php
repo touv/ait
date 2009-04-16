@@ -1044,33 +1044,42 @@ class AIT extends AITRoot
      */
     protected function _getTagBySystemID($i)
     {
+        $sql = sprintf("
+            SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type
+            FROM %s
+            WHERE id = ?
+            LIMIT 0,1
+            ",
+            $this->getPDO()->tag()
+        );
+        self::timer();
+        if (($r = $this->callClassCallback(
+            'getTagBySystemIDCache',
+            $cid = self::str2cid($sql, $i)
+        )) !== false) return $r;
+
         try {
-            $sql = sprintf("
-                SELECT id, label, type
-                FROM %s
-                WHERE id = ?
-                LIMIT 0,1
-                ",
-                $this->getPDO()->tag()
-            );
-            self::timer();
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
             $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
-            self::debug(self::timer(true), $sql, $i);
-
-            if (is_array($row)) {
-                settype($row['type'], 'integer');
-                settype($row['id'], 'integer');
-            }
-
-            return $row;
         }
         catch (PDOException $e) {
             self::catchError($e);
         }
+
+        self::debug(self::timer(true), $sql, $i);
+
+        if (is_array($row)) {
+            settype($row['type'], 'integer');
+            settype($row['id'], 'integer');
+        }
+
+        if (isset($cid))
+            $this->callClassCallback('getTagBySystemIDCache', $cid, $row);
+
+        return $row;
     }
     // }}}
 
@@ -1342,7 +1351,7 @@ class AIT extends AITRoot
     }
     // }}}
 
-     // {{{ factory
+    // {{{ factory
     /**
      * Créer un objet à partir d'un tableau de donnée
      *

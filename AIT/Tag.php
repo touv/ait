@@ -282,6 +282,12 @@ class AIT_Tag extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'fetchRelatedTagsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -300,6 +306,10 @@ class AIT_Tag extends AIT
         $sql = 'SELECT COUNT(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO()); 
+
+        if (isset($cid))
+            $this->callClassCallback('fetchRelatedTagsCache', $cid, $r);
+
         return $r;
     }
     // }}}
@@ -336,10 +346,18 @@ class AIT_Tag extends AIT
     */
     public function getTagType()
     {
+        if (($r = $this->callClassCallback(
+            'getTagTypeCache',
+            $cid = self::str2cid($this->_type)
+        )) !== false) return $r;
+
         $row = $this->_getTagBySystemID($this->_type);
 
         if (is_array($row)) {
-            return new AIT_TagType($row['label'], null, $this->getPDO(), $this->_type, $row);
+            $r = new AIT_TagType($row['label'], null, $this->getPDO(), $this->_type, $row);
+            if (isset($cid))
+                $this->callClassCallback('getTagTypeCache', $cid, $r);
+            return $r;
         }
     }
     // }}}
@@ -374,6 +392,12 @@ class AIT_Tag extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'getItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -391,6 +415,9 @@ class AIT_Tag extends AIT
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('getItemsCache', $cid, $r);
 
         return $r;
     }

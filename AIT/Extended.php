@@ -53,13 +53,13 @@ class AIT_Extended
     /**
      * @param array
      */
-    private $_options = array();
+    protected $_options = array();
     /**
-    * Constructeur
-    *
-    * @param array option forunit par l'extention
-    * @access	private
-    */
+     * Constructeur
+     *
+     * @param array option forunit par l'extention
+     * @access	private
+     */
     function __construct(array $a)
     {
         $this->_options = $a;
@@ -75,6 +75,18 @@ class AIT_Extended
     {
         $pdo->setOptions($this->_options);
     }
+    // {{{ __sleep
+    /**
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        return array(
+            "\0*\0"."_options",
+        );
+    }
+    // }}}
 }
 
 

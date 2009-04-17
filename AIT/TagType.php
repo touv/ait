@@ -160,6 +160,12 @@ class AIT_TagType extends AIT
             ",
             $this->getPDO()->tag()
         );
+      
+        if (($r = $this->callClassCallback(
+            'getTagCache',
+            $cid = self::str2cid($l, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
@@ -175,6 +181,9 @@ class AIT_TagType extends AIT
         else $ret = null;
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $this->_id);
+
+        if (isset($cid))
+            $this->callClassCallback('getTagCache', $cid, $ret);
 
         return $ret;
     }

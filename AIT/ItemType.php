@@ -323,6 +323,13 @@ class AIT_ItemType extends AIT
             WHERE label = ? AND type = ?
             LIMIT 0,1
             ", $this->getPDO()->tag());
+      
+        if (($r = $this->callClassCallback(
+            'getItemCache',
+            $cid = self::str2cid($l, $this->_id)
+        )) !== false) return $r;
+
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $l, PDO::PARAM_STR);
@@ -340,6 +347,9 @@ class AIT_ItemType extends AIT
         $id = (int)$stmt->fetchColumn(0);
         $stmt->closeCursor();
         self::debug(self::timer(true), $sql, $l, $this->_id);
+
+        if (isset($cid))
+            $this->callClassCallback('getItemCache', $cid, $ret);
 
         return $ret;
     }

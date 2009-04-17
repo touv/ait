@@ -131,6 +131,7 @@ class PDOAIT extends PDO
         'tag'      => 'tag',
         'tagged'   => 'tagged',
         'callbacks' => array(),
+        'extends' => array(),
     );
 
     // {{{ __construct
@@ -161,8 +162,8 @@ class PDOAIT extends PDO
      */
     public function extendWith(AIT_Extended $o)
     {
-
         $o->register($this);
+        $this->_options['extends'][] = $o;
         return $this;
     }
     // }}}

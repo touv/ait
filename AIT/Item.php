@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,10 +26,10 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
+ * @link      http://ait.touv.fr/
  */
 
 /**
@@ -44,9 +44,9 @@ require_once 'AIT.php';
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT_Item extends AIT
 {
@@ -317,6 +317,12 @@ class AIT_Item extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'fetchTagsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -335,6 +341,9 @@ class AIT_Item extends AIT
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('fetchTagsCache', $cid, $r);
 
         return $r;
     }
@@ -366,10 +375,20 @@ class AIT_Item extends AIT
      */
     public function getItemType()
     {
+        if (($r = $this->callClassCallback(
+            'getItemTypeCache',
+            $cid = self::str2cid($this->_type)
+        )) !== false) return $r;
+
+
         $row = $this->_getTagBySystemID($this->_type);
 
         if (is_array($row)) {
-            return new AIT_ItemType($row['label'], $this->getPDO(), $this->_type, $row);
+            $r = new AIT_ItemType($row['label'], $this->getPDO(), $this->_type, $row);
+            if (isset($cid))
+                $this->callClassCallback('getItemTypeCache', $cid, $r);
+            return $r;
+
         }
     }
     // }}}

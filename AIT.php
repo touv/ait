@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,11 +26,11 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
- */
+ * @link      http://ait.touv.fr/
+ * */
 
 /**
  * Dépendances
@@ -47,9 +47,9 @@ require_once 'AIT/Tag.php';
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AITSchema {
 
@@ -115,9 +115,9 @@ class AITSchema {
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class PDOAIT extends PDO
 {
@@ -161,6 +161,7 @@ class PDOAIT extends PDO
      */
     public function extendWith(AIT_Extended $o)
     {
+
         $o->register($this);
         return $this;
     }
@@ -201,7 +202,36 @@ class PDOAIT extends PDO
     public function setOption($n, $v)
     {
         if (isset($this->_options[$n]) && !is_null($v)) {
-            $this->_options[$n] = $v;
+            $func = array($this, 'setOption'.ucfirst($n));
+            if (is_callable($func)) {
+                call_user_func($func, $v);
+            }
+            else {
+                $this->_options[$n] = $v;
+            }
+        }
+    }
+    // }}}
+    // {{{ setOption
+    /**
+     * Fixe l'option "callbacks"
+     *
+     * @param string $value valeur
+     * @return	string
+     */
+    public function setOptionCallbacks($v)
+    {
+        reset($v);
+        while (list($k, ) = each($v)) {
+            if (!isset($this->_options['callbacks'][$k])) {
+                $this->_options['callbacks'][$k] = $v[$k];
+            }
+            elseif (!is_array($this->_options['callbacks'][$k])) {
+                $this->_options['callbacks'][$k] = $v[$k];
+            }
+            elseif (is_array($this->_options['callbacks'][$k])) {
+                $this->_options['callbacks'][$k] = array_merge($this->_options['callbacks'][$k], $v[$k]);
+            }
         }
     }
     // }}}
@@ -388,9 +418,9 @@ class PDOAIT extends PDO
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 abstract class AITRoot
 {
@@ -436,6 +466,7 @@ abstract class AITRoot
         $this->_pdo_opt = $pdo->getOptions();
     }
     // }}}
+
     // {{{ __sleep
     /**
      * Avant serialization
@@ -460,9 +491,9 @@ abstract class AITRoot
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT extends AITRoot
 {
@@ -1321,7 +1352,7 @@ class AIT extends AITRoot
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
         $sql1 = 'SELECT tag.id id, tag.label label, tag.type type, tag.prefix prefix, tag.suffix suffix, tag.buffer buffer, tag.scheme scheme, tag.language language, tag.score score, tag.frequency frequency, b.type crtl';
         $sql2 = sprintf('
-            FROM %1$s tag 
+            FROM %1$s tag
             LEFT JOIN %1$s b ON tag.type=b.id
             WHERE tag.type != 0 %2$s
             ',
@@ -1476,13 +1507,20 @@ class AIT extends AITRoot
     public static function debug()
     {
         if (self::$debugging === true)  {
+            $dbg = debug_backtrace();
+            for($i = 2; $i > 0; $i--) {
+                if (isset($dbg[$i]['function']) and isset($dbg[$i]['class']))
+                    echo $dbg[$i]['class'].'::'.$dbg[$i]['function']. ($i != 1 ? ' => ' : '');
+            }
+            echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n\t" : "<br/>\n&nbsp;&nbsp;&nbsp;&nbsp;\t";
+
             $argc = func_num_args();
             for ($i = 0; $i < $argc; $i++) {
                 $value = func_get_arg($i);
                 echo implode(' ', array_map('trim',explode("\n",$value))). ($i < $argc - 1 ? ' / ' : '');
 
             }
-            echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n" : "<br/>";
+            echo substr(php_sapi_name(), 0, 3) == 'cli'  ? "\n" : "<br/>\n";
         }
     }
     // }}}
@@ -1551,8 +1589,9 @@ class AIT extends AITRoot
         $argc = func_num_args();
         for ($i = 0; $i < $argc; $i++) {
             $arg = func_get_arg($i);
-            if (is_string($arg)) $ret .= $arg;
+            if (!is_object($arg)) $ret .= $arg;
         }
+
         return md5($ret);
     }
     // }}}
@@ -1579,6 +1618,24 @@ class AIT extends AITRoot
     }
     // }}}
 
+    // {{{ __sleep
+    /**
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        return array_merge(parent::__sleep(), array (
+            "\0*\0"."_id",
+            "\0*\0"."_element",
+            "\0*\0"."_label",
+            "\0*\0"."_type",
+            "\0*\0"."_methods",
+            "\0*\0"."_cols",
+            "\0*\0"."_data",
+        ));
+    }
+    // }}}
 }
 
 
@@ -1589,13 +1646,13 @@ class AIT extends AITRoot
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AITQuery extends AITRoot {
 
-    protected $sql = '';
+    protected $_sql = '';
 
     protected $_step = array();
 
@@ -1621,7 +1678,7 @@ class AITQuery extends AITRoot {
     public function clean()
     {
         array_push($this->_step, 'start');
-        $this->sql = '';
+        $this->_sql = '';
     }
     // }}}
 
@@ -1721,7 +1778,7 @@ class AITQuery extends AITRoot {
      */
     public function getSQL()
     {
-        return sprintf('SELECT item_id FROM %s WHERE %s', $this->getPDO()->tagged(), $this->sql);
+        return sprintf('SELECT item_id FROM %s WHERE %s', $this->getPDO()->tagged(), $this->_sql);
     }
     // }}}
 
@@ -1735,22 +1792,36 @@ class AITQuery extends AITRoot {
     {
         array_pop($this->_step);
         if (end($this->_step) === 'eitheror') {
-            if ($this->sql === '')
-                $this->sql = $sql;
+            if ($this->_sql === '')
+                $this->_sql = $sql;
             else
-                $this->sql .= ' OR '.$sql;
+                $this->_sql .= ' OR '.$sql;
         }
         else {
-            if ($this->sql === '')
-                $this->sql = $sql;
+            if ($this->_sql === '')
+                $this->_sql = $sql;
             else
-                $this->sql = sprintf(
+                $this->_sql = sprintf(
                     " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
                     $sql,
                     $this->getPDO()->tagged(),
-                    $this->sql
+                    $this->_sql
                 );
         }
+    }
+    // }}}
+
+    // {{{ __sleep
+    /**
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        return array_merge(parent::__sleep(), array (
+            "\0*\0"."_step",
+            "\0*\0"."_sql",
+        ));
     }
     // }}}
 
@@ -1763,9 +1834,9 @@ class AITQuery extends AITRoot {
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
 
@@ -1778,11 +1849,13 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
     /**
      * Constructeur
      *
-     * @param PDOAIT $pdo objet de connexion à la base
+     * @param array
      */
-    function __construct($a)
+    function __construct($a, $pdo = null)
     {
         $this->_array = $a;
+        if (!is_null($pdo))
+            $this->setPDO($pdo);
     }
     // }}}
 
@@ -1895,11 +1968,12 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
      * @param array $params les paramètres nécessaire à la requete
      * @param pdo $pdo pointeur vers la base de données
      */
-    public function setQueryForTotal($sql,  $params, $pdo)
+    public function setQueryForTotal($sql,  $params, $pdo = null)
     {
         $this->_sql = $sql;
         $this->_params = $params;
-        $this->setPDO($pdo);
+        if (!is_null($pdo))
+            $this->setPDO($pdo);
     }
     // }}}
 
@@ -1932,6 +2006,21 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
     }
     // }}}
 
+    // {{{ __sleep
+    /**
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        return array_merge(parent::__sleep(), array (
+            "\0*\0"."_total",
+            "\0*\0"."_sql",
+            "\0*\0"."_params",
+            "\0*\0"."_array",
+        ));
+    }
+    // }}}
 }
 
 
@@ -1942,9 +2031,9 @@ class AITResult extends AITRoot implements Countable, Iterator, ArrayAccess {
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AITTagsObject implements Countable, Iterator {
 
@@ -2120,6 +2209,18 @@ class AITTagsObject implements Countable, Iterator {
     }
     // }}}
 
+    // {{{ __sleep
+    /**
+     * Avant serialization
+     *
+     */
+    public function __sleep () 
+    {
+        return array (
+            "\0*\0"."_tags",
+        );
+    }
+    // }}}
 }
 
 

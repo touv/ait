@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-04-02</date>
+    <date>2009-04-17</date>
     <version>
-        <release>2.3.1</release>
+        <release>2.3.2</release>
         <api>2.3</api>
     </version>
     <stability>
@@ -25,6 +25,7 @@
     <notes>
         + Ajout de search
         + Ajout de callbacks
+        + bugfixes
     </notes>
     <contents>
         <dir name="/">

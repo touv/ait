@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,10 +26,10 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
+ * @link      http://ait.touv.fr/
  */
 
 /**
@@ -44,9 +44,9 @@ require_once 'AIT.php';
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT_Tag extends AIT
 {
@@ -108,9 +108,9 @@ class AIT_Tag extends AIT
                 $this->_id = $this->_addTag($this->_label, $this->_type, $row);
                 $this->callClassCallback('addHook', $this);
 
-                if ($row !== false) 
+                if ($row !== false)
                     foreach($this->_cols as $n => $t)
-                        if (isset($row[$n])) 
+                        if (isset($row[$n]))
                             $this->_set($n, $row[$n]);
 
                 if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
@@ -132,9 +132,9 @@ class AIT_Tag extends AIT
                 $this->_id = $this->_addTag($this->_label, $this->_type, $row);
                 $this->callClassCallback('addHook', $this);
 
-                if ($row !== false) 
+                if ($row !== false)
                     foreach($this->_cols as $n => $t)
-                        if (isset($row[$n])) 
+                        if (isset($row[$n]))
                             $this->_set($n, $row[$n]);
             }
             else {
@@ -262,7 +262,7 @@ class AIT_Tag extends AIT
             if (!empty($w1)) $w = ' AND ('.$w1.')';
             if (!empty($w2)) {
                 $w .= ' AND ('.$w2.')';
-                $s = sprintf('LEFT JOIN %s d ON d.tag_id=c.id LEFT JOIN %s e ON d.item_id=e.item_id', 
+                $s = sprintf('LEFT JOIN %s d ON d.tag_id=c.id LEFT JOIN %s e ON d.item_id=e.item_id',
                     $this->getPDO()->tagged(),
                     $this->getPDO()->tagged()
                 );
@@ -272,8 +272,8 @@ class AIT_Tag extends AIT
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.item_id
-            LEFT JOIN %s c ON b.tag_id=c.id 
-            $s           
+            LEFT JOIN %s c ON b.tag_id=c.id
+            $s
             WHERE a.tag_id = ? $w
             ",
             $this->getPDO()->tagged(),
@@ -305,7 +305,7 @@ class AIT_Tag extends AIT
 
         $sql = 'SELECT COUNT(DISTINCT id) '.$sql2;
         $r = new AITResult($ret);
-        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO()); 
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
         if (isset($cid))
             $this->callClassCallback('fetchRelatedTagsCache', $cid, $r);
@@ -318,11 +318,13 @@ class AIT_Tag extends AIT
     /**
      * Compte le nombre de tags du type d'item courant
      *
+     * @param boolean $reload récupére la valeur en base et non celle du cache de l'objet
+     *
      * @return integer
      */
-    function countItems()
+    function countItems($reload = true)
     {
-        return (int) $this->_get('frequency', true);
+        return (int) $this->_get('frequency', $reload);
     }
     // }}}
 
@@ -385,7 +387,7 @@ class AIT_Tag extends AIT
         $sql2 = sprintf("
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.id
-            WHERE tag_id = ? 
+            WHERE tag_id = ?
             ",
             $this->getPDO()->tagged(),
             $this->getPDO()->tag()

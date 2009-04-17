@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,10 +26,10 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
+ * @link      http://ait.touv.fr/
  */
 
 /**
@@ -44,9 +44,9 @@ require_once 'AIT.php';
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT_TagType extends AIT
 {
@@ -226,6 +226,12 @@ class AIT_TagType extends AIT
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
+
+        if (($r = $this->callClassCallback(
+            'getTagsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         self::timer();
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -244,6 +250,9 @@ class AIT_TagType extends AIT
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
 
+        if (isset($cid))
+            $this->callClassCallback('getTagsCache', $cid, $r);
+
         return $r;
     }
     // }}}
@@ -261,11 +270,18 @@ class AIT_TagType extends AIT
         if (!is_integer($i))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($i).' given', E_USER_ERROR);
 
+        if (($r = $this->callClassCallback(
+            'getTagBySystemIDCache',
+            $cid = self::str2cid($i)
+        )) !== false) return $r;
 
         $row = $this->_getTagBySystemID($i);
 
         if (is_array($row)) {
-            return new AIT_Tag($row['label'], $row['type'], null, $this->getPDO(), $i);
+            $r = new AIT_Tag($row['label'], $row['type'], null, $this->getPDO(), $i);
+            if (isset($cid))
+                $this->callClassCallback('getTagBySystemIDCache', $cid, $r);
+            return $r;
         }
     }
     // }}}
@@ -306,6 +322,11 @@ class AIT_TagType extends AIT
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
 
+        if (($r = $this->callClassCallback(
+            'searchTagsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -322,6 +343,9 @@ class AIT_TagType extends AIT
         $sql = 'SELECT COUNT(*) '.$sql2;
         $r = new AITResult($ret);
         $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('searchTagsCache', $cid, $r);
 
         return $r;
     }
@@ -364,11 +388,13 @@ class AIT_TagType extends AIT
     /**
      * Compte le nombre d'item attaché au tag du 'type' de tag courant
      *
+     * @param boolean $reload récupére la valeur en base et non celle du cache de l'objet
+     *
      * @return integer
      */
-    function countItems()
+    function countItems($reload = true)
     {
-        return (int) $this->_get('frequency', true);
+        return (int) $this->_get('frequency', $reload);
     }
     // }}}
 

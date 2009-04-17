@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,10 +26,10 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
+ * @link      http://ait.touv.fr/
  */
 
 /**
@@ -46,9 +46,9 @@ require_once 'AIT/TagType.php';
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT_ItemType extends AIT
 {
@@ -169,8 +169,9 @@ class AIT_ItemType extends AIT
     function defTagType($l)
     {
         $ret = $this->getTagType($l);
-        if (is_null($ret))
+        if (is_null($ret)) {
             $ret = new AIT_TagType($l, $this->_id, $this->getPDO());
+        }
         return $ret;
     }
     function defTag($l) { return $this->defTagType($l); }
@@ -493,9 +494,9 @@ class AIT_ItemType extends AIT
         self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT count(DISTINCT id) '.$sql2;
-        $r = new AITResult($ret);
+        $r = new AITResult($ret, $this->getPDO());
         if ($tags->count() > 1) {
-            $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+            $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,));
         }
         else {
             // Pour un seul tag il est intule de faire un "count"

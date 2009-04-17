@@ -4,7 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | AIT - All is Tag                                                         |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 Nicolas Thouvenin                                     |
+// | Copyright (C) 2009 Nicolas Thouvenin                                     |
 // +--------------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or            |
 // | modify it under the terms of the GNU General Public License              |
@@ -26,10 +26,10 @@
  * @category  AIT
  * @package   AIT
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
- * @copyright 2008 Nicolas Thouvenin
+ * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
  * @version   SVN: $Id$
- * @link      http://www.pxxo.net/
+ * @link      http://ait.touv.fr/
  */
 
 /**
@@ -47,7 +47,7 @@ require_once 'AIT/Extended.php';
  * @author    Nicolas Thouvenin <nthouvenin@gmail.com>
  * @copyright 2009 Nicolas Thouvenin
  * @license   http://opensource.org/licenses/lgpl-license.php LGPL
- * @link      http://www.pxxo.net/fr/ait
+ * @link      http://ait.touv.fr/
  */
 class AIT_Extended_Caching extends AIT_Extended
 {
@@ -58,21 +58,31 @@ class AIT_Extended_Caching extends AIT_Extended
      */
     function __construct()
     {
-
-        parent::__construct(array(
-            'callbacks' => array(
-                'ItemType' => array(
-                    'getItemsCache'    => array($this, 'cacher'),
-                    'fetchItemsCache'  => array($this, 'cacher'),
-                    'searchItemsCache' => array($this, 'cacher'),
-                    'queryItemsCache'  => array($this, 'cacher'),
-                    'getTagTypesCache' => array($this, 'cacher'),
-                ),
-                'Item' => array(),
-                'TagType' => array(),
-                'Tag' => array(),
-            ),
-        ));
+        parent::__construct(
+            array(
+                'callbacks' => array(
+                    'ItemType' => array(
+                        'getItemsCache'    => array($this, 'cacher'),
+                        'fetchItemsCache'  => array($this, 'cacher'),
+                        'searchItemsCache' => array($this, 'cacher'),
+                        'queryItemsCache'  => array($this, 'cacher'),
+                        'getTagTypesCache' => array($this, 'cacher'),
+                    ),
+                    'Item' => array(
+                        'fetchTagsCache'       => array($this, 'cacher'),
+                        'getItemType'          => array($this, 'cacher'),
+                    ),
+                    'TagType' => array(
+                        'getTagsCache'       => array($this, 'cacher'),
+                    ),
+                    'Tag' => array(
+                        'getTagTypeCache'       => array($this, 'cacher'),
+                        'fetchRelatedTagsCache' => array($this, 'cacher'),
+                        'getItems'              => array($this, 'cacher'),
+                    ),
+                )
+            )
+        );
     }
     // }}}
 

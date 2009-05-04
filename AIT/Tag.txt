@@ -62,17 +62,21 @@ attach
 Synopsis
 ++++++++
 
-    AIT_Tag attach(AIT_Item $o)
+    AIT_Tag attach(AIT_Item $o, Mixed $r = null)
 
 Description
 +++++++++++
 
-Ajoute une association entre le tag et un item
+Ajoute une association entre le tag et un item. On peut présiser l'ordre des tags en indiquant 
+un tag après lequel on doit s'inserer ou la constante AIT::INSERT_FIRST. Dans ce cas on ajoutera 
+le tag en premier dans la liste des tags associés à AIT_Item. Si $r reste à NULL le tag sera ajouté
+en fin de liste.
 
 Paramètres
 ++++++++++
 
 AIT_Item *$o*:: Un objet contenant un item.
+mixed *$r*:: Un objet AIT_Tag ou AIT::INSERT_FIRST
 
 
 Retour

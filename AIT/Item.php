@@ -101,9 +101,9 @@ class AIT_Item extends AIT
             $this->_id = $this->_addTag($this->_label, $this->_type, $row);
             $this->callClassCallback('addHook', $this);
 
-            if ($row !== false) 
+            if ($row !== false)
                 foreach($this->_cols as $n => $t)
-                    if (isset($row[$n])) 
+                    if (isset($row[$n]))
                         $this->_set($n, $row[$n]);
 
             $this->_increaseFrequency($this->_type);
@@ -212,12 +212,13 @@ class AIT_Item extends AIT
      * Ajoute une association entre le tag et un item
      *
      * @param AIT_Tag $o Tag
+     * @param mixed $r AIT::INSERT_FIRST or AIT_Tag
      *
      * @return AIT_Item
      */
-    function attach(AIT_Tag $o)
+    function attach(AIT_Tag $o, $r = null)
     {
-        $o->attach($this);
+        $o->attach($this, $r);
         return $this;
     }
     // }}}
@@ -368,7 +369,7 @@ class AIT_Item extends AIT
         $this->_rmTag($this->_id);
     }
     // }}}
-    
+
     // {{{ getItemType
     /**
      * Retourne le type de tag associé

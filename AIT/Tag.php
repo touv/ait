@@ -187,14 +187,18 @@ class AIT_Tag extends AIT
      * Ajoute une association entre le tag et un item
      *
      * @param AIT_Item $o Un objet contenant un item.
+     * @param mixed $r AIT::INSERT_FIRST or AIT_Tag
      *
      * @return AIT_Tag Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.
      */
-    function attach(AIT_Item $o)
+    function attach(AIT_Item $o, $r = null)
     {
         $this->_item_id = $o->getSystemID();
         if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
-            $this->_addTagged($this->_id, $this->_item_id);
+            if ($r instanceof AIT_Tag) {
+                $r = $r->getSystemID();
+            }
+            $this->_addTagged($this->_id, $this->_item_id, $r);
             $this->_increaseFrequency($this->_id);
             $this->_increaseFrequency($this->_type);
         }

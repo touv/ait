@@ -12,10 +12,10 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-04-17</date>
+    <date>2009-05-04</date>
     <version>
-        <release>2.3.3</release>
-        <api>2.3</api>
+        <release>2.4.0</release>
+        <api>2.4</api>
     </version>
     <stability>
         <release>stable</release>
@@ -23,9 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + Ajout de search
-        + Ajout de callbacks
-        + bugfixes
+        + ordonnancement des tags
     </notes>
     <contents>
         <dir name="/">
@@ -435,6 +433,23 @@
             <notes>
                 + Space devient Buffer
                 + Ajout de suffix, prefix, scheme et language
+            </notes>
+        </release>
+        <release>
+            <date>2009-04-17</date>
+            <version>
+                <release>2.3.3</release>
+                <api>2.3</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + Ajout de search
+                + Ajout de callbacks
+                + bugfixes
             </notes>
         </release>
     </changelog>

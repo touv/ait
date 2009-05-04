@@ -277,7 +277,7 @@ class PDOAIT extends PDO
      * @param   boolean
      * @return	string
      */
-    public function tagged($crue = false)
+    public function tagged($crud = false)
     {
         return $this->_options['prefix'].$this->_options['tagged'];
     }
@@ -293,8 +293,9 @@ class PDOAIT extends PDO
     public function checkup($init = true)
     {
         try {
-            $sql = sprintf(
-                "SELECT count(*) n FROM %s WHERE label='tag' or label='item' LIMIT 0,1;",
+            $sql = sprintf('
+                SELECT count(*) n FROM %s WHERE label=\'tag\' or label=\'item\' LIMIT 0,1;
+                ',
                 $this->tag());
             $stmt = $this->query($sql);
 
@@ -362,6 +363,7 @@ class PDOAIT extends PDO
                     CREATE TABLE %s (
                         tag_id INTEGER(11) UNSIGNED NOT NULL,
                         item_id INTEGER(11) UNSIGNED NOT NULL,
+                        rank INTEGER(11) NOT NULL default '0',
                         PRIMARY KEY (tag_id, item_id),
                 INDEX (tag_id),
                 INDEX (item_id)
@@ -551,6 +553,8 @@ class AIT extends AITRoot
     const ORDER_BY_UPDATED = 32;
     const ORDER_BY_CREATED = 64;
     const ORDER_BY_FREQUENCY = 128;
+    const ORDER_BY_RANK = 256;
+    const INSERT_FIRST = 0;
 
     // {{{ __construct
     /**
@@ -686,7 +690,11 @@ class AIT extends AITRoot
     function exists()
     {
         try {
-            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
+            $sql = sprintf('
+                SELECT count(*) FROM %s WHERE id=? LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
+            );
 
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -717,7 +725,11 @@ class AIT extends AITRoot
     protected function _checkTag($i, $t)
     {
         try {
-            $sql = sprintf("SELECT count(*) n FROM %s WHERE id=? AND type=? LIMIT 0,1", $this->getPDO()->tag());
+            $sql = sprintf('
+                SELECT count(*) n FROM %s WHERE id=? AND type=? LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
+            );
 
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $i, PDO::PARAM_INT);
@@ -748,7 +760,11 @@ class AIT extends AITRoot
     protected function _checkType($t)
     {
         try {
-            $sql = sprintf("SELECT count(*) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
+            $sql = sprintf('
+                SELECT count(*) FROM %s WHERE id=? LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
+            );
 
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $t, PDO::PARAM_INT);
@@ -777,8 +793,9 @@ class AIT extends AITRoot
     protected function _checkTagged($m, $i)
     {
         try {
-            $sql = sprintf(
-                "SELECT count(*) n FROM %s WHERE tag_id=? and item_id=? LIMIT 0,1",
+            $sql = sprintf('
+                SELECT count(*) n FROM %s WHERE tag_id=? and item_id=? LIMIT 0,1
+                ',
                 $this->getPDO()->tagged()
             );
 
@@ -809,8 +826,10 @@ class AIT extends AITRoot
     protected function _increaseFrequency($i)
     {
         try {
-            $sql = sprintf(
-                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->getPDO()->tag()
+            $sql = sprintf('
+                SELECT frequency FROM %s WHERE id = ? LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
             );
             self::timer();
             $stmt = $this->getPDO()->prepare($sql);
@@ -824,8 +843,9 @@ class AIT extends AITRoot
             ++$f;
             if ($f <= 0) $f = 1; // Control IMPORTANT
 
-            $sql = sprintf(
-                "UPDATE %s SET frequency = ? WHERE id = ?",
+            $sql = sprintf('
+                UPDATE %s SET frequency = ? WHERE id = ?
+                ',
                 $this->getPDO()->tag(true)
             );
             self::timer();
@@ -853,8 +873,10 @@ class AIT extends AITRoot
     protected function _decreaseFrequency($i)
     {
         try {
-            $sql = sprintf(
-                "SELECT frequency FROM %s WHERE id = ? LIMIT 0,1", $this->getPDO()->tag()
+            $sql = sprintf('
+                SELECT frequency FROM %s WHERE id = ? LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
             );
             self::timer();
             $stmt = $this->getPDO()->prepare($sql);
@@ -868,8 +890,9 @@ class AIT extends AITRoot
             --$f;
             if ($f <= 0) $f = 0; // Control IMPORTANT
 
-            $sql = sprintf(
-                "UPDATE %s SET frequency = ? WHERE id = ?",
+            $sql = sprintf('
+                UPDATE %s SET frequency = ? WHERE id = ?
+                ',
                 $this->getPDO()->tag(true)
             );
             self::timer();
@@ -894,25 +917,98 @@ class AIT extends AITRoot
      *
      * @param string $t tag id
      * @param string $i item id
+     * @param in $p position
      */
-    protected function _addTagged($t, $i)
+    protected function _addTagged($t, $i, $p = null)
     {
         try {
-            $sql = sprintf(
-                "INSERT INTO %s VALUES (?, ?);",
-                $this->getPDO()->tagged(true)
-            );
-            self::timer();
-            $stmt = $this->getPDO()->prepare($sql);
-            $stmt->bindParam(1, $t, PDO::PARAM_INT);
-            $stmt->bindParam(2, $i, PDO::PARAM_INT);
-            $stmt->execute();
-            $stmt->closeCursor();
-            self::debug(self::timer(true), $sql, $t, $i);
+            if (is_null($p) or $p === 0) {
+                $sql = sprintf('
+                    INSERT INTO %1$s (tag_id, item_id, rank) SELECT ?, ?, %2$s FROM %1$s WHERE item_id = ? LIMIT 0,1
+                    ',
+                    $this->getPDO()->tagged(true),
+                    ($p === 0 ? 'min(rank) - 1' : 'max(rank) + 1')
+                );
+                self::timer();
+                $stmt = $this->getPDO()->prepare($sql);
+                $stmt->bindParam(1, $t, PDO::PARAM_INT);
+                $stmt->bindParam(2, $i, PDO::PARAM_INT);
+                $stmt->bindParam(3, $i, PDO::PARAM_INT);
+                $stmt->execute();
+                settype($t, 'integer');
+                settype($i, 'integer');
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $t, $i, $i);
+
+            }
+            else {
+                $sql = sprintf('
+                    SELECT rank 
+                    FROM %s 
+                    WHERE tag_id = ? and item_id = ?
+                    ',
+                    $this->getPDO()->tagged(true)
+                );
+                self::timer();
+                $stmt = $this->getPDO()->prepare($sql);
+                $stmt->bindParam(1, $p, PDO::PARAM_INT);
+                $stmt->bindParam(2, $i, PDO::PARAM_INT);
+                $stmt->execute();
+                $rank = (int) $stmt->fetchColumn(0);                
+                settype($p, 'integer');
+                settype($i, 'integer');
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $p, $i);
+
+                $sql =  '
+                    SET @rank = ?;  
+                ';
+                self::timer();
+                $stmt = $this->getPDO()->prepare($sql);
+                $stmt->bindParam(1, $rank, PDO::PARAM_INT);
+                $stmt->execute();
+                settype($rank, 'integer');
+                settype($i, 'integer');
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $rank);
+
+                $sql = sprintf('
+                    UPDATE %s SET rank = (SELECT @rank := @rank + 1) WHERE item_id = ? ORDER BY rank;
+                ',
+                    $this->getPDO()->tagged(true)
+                );
+                self::timer();
+                $stmt = $this->getPDO()->prepare($sql);
+                $stmt->bindParam(1, $i, PDO::PARAM_INT);
+                $stmt->execute();
+                settype($rank, 'integer');
+                settype($i, 'integer');
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $i);
+
+                ++$rank;
+                $sql = sprintf('
+                    INSERT INTO %s (tag_id, item_id, rank) VALUES (?, ?, ?);
+                ',
+                    $this->getPDO()->tagged(true)
+                );
+                self::timer();
+                $stmt = $this->getPDO()->prepare($sql);
+                $stmt->bindParam(1, $t, PDO::PARAM_INT);
+                $stmt->bindParam(2, $i, PDO::PARAM_INT);
+                $stmt->bindParam(3, $rank, PDO::PARAM_INT);
+                $stmt->execute();
+                settype($t, 'integer');
+                settype($i, 'integer');
+                settype($rank, 'integer');
+                $stmt->closeCursor();
+                self::debug(self::timer(true), $sql, $t, $i, $rank);
+            } 
         }
         catch (PDOException $e) {
             self::catchError($e);
         }
+
     }
     // }}}
 
@@ -937,8 +1033,9 @@ class AIT extends AITRoot
             else
                 throw new Exception('Bad Arguments');
 
-            $sql = sprintf(
-                "DELETE FROM %s WHERE %s=?",
+            $sql = sprintf('
+                DELETE FROM %s WHERE %s=?
+                ',
                 $this->getPDO()->tagged(true),
                 $field
             );
@@ -964,8 +1061,9 @@ class AIT extends AITRoot
     protected function _rmTag($i)
     {
         try {
-            $sql = sprintf(
-                "DELETE FROM %s WHERE id=?",
+            $sql = sprintf('
+                DELETE FROM %s WHERE id=?
+                ',
                 $this->getPDO()->tag(true)
             );
             self::timer();
@@ -997,7 +1095,11 @@ class AIT extends AITRoot
     protected function _addTag($l, $t = null, $r = false)
     {
         try {
-            $sql = sprintf("SELECT id FROM %s WHERE label=? and type=?  LIMIT 0,1", $this->getPDO()->tag());
+            $sql = sprintf('
+                SELECT id FROM %s WHERE label=? and type=?  LIMIT 0,1
+                ', 
+                $this->getPDO()->tag()
+            );
 
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $l, PDO::PARAM_STR);
@@ -1023,8 +1125,9 @@ class AIT extends AITRoot
 
             self::timer();
             if (is_null($t)) {
-                $sql = sprintf(
-                    "INSERT INTO %s (label, updated, created %s) VALUES (?, now(), now() %s);",
+                $sql = sprintf('
+                    INSERT INTO %s (label, updated, created %s) VALUES (?, now(), now() %s);
+                    ',
                     $this->getPDO()->tag(true),
                     $sqlA,
                     $sqlB
@@ -1034,8 +1137,9 @@ class AIT extends AITRoot
                 $n = 2;
             }
             else {
-                $sql = sprintf(
-                    "INSERT INTO %s (label, type, updated, created %s) VALUES (?, ?, now(), now() %s);",
+                $sql = sprintf('
+                    INSERT INTO %s (label, type, updated, created %s) VALUES (?, ?, now(), now() %s);
+                    ',
                     $this->getPDO()->tag(true),
                     $sqlA,
                     $sqlB
@@ -1076,12 +1180,12 @@ class AIT extends AITRoot
      */
     protected function _getTagBySystemID($i)
     {
-        $sql = sprintf("
+        $sql = sprintf('
             SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type
             FROM %s
             WHERE id = ?
             LIMIT 0,1
-            ",
+            ',
             $this->getPDO()->tag()
         );
         self::timer();
@@ -1127,7 +1231,11 @@ class AIT extends AITRoot
         $this->_data[$n] = $v;
         try {
             self::timer();
-            $sql = sprintf("UPDATE %s set %s=? WHERE id=?", $this->getPDO()->tag(true), $n);
+            $sql = sprintf('
+                UPDATE %s set %s=? WHERE id=?
+                ', 
+                $this->getPDO()->tag(true), $n
+            );
             $stmt = $this->getPDO()->prepare($sql);
             $typ = gettype($v);
             if ($typ === 'string')
@@ -1181,7 +1289,11 @@ class AIT extends AITRoot
 
         if (!isset($this->_data[$n])) {
             try {
-                $sql = sprintf("SELECT %s FROM %s WHERE id=? LIMIT 0,1", $n, $this->getPDO()->tag());
+                $sql = sprintf('
+                    SELECT %s FROM %s WHERE id=? LIMIT 0,1
+                    ', 
+                    $n, $this->getPDO()->tag()
+                );
                 self::timer();
                 $stmt = $this->getPDO()->prepare($sql);
                 $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
@@ -1267,7 +1379,11 @@ class AIT extends AITRoot
     public function getTimestamps()
     {
         try {
-            $sql = sprintf("SELECT UNIX_TIMESTAMP(updated), UNIX_TIMESTAMP(created) FROM %s WHERE id=? LIMIT 0,1", $this->getPDO()->tag());
+            $sql = sprintf('
+                SELECT UNIX_TIMESTAMP(updated), UNIX_TIMESTAMP(created) FROM %s WHERE id=? LIMIT 0,1
+                ',
+                $this->getPDO()->tag()
+            );
             $stmt = $this->getPDO()->prepare($sql);
             $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -1434,13 +1550,13 @@ class AIT extends AITRoot
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($id).' given', E_USER_ERROR);
 
         try {
-            $sql = sprintf("
+            $sql = sprintf('
                 SELECT a.id id, a.label label, a.type type, b.type crtl
                 FROM %s a
                 LEFT JOIN %s b ON a.type=b.id
                 WHERE a.id = ?
                 LIMIT 0,1
-                ",
+                ',
                 $pdo->tag(),
                 $pdo->tag()
             );
@@ -1486,6 +1602,8 @@ class AIT extends AITRoot
                 $sql .= ' created';
             elseif ( (self::ORDER_BY_FREQUENCY & $ordering) === self::ORDER_BY_FREQUENCY)
                 $sql .= ' frequency';
+            elseif ( (self::ORDER_BY_RANK & $ordering) === self::ORDER_BY_RANK)
+                $sql .= ' rank';
             else
                 $sql .= ' id';
 
@@ -1719,12 +1837,12 @@ class AITQuery extends AITRoot {
                 continue;
             }
             if (empty($w))  {
-                $w = sprintf("tag_id = %s",
+                $w = sprintf('tag_id = %s',
                     $tag->getSystemID()
                 );
             }
             else {
-                $w = sprintf("tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                $w = sprintf('tag_id = %s AND item_id IN (SELECT item_id FROM %s WHERE %s)',
                     $tag->getSystemID(),
                     $this->getPDO()->tagged(),
                     $w
@@ -1779,7 +1897,12 @@ class AITQuery extends AITRoot {
      */
     public function getSQL()
     {
-        return sprintf('SELECT item_id FROM %s WHERE %s', $this->getPDO()->tagged(), $this->_sql);
+        return sprintf('
+            SELECT item_id FROM %s WHERE %s
+            ', 
+            $this->getPDO()->tagged(), 
+            $this->_sql
+        );
     }
     // }}}
 
@@ -1803,7 +1926,7 @@ class AITQuery extends AITRoot {
                 $this->_sql = $sql;
             else
                 $this->_sql = sprintf(
-                    " (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)",
+                    ' (%s) AND item_id IN (SELECT item_id FROM %s WHERE %s)',
                     $sql,
                     $this->getPDO()->tagged(),
                     $this->_sql

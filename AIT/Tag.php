@@ -84,8 +84,9 @@ class AIT_Tag extends AIT
 
         if (!is_null($this->_item_id) && $id === false ) {
             try {
-                $sql = sprintf(
-                    "SELECT type FROM %s WHERE id=? LIMIT 0,1",
+                $sql = sprintf('
+                    SELECT type FROM %s WHERE id=? LIMIT 0,1
+                    ',
                     $this->getPDO()->tag()
                 );
                 self::timer();
@@ -96,7 +97,7 @@ class AIT_Tag extends AIT
                 $stmt->closeCursor();
                 self::debug(self::timer(true), $sql, $i);
 
-                if (! $this->_checkTag($this->_type, 2)) {
+                if (! $this->_checkTag($this->_type, self::TAG)) {
                     trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tag"', E_USER_ERROR);
                 }
                 if (! $this->_checkTagged($t, $it)) {
@@ -154,8 +155,9 @@ class AIT_Tag extends AIT
     function detach()
     {
         try {
-            $sql = sprintf(
-                "DELETE FROM %s WHERE tag_id=? AND item_id=?",
+            $sql = sprintf('
+                DELETE FROM %s WHERE tag_id=? AND item_id=?
+                ',
                 $this->getPDO()->tagged(true)
             );
             self::timer();
@@ -273,16 +275,17 @@ class AIT_Tag extends AIT
             }
         }
         $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
-        $sql2 = sprintf("
-            FROM %s a
-            LEFT JOIN %s b ON a.item_id=b.item_id
-            LEFT JOIN %s c ON b.tag_id=c.id
-            $s
-            WHERE a.tag_id = ? $w
-            ",
+        $sql2 = sprintf('
+            FROM %1$s a
+            LEFT JOIN %1$s b ON a.item_id=b.item_id
+            LEFT JOIN %2$s c ON b.tag_id=c.id
+            %3$s
+            WHERE a.tag_id = ?  %4$s
+            ',
             $this->getPDO()->tagged(),
-            $this->getPDO()->tagged(),
-            $this->getPDO()->tag()
+            $this->getPDO()->tag(),
+            $s,
+            $w
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
@@ -388,11 +391,11 @@ class AIT_Tag extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language score, frequency, type ';
-        $sql2 = sprintf("
+        $sql2 = sprintf('
             FROM %s a
             LEFT JOIN %s b ON a.item_id=b.id
             WHERE tag_id = ?
-            ",
+            ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag()
         );

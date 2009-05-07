@@ -1026,7 +1026,53 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+    function test_attach_polymorph()
+    {
+        $it = new AIT_ItemType('A', $this->db);
+        $i1 = $it->addItem('B');
+        $i2 = $it->addItem('C');
+        $tt = $it->addTag('D');
+        $t1 = $tt->addTag('E');
+        $t2 = $tt->addTag('F');
 
+        $i1->attach($t1)->attach($t2);
+        $i2->attach($t1);
+
+        $i1->attach($i2);
+
+        $tags = $i1->getTags();
+        $this->assertEquals($tags->count(), 2);
+
+        $tags = $i1->getTypedTags($tt);
+        $this->assertEquals($tags->count(), 2);
+
+        $tags = $i1->fetchTags(new ArrayObject(array($tt)));
+        $this->assertEquals($tags->count(), 2);
+
+        $items = $i1->getItems();
+        $this->assertEquals($items->count(), 1);
+        $items = $i1->getTypedItems($it);
+        $this->assertEquals($items->count(), 1);
+
+        $items = $i1->fetchItems(new ArrayObject(array($it)));
+        $this->assertEquals($items->count(), 1);
+
+        $elems = $i1->getElements();
+        $this->assertEquals($elems->count(), 3);
+
+        $elems = $i1->getTypedElements($tt);
+        $this->assertEquals($elems->count(), 2);
+
+        $elems = $i1->getTypedElements($it);
+        $this->assertEquals($elems->count(), 1);
+
+        $elems = $i1->fetchElements(new ArrayObject(array($it, $tt)));
+        $this->assertEquals($elems->count(), 3);
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
 
     /**/
     private function _d()

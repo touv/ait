@@ -399,12 +399,14 @@ class PDOAIT extends PDO
     {
         try {
             $this->exec(sprintf(
-                "INSERT INTO %s (id, label, created) VALUES (1, 'item', now());",
-                $this->tag(true)
+                "INSERT INTO %s (id, label, created) VALUES (%s, 'item', now());",
+                $this->tag(true),
+                AIT::ITEM
             ));
             $this->exec(sprintf(
-                "INSERT INTO %s (id, label, created) VALUES (2, 'tag', now());",
-                $this->tag(true)
+                "INSERT INTO %s (id, label, created) VALUES (%s, 'tag', now());",
+                $this->tag(true),
+                AIT::TAG
             ));
         }
         catch (PDOException $e) {
@@ -555,6 +557,8 @@ class AIT extends AITRoot
     const ORDER_BY_FREQUENCY = 128;
     const ORDER_BY_RANK = 256;
     const INSERT_FIRST = 0;
+    const ITEM = 1;
+    const TAG = 2;
 
     // {{{ __construct
     /**
@@ -1127,7 +1131,7 @@ class AIT extends AITRoot
             if (is_null($t)) {
                 $sql = sprintf('
                     INSERT INTO %s (label, updated, created %s) VALUES (?, now(), now() %s);
-                    ',
+                ',
                     $this->getPDO()->tag(true),
                     $sqlA,
                     $sqlB
@@ -1139,7 +1143,7 @@ class AIT extends AITRoot
             else {
                 $sql = sprintf('
                     INSERT INTO %s (label, type, updated, created %s) VALUES (?, ?, now(), now() %s);
-                    ',
+                ',
                     $this->getPDO()->tag(true),
                     $sqlA,
                     $sqlB
@@ -1521,16 +1525,16 @@ class AIT extends AITRoot
         settype($row['crtl'], 'integer');
 
         $o = null;
-        if ($row['type'] === 1) {
+        if ($row['type'] === self::ITEM) {
             $o = new AIT_ItemType($row['label'], $pdo, $row['id'], $row);
         }
-        elseif ($row['type'] === 2) {
+        elseif ($row['type'] === self::TAG) {
             $o = new AIT_TagType($row['label'], null, $pdo, $row['id'], $row);
         }
-        elseif ($row['crtl'] === 1) {
+        elseif ($row['crtl'] === self::ITEM) {
             $o = new AIT_Item($row['label'], $row['type'], $pdo, $row['id'], $row);
         }
-        elseif ($row['crtl'] === 2) {
+        elseif ($row['crtl'] === self::TAG) {
             $o = new AIT_Tag($row['label'], $row['type'], null, $pdo, $row['id'], $row);
         }
         return $o;

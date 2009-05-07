@@ -81,7 +81,7 @@ class AIT_TagType extends AIT
         $this->_item_id = $i;
 
         if ($id === false) {
-            if (! $this->_checkTag($this->_item_id, 1)) {
+            if (! $this->_checkTag($this->_item_id, self::ITEM)) {
                 trigger_error('Argument 2 passed to '.__METHOD__.' not describe a "tagtype"', E_USER_ERROR);
             }
             $this->_id = $this->_addTag($this->_label, 2, $row);
@@ -152,12 +152,12 @@ class AIT_TagType extends AIT
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a string, '.gettype($l).' given', E_USER_ERROR);
 
-        $sql = sprintf("
+        $sql = sprintf('
             SELECT id, label, type
             FROM %s
             WHERE label = ? AND type = ?
             LIMIT 0,1
-            ",
+            ',
             $this->getPDO()->tag()
         );
       
@@ -227,10 +227,10 @@ class AIT_TagType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
-        $sql2 = sprintf("
+        $sql2 = sprintf('
             FROM %s
             WHERE type = ?
-            ",
+            ',
             $this->getPDO()->tag()
         );
         $sql = $sql1.$sql2;
@@ -369,11 +369,13 @@ class AIT_TagType extends AIT
     function countTags()
     {
         try {
-            $sql = sprintf("
+            $sql = sprintf('
                 SELECT count(*)
                 FROM %s
                 WHERE type = ?
-                ", $this->getPDO()->tag());
+                ',
+                $this->getPDO()->tag()
+            );
             self::timer();
 
             $stmt = $this->getPDO()->prepare($sql);

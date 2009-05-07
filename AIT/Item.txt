@@ -274,6 +274,177 @@ Retour
 
 Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
+// ----------------------------------------------------------------------------
+getItems
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les items attachés à l'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+// ----------------------------------------------------------------------------
+getTypedItems
+^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item::getTypedItems(AIT_ItemType $typeitem, $offset=null, $lines=null, $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les items d'un certain type attaché à l'item courant
+
+Paramètres
+++++++++++
+
+AIT_ItemType *$itemtag*:: un type d'item
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+
+// ----------------------------------------------------------------------------
+fetchItems
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+   AITResult fetchItems(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne les items attachés à l'item courant à condition qu'il soit de l'un des types d'item 
+donné dans $types
+
+Paramètres
+++++++++++
+
+ArrayObject *$tags*:: Tableau de type d'item
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+
+// ----------------------------------------------------------------------------
+getElements
+^^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult getElements(integer $offset=null, integer $lines=null, integer $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les éléments attachés à l'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.
+
+// ----------------------------------------------------------------------------
+getTypedElements
+^^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AIT_Item::getTypedElements($type, $offset=null, $lines=null, $ordering=null)
+
+Description
++++++++++++
+
+Retourne tous les élements d'un certain type attaché à l'item courant
+
+Paramètres
+++++++++++
+
+mixed *$type*:: un type d'item ou un type de tag
+integer *$offset*:: décalage à parir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.
+
+
+// ----------------------------------------------------------------------------
+fetchItems
+^^^^^^^^^
+
+Synopsis
+++++++++
+
+   AITResult fetchElements(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, $control = null)
+
+Description
++++++++++++
+
+Retourne les élements attachés à l'item courant à condition qu'il soit de l'un des types d'item 
+donné dans $types
+
+Paramètres
+++++++++++
+
+ArrayObject *$tags*:: Tableau de type d'item
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+integer *$control*:: permet de filtrer suivant les tags (AIT::TAG) ou les items (AIT::ITEM)
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.
 
 // ----------------------------------------------------------------------------
 del

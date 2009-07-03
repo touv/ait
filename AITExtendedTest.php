@@ -16,6 +16,11 @@ function normalize($s, $l) {
     return $tn->get(Text_Normalize::Uppercase);
 }
 
+function check($o) {
+    return $o->getTagType()->get() === 'TypeTagPrefix';
+}
+
+
 
 
 class AITExtendedTest extends PHPUnit_Framework_TestCase
@@ -183,5 +188,97 @@ class AITExtendedTest extends PHPUnit_Framework_TestCase
     }
 
 
+    function test_prefix1()
+    {
+        require_once 'AIT/Extended/Prefix.php';
+        $this->db->checkup();
+        $this->db->extendWith(new AIT_Extended_Prefix());
+
+        $it = new AIT_ItemType('_1', $this->db);
+        $i1 = $it->addItem('_2');
+        $i2 = $it->addItem('_3');
+
+        $tt = $it->addTag('_4');
+
+        $t1 = $tt->addTag('X', array('prefix' => 'P1_'));
+        $t2 = $tt->addTag('X', array('prefix' => 'P2_'));
+        
+        $i1->attach($t1);
+        $i2->attach($t2);
+
+        $tags = $i1->getTags();
+        $t1a = $tags->offsetGet(0);
+
+        $this->assertEquals($t1a->get(), 'X');
+
+        $tags = $i2->getTags();
+        $t2a = $tags->offsetGet(0);
+        $this->assertEquals($t2a->get(), 'X');
+
+
+        $this->assertEquals($t1->getSystemID(), $t1a->getSystemID());
+        $this->assertEquals($t2->getSystemID(), $t2a->getSystemID());
+
+        $this->assertNotEquals($t1->getSystemID(), $t2->getSystemID());
+        $this->assertNotEquals($t1a->getSystemID(), $t2a->getSystemID());
+
+        $it->del();
+    }
+
+    function test_prefix2()
+    {
+        require_once 'AIT/Extended/Prefix.php';
+        $this->db->checkup();
+        $this->db->extendWith(new AIT_Extended_Prefix('check'));
+
+        $it = new AIT_ItemType('A', $this->db);
+        $i1 = $it->addItem('B');
+        $i2 = $it->addItem('C');
+        $i3 = $it->addItem('D');
+        $i4 = $it->addItem('E');
+
+        $tt = $it->addTagType('TypeTagPrefix');
+        $ty = $it->addTagType('TypeTagNormal');
+
+        $t1 = $tt->addTag('X', array('prefix' => 'P3_'));
+        $t2 = $tt->addTag('X', array('prefix' => 'P4_'));
+        
+        $t3 = $ty->addTag('Y', array('prefix' => 'P5_'));
+        $t4 = $ty->addTag('Y', array('prefix' => 'P6_'));
+
+        $i1->attach($t1);
+        $i2->attach($t2);
+        $i3->attach($t3);
+        $i4->attach($t4);
+
+        $tags = $i1->getTags();
+        $t1a = $tags->offsetGet(0);
+
+        $this->assertEquals($t1a->get(), 'X');
+
+        $tags = $i2->getTags();
+        $t2a = $tags->offsetGet(0);
+        $this->assertEquals($t2a->get(), 'X');
+
+        $tags = $i3->getTags();
+        $t3a = $tags->offsetGet(0);
+        $this->assertEquals($t3a->get(), 'Y');
+
+        $tags = $i4->getTags();
+        $t4a = $tags->offsetGet(0);
+        $this->assertEquals($t4a->get(), 'Y');
+
+        $this->assertEquals($t1->getSystemID(), $t1a->getSystemID());
+        $this->assertEquals($t2->getSystemID(), $t2a->getSystemID());
+
+        $this->assertNotEquals($t1->getSystemID(), $t2->getSystemID());
+        $this->assertNotEquals($t1a->getSystemID(), $t2a->getSystemID());
+
+        $this->assertEquals($t3->getSystemID(), $t4->getSystemID());
+        $this->assertEquals($t3a->getSystemID(), $t4a->getSystemID());
+        $this->assertEquals($t3->getSystemID(), $t3a->getSystemID());
+        $this->assertEquals($t4->getSystemID(), $t4a->getSystemID());
+
+    }
 
 }

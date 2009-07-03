@@ -12,9 +12,9 @@
         <email>nthouvenin@gmail.com</email>
         <active>yes</active>
     </lead>
-    <date>2009-05-07</date>
+    <date>2009-07-03</date>
     <version>
-        <release>2.5.0</release>
+        <release>2.5.1</release>
         <api>2.5</api>
     </version>
     <stability>
@@ -23,7 +23,7 @@
     </stability>
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
-        + ajout de la notion d'élements (on peut attacher un item à un autre item)
+        + ajout du plugin Prefix
     </notes>
     <contents>
         <dir name="/">
@@ -34,6 +34,7 @@
                 <file name="Tag.php" role="php" />
                 <file name="Extended.php" role="php" />
                 <dir name="Extended">
+					<file name="Prefix.php" role="php" />
 					<file name="Caching.php" role="php" />
 					<dir name="Caching">
 						<file name="Basic.php" role="php" />
@@ -465,6 +466,21 @@
             <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
             <notes>
                 + ordonnancement des tags
+            </notes>
+        </release>
+        <release>
+            <date>2009-05-07</date>
+            <version>
+                <release>2.5.0</release>
+                <api>2.5</api>
+            </version>
+            <stability>
+                <release>stable</release>
+                <api>stable</api>
+            </stability>
+            <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
+            <notes>
+                + ajout de la notion d'élements (on peut attacher un item à un autre item)
             </notes>
         </release>
     </changelog>

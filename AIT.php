@@ -680,9 +680,9 @@ class AIT extends AITRoot
     function ren($l)
     {
         if ($l !== $this->_label) {
+            $this->callClassCallback('renHook', $l, $this);
             $this->_label = $l;
             $this->_set('label', $this->_label);
-            $this->callClassCallback('renHook', $this->_id);
         }
     }
     // }}}
@@ -1232,6 +1232,8 @@ class AIT extends AITRoot
      */
     protected function _set($n, $v)
     {
+        $this->callClassCallback('setHook', $n, $v, $this);
+
         $this->_data[$n] = $v;
         try {
             self::timer();
@@ -1346,11 +1348,15 @@ class AIT extends AITRoot
 
         if (isset($attr[$name])) {
             $name = '_'.$attr[$name];
-            return $this->$name;
+            $value = $this->$name;
         }
         if (isset($this->_cols[$name])) {
-            return $this->_get($name);
+            $value = $this->_get($name);
         }
+        if ($this->isClassCallback('getHook')) {
+            $value = $this->callClassCallback('getHook', $name, $value, $this);
+        }
+        return $value;
     }
     // }}}
 

@@ -37,7 +37,6 @@
  */
 require_once 'AIT.php';
 require_once 'AIT/Extended.php';
-require_once 'Text/Normalize.php';
 
 
 /**
@@ -68,16 +67,6 @@ class AIT_Extended_Prefix extends AIT_Extended
                 ),
             ),
         ));
-        if (is_array($tt)) {
-            foreach($tt as $t) {
-                if ( $t instanceof AIT_Tag or $t instanceof AIT_Item) {
-                    self::$filter[] = $t->get('type');
-                }
-            }
-        }
-        elseif ( $t instanceof AIT_Tag or $t instanceof AIT_Item) {
-            self::$filter[] = $t->get('type');
-        }
     }
 
     function getHook($n, $v, $o)

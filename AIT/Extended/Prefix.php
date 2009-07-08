@@ -76,7 +76,10 @@ class AIT_Extended_Prefix extends AIT_Extended
         if ($c === true) return $v;
         else $c = true;
 
-        if (!$this->_check($o)) return $v;
+        if (!$this->_check($o)) {
+            $c = false;
+            return $v;
+        }
         $prefix = $o->get('prefix');
 
         if (!is_null($prefix) and $prefix !== '')

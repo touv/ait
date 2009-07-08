@@ -216,7 +216,7 @@ getItems
 Synopsis
 ++++++++
 
-    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -229,7 +229,7 @@ Paramètres
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
-
+array *$cols*:: filtre sur les champs complémentaires
 
 Retour
 ++++++
@@ -251,7 +251,7 @@ fetchItems
 Synopsis
 ++++++++
 
-    AITResult fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null,  array $cols=[])
 
 Description
 +++++++++++
@@ -265,6 +265,8 @@ ArrayObject *$tags*:: Tableau de tag
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -288,7 +290,7 @@ getTagTypes
 Synopsis
 ++++++++
 
-    AITResult getTagTypes(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTagTypes(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -301,6 +303,8 @@ Paramètres
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -315,7 +319,7 @@ searchItems
 Synopsis
 ++++++++
 
-    AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -329,6 +333,8 @@ string *$query*:: requete (le format peut varier en fonction de la callback) san
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -377,7 +383,7 @@ queryItems
 Synopsis
 ++++++++
 
-    AIT_ItemType::queryItems(AITQuery $query, $offset=null, $lines=null, $ordering=null)
+    AIT_ItemType::queryItems(AITQuery $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -387,10 +393,12 @@ On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AIT
 Paramètres
 ++++++++++
 
-*$l*:: $query objet contenant la requête d'interrogation.
-*$offset*:: décalage à partir du premier enregistrement.
-*$lines*:: nombre de lignes à retourner.
-*$ordering*:: flag permettant le tri.
+AITQuery*$l*:: $query objet contenant la requête d'interrogation.
+integer *$offset*:: décalage à partir du premier enregistrement.
+integer *$lines*:: nombre de lignes à retourner.
+integer *$ordering*:: flag permettant le tri.
+array *$cols*:: filtre sur les champs complémentaires
+
 
 Retour
 ++++++

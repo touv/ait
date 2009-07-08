@@ -271,12 +271,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTags($offset = null, $lines = null, $ordering = null)
+    function getTags($offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering, self::TAG);
+        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering, $cols, self::TAG);
     }
     // }}}
 
@@ -288,12 +289,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTypedTags(AIT_TagType $typetag, $offset = null, $lines = null, $ordering = null)
+    function getTypedTags(AIT_TagType $typetag, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements(new ArrayObject(array($typetag)), $offset, $lines, $ordering, self::TAG);
+        return $this->fetchElements(new ArrayObject(array($typetag)), $offset, $lines, $ordering, $cols, self::TAG);
     }
     // }}}
 
@@ -305,12 +307,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function fetchTags(ArrayObject $types, $offset = null, $lines = null, $ordering = null)
+    function fetchTags(ArrayObject $types, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements($types, $offset, $lines, $ordering, self::TAG);
+        return $this->fetchElements($types, $offset, $lines, $ordering, $cols, self::TAG);
     }
     // }}}
 
@@ -321,12 +324,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getItems($offset = null, $lines = null, $ordering = null)
+    function getItems($offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering, self::ITEM);
+        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering, $cols, self::ITEM);
     }
     // }}}
 
@@ -338,12 +342,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTypedItems(AIT_ItemType $typeitem, $offset = null, $lines = null, $ordering = null)
+    function getTypedItems(AIT_ItemType $typeitem, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements(new ArrayObject(array($typeitem)), $offset, $lines, $ordering, self::ITEM);
+        return $this->fetchElements(new ArrayObject(array($typeitem)), $offset, $lines, $ordering, $cols, self::ITEM);
     }
     // }}}
 
@@ -355,12 +360,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function fetchItems(ArrayObject $types, $offset = null, $lines = null, $ordering = null)
+    function fetchItems(ArrayObject $types, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements($types, $offset, $lines, $ordering, self::ITEM);
+        return $this->fetchElements($types, $offset, $lines, $ordering, $cols, self::ITEM);
     }
     // }}}
 
@@ -371,12 +377,13 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getElements($offset = null, $lines = null, $ordering = null)
+    function getElements($offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering);
+        return $this->fetchElements(new ArrayObject(), $offset, $lines, $ordering, $cols);
     }
     // }}}
 
@@ -388,14 +395,15 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTypedElements($type, $offset = null, $lines = null, $ordering = null)
+    function getTypedElements($type, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (! $type instanceof AIT_TagType and ! $type instanceof AIT_ItemType) 
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a instance of AIT_TagType or AIT_ItemType, '.gettype($type).' given', E_USER_ERROR);
-        return $this->fetchElements(new ArrayObject(array($type)), $offset, $lines, $ordering);
+        return $this->fetchElements(new ArrayObject(array($type)), $offset, $lines, $ordering, $cols);
     }
     // }}}
 
@@ -407,11 +415,12 @@ class AIT_Item extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      * @param integer $control flag permettant le tri
      *
      * @return AITResult
      */
-    function fetchElements(ArrayObject $types, $offset = null, $lines = null, $ordering = null, $control = null)
+    function fetchElements(ArrayObject $types, $offset = null, $lines = null, $ordering = null, $cols = array(), $control = null)
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -419,9 +428,10 @@ class AIT_Item extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
         if (!is_null($control) && $control != self::ITEM && $control != self::TAG)
-            trigger_error('Argument 4 passed to '.__METHOD__.' must be a equal to AIT::TAG or AIT::ITEM, '.gettype($ordering).' given', E_USER_ERROR);
-
+            trigger_error('Argument 6 passed to '.__METHOD__.' must be a equal to AIT::TAG or AIT::ITEM, '.gettype($control).' given', E_USER_ERROR);
 
         $n = 0;
         $w  = '';
@@ -432,7 +442,7 @@ class AIT_Item extends AIT
                     continue;
                 }
                 if (!empty($w)) $w .= ' OR ';
-                $w .= 'b.type = '. $type->getSystemID();
+                $w .= 'tag.type = '. $type->getSystemID();
                 $n++;
             }
             if ($n === 0) return new AITResult(array());
@@ -442,18 +452,18 @@ class AIT_Item extends AIT
             $w .= ' AND c.type = '. $control;
         }
 
-        $sql1 = 'SELECT b.id id, b.label label, b.prefix prefix, b.suffix suffix, b.buffer buffer, b.scheme scheme, b.language language, b.score score, b.frequency frequency, b.type type, c.type crtl ';
+        $sql1 = 'SELECT tag.id id, tag.label label, tag.prefix prefix, tag.suffix suffix, tag.buffer buffer, tag.scheme scheme, tag.language language, tag.score score, tag.frequency frequency, tag.type type, c.type crtl ';
         $sql2 = sprintf('
             FROM %1$s a
-            LEFT JOIN %2$s b ON a.tag_id=b.id
-            LEFT JOIN %2$s c ON b.type=c.id
+            LEFT JOIN %2$s tag ON a.tag_id=tag.id
+            LEFT JOIN %2$s c ON tag.type=c.id
             WHERE a.item_id = ? %3$s
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag(),
             $w
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(

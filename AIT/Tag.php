@@ -215,12 +215,13 @@ class AIT_Tag extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri.
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getRelatedTags($offset = null, $lines = null, $ordering = null)
+    function getRelatedTags($offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        return $this->fetchRelatedTags(new ArrayObject(), $offset, $lines, $ordering);
+        return $this->fetchRelatedTags(new ArrayObject(), $offset, $lines, $ordering, $cols);
     }
     // }}}
 
@@ -234,10 +235,11 @@ class AIT_Tag extends AIT
     * @param integer $offset décalage à parir du premier enregistrement
     * @param integer $lines nombre de lignes à retourner
     * @param integer $ordering flag permettant le tri
+    * @param array   $cols filtre sur les champs complémentaires
     *
     * @return AITResult
     */
-    function fetchRelatedTags(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
+    function fetchRelatedTags(ArrayObject $tags, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -245,6 +247,9 @@ class AIT_Tag extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $n = 0;
         $w = $w1 = $w2 = $s = '';
@@ -268,7 +273,7 @@ class AIT_Tag extends AIT
             if (!empty($w1)) $w = ' AND ('.$w1.')';
             if (!empty($w2)) {
                 $w .= ' AND ('.$w2.')';
-                $s = sprintf('LEFT JOIN %s d ON d.tag_id=c.id LEFT JOIN %s e ON d.item_id=e.item_id',
+                $s = sprintf('LEFT JOIN %s d ON d.tag_id=tag.id LEFT JOIN %s e ON d.item_id=e.item_id',
                     $this->getPDO()->tagged(),
                     $this->getPDO()->tagged()
                 );
@@ -278,7 +283,7 @@ class AIT_Tag extends AIT
         $sql2 = sprintf('
             FROM %1$s a
             LEFT JOIN %1$s b ON a.item_id=b.item_id
-            LEFT JOIN %2$s c ON b.tag_id=c.id
+            LEFT JOIN %2$s tag ON b.tag_id=tag.id
             %3$s
             WHERE a.tag_id = ?  %4$s
             ',
@@ -287,7 +292,7 @@ class AIT_Tag extends AIT
             $s,
             $w
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(
@@ -378,10 +383,11 @@ class AIT_Tag extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array    $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getItems($offset = null, $lines = null, $ordering = null)
+    function getItems($offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -389,17 +395,20 @@ class AIT_Tag extends AIT
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language score, frequency, type ';
         $sql2 = sprintf('
             FROM %s a
-            LEFT JOIN %s b ON a.item_id=b.id
+            LEFT JOIN %s tag ON a.item_id=tag.id
             WHERE tag_id = ?
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag()
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(

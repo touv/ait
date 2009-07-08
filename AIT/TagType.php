@@ -154,7 +154,7 @@ class AIT_TagType extends AIT
 
         $sql = sprintf('
             SELECT id, label, type
-            FROM %s
+            FROM %s tag
             WHERE label = ? AND type = ?
             LIMIT 0,1
             ',
@@ -214,10 +214,11 @@ class AIT_TagType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array    $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTags($offset = null, $lines = null, $ordering = null)
+    function getTags($offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -225,15 +226,17 @@ class AIT_TagType extends AIT
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf('
-            FROM %s
+            FROM %s tag
             WHERE type = ?
             ',
             $this->getPDO()->tag()
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(
@@ -371,7 +374,7 @@ class AIT_TagType extends AIT
         try {
             $sql = sprintf('
                 SELECT count(*)
-                FROM %s
+                FROM %s tag
                 WHERE type = ?
                 ',
                 $this->getPDO()->tag()

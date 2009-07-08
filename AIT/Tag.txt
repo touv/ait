@@ -97,7 +97,7 @@ getRelatedTags
 Synopsis
 ++++++++
 
-    AITResult getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -110,6 +110,7 @@ Paramètres
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri.
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -124,7 +125,7 @@ fetchRelatedTags
 Synopsis
 ++++++++
 
-    AITResult fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -139,6 +140,8 @@ ArrayObject *$tags*:: Tableau de type de tag
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -236,7 +239,7 @@ getItems
 Synopsis
 ++++++++
 
-    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -249,6 +252,7 @@ Paramètres
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour

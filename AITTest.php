@@ -132,17 +132,27 @@ class AITTest extends PHPUnit_Framework_TestCase
             'buffer' => 'CD',
         ));
 
+        $tags  = $it->getTags(null, null, null, array('prefix'=>'C'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), 'tagtype');
+
         $ttt = AIT::getBySystemID($this->db, $tt->getSystemID());
         $this->assertEquals($ttt->get('prefix'), 'C');
         $this->assertEquals($ttt->get('suffix'), 'D');
         $this->assertEquals($ttt->get('buffer'), 'CD');
 
-
-        $t1 = $tt->addTag('@1', array(
+        $c1 = array(
             'prefix' => 'E',
             'suffix' => 'F',
             'buffer' => 'EF',
-        ));
+        );
+        $t1 = $tt->addTag('@1', $c1);
+        array_shift($c1);
+        $tags  = $tt->getTags(null, null, null, $c1);
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '@1');
 
         $t1t = AIT::getBySystemID($this->db, $t1->getSystemID());
         $this->assertEquals($t1t->get('prefix'), 'E');
@@ -150,11 +160,17 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($t1t->get('buffer'), 'EF');
 
 
-        $t2 = $tt->addTag('@2', array(
+        $c2 = array(
             'prefix' => 'G',
             'suffix' => 'H',
             'buffer' => 'GH',
-        ));
+        );
+        $t2 = $tt->addTag('@2', $c2);
+
+        $tags  = $tt->getTags(null, null, null, $c2);
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '@2');
 
         $t2t = AIT::getBySystemID($this->db, $t2->getSystemID());
         $this->assertEquals($t2t->get('prefix'), 'G');
@@ -166,6 +182,7 @@ class AITTest extends PHPUnit_Framework_TestCase
             'suffix' => 'J',
             'buffer' => 'IJ',
         ));
+        $i1->attach($t1)->attach($t2);
 
         $i1t = AIT::getBySystemID($this->db, $i1->getSystemID());
         $this->assertEquals($i1t->get('prefix'), 'I');
@@ -178,11 +195,42 @@ class AITTest extends PHPUnit_Framework_TestCase
             'suffix' => 'L',
             'buffer' => 'KL',
         ));
+        $i2->attach($t2);
 
         $i2t = AIT::getBySystemID($this->db, $i2->getSystemID());
         $this->assertEquals($i2t->get('prefix'), 'K');
         $this->assertEquals($i2t->get('suffix'), 'L');
         $this->assertEquals($i2t->get('buffer'), 'KL');
+
+        $tags = $it->getItems(null, null, null, array('suffix'=>'L'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '#2');
+
+
+        $tags = $i1->getTags(null, null, null, array('suffix'=>'H'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '@2');
+
+        $q = new ArrayObject(array($t2));
+        $tags = $it->fetchItems($q, null, null, null, array('buffer'=>'KL'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '#2');
+
+        $q =  new AITQuery($this->db);
+        $q->one(new ArrayObject(array($t2)));
+        $tags = $it->queryItems($q, null, null, null, array('buffer'=>'KL'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '#2');
+
+        $items = $t2->getItems(null, null, null, array('suffix'=>'KL'));
+        $this->assertEquals($tags->count(), 1);
+        $this->assertTrue($tags[0]->exists());
+        $this->assertEquals($tags[0]->get(), '#2');
+
 
 
         $tt->del();

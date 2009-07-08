@@ -127,9 +127,9 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
         $sql = sprintf('
-            SELECT a.id id, label, type
-            FROM %s a
-            LEFT JOIN %s b ON a.id=b.tag_id
+            SELECT tag.id id, label, type
+            FROM %s tag 
+            LEFT JOIN %s b ON tag.id=b.tag_id
             WHERE label = ? and type = %s and item_id = ?
             LIMIT 0,1
             ',
@@ -185,10 +185,11 @@ class AIT_ItemType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getTagTypes($offset = null, $lines = null, $ordering = null)
+    function getTagTypes($offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -196,17 +197,20 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf('
-            FROM %s a
-            LEFT JOIN %s b ON a.tag_id=b.id
+            FROM %s tag 
+            LEFT JOIN %s b ON tag.tag_id=b.id
             WHERE item_id = ?
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag()
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
         
         if (($r = $this->callClassCallback(
@@ -251,7 +255,7 @@ class AIT_ItemType extends AIT
         try {
             $sql = sprintf('
                 SELECT count(*)
-                FROM %s
+                FROM %s tagged
                 WHERE item_id = ?
                 ', 
                 $this->getPDO()->tagged()
@@ -322,7 +326,7 @@ class AIT_ItemType extends AIT
 
         $sql = sprintf('
             SELECT id, label, type
-            FROM %s
+            FROM %s tag
             WHERE label = ? AND type = ?
             LIMIT 0,1
             ', 
@@ -385,10 +389,11 @@ class AIT_ItemType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function getItems($offset = null, $lines = null, $ordering = null)
+    function getItems($offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -396,15 +401,18 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf('
-            FROM %s
+            FROM %s tag
             WHERE type = ?
             ', 
             $this->getPDO()->tag()
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(
@@ -445,10 +453,11 @@ class AIT_ItemType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return	AITResult
      */
-    function fetchItems(ArrayObject $tags, $offset = null, $lines = null, $ordering = null)
+    function fetchItems(ArrayObject $tags, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -456,6 +465,9 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $n = 0;
         $w  = '';
@@ -488,7 +500,7 @@ class AIT_ItemType extends AIT
             $this->getPDO()->tag(),
             $w
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
 
         if (($r = $this->callClassCallback(
@@ -536,10 +548,11 @@ class AIT_ItemType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function searchItems($query, $offset = null, $lines = null, $ordering = null)
+    function searchItems($query, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -547,6 +560,9 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         if ($this->isClassCallback('searchItemsHook'))
             $query = $this->callClassCallback('searchItemsHook', $query, $this);
@@ -564,7 +580,7 @@ class AIT_ItemType extends AIT
             $this->getPDO()->tagged(),
             $query
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
 
         self::sqler($sql, $offset, $lines, $ordering);
         
@@ -628,10 +644,11 @@ class AIT_ItemType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return	AITResult
      */
-    function queryItems(AITQuery $query, $offset = null, $lines = null, $ordering = null)
+    function queryItems(AITQuery $query, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -639,18 +656,21 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
 
         $w = $query->getSQL();
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
         $sql2 = sprintf('
             FROM (%s) temp
-            LEFT JOIN %s b ON temp.item_id = b.id
+            LEFT JOIN %s tag ON temp.item_id = tag.id
             WHERE type = ?
             ',
             $w,
             $this->getPDO()->tag()
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
         
         if (($r = $this->callClassCallback(
@@ -706,7 +726,7 @@ class AIT_ItemType extends AIT
 
         $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
         $sql2 = sprintf('
-            FROM %s
+            FROM %s tag
             WHERE type = 1 
             ',
             $pdo->tag()

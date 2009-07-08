@@ -14,7 +14,7 @@
     </lead>
     <date>2009-07-08</date>
     <version>
-        <release>2.5.3</release>
+        <release>2.5.4</release>
         <api>2.5</api>
     </version>
     <stability>
@@ -24,6 +24,7 @@
     <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL</license>
     <notes>
         + ajout du plugin Prefix
+		+ filtre partout possible sur les champs complémentaires
     </notes>
     <contents>
         <dir name="/">

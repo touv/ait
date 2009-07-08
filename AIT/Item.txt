@@ -189,7 +189,7 @@ getTags
 Synopsis
 ++++++++
 
-    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -202,6 +202,7 @@ Paramètres
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -216,7 +217,7 @@ getTypedTags
 Synopsis
 ++++++++
 
-    AIT_Item::getTypedTags(AIT_TagType $typetag, $offset=null, $lines=null, $ordering=null)
+    AIT_Item::getTypedTags(AIT_TagType $typetag, $offset=null, $lines=null, $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -230,6 +231,7 @@ AIT_TagType *$typetag*:: un type de tag
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -253,7 +255,7 @@ fetchTags
 Synopsis
 ++++++++
 
-   AITResult fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)
+   AITResult fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -267,6 +269,7 @@ ArrayObject *$tags*:: Tableau de type de tag
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -281,7 +284,7 @@ getItems
 Synopsis
 ++++++++
 
-    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -294,6 +297,8 @@ Paramètres
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -308,7 +313,7 @@ getTypedItems
 Synopsis
 ++++++++
 
-    AIT_Item::getTypedItems(AIT_ItemType $typeitem, $offset=null, $lines=null, $ordering=null)
+    AIT_Item::getTypedItems(AIT_ItemType $typeitem, $offset=null, $lines=null, $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -322,6 +327,7 @@ AIT_ItemType *$itemtag*:: un type d'item
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -337,7 +343,7 @@ fetchItems
 Synopsis
 ++++++++
 
-   AITResult fetchItems(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null)
+   AITResult fetchItems(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -352,6 +358,7 @@ ArrayObject *$tags*:: Tableau de type d'item
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -367,7 +374,7 @@ getElements
 Synopsis
 ++++++++
 
-    AITResult getElements(integer $offset=null, integer $lines=null, integer $ordering=null)
+    AITResult getElements(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -380,6 +387,8 @@ Paramètres
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
 
 
 Retour
@@ -394,7 +403,7 @@ getTypedElements
 Synopsis
 ++++++++
 
-    AIT_Item::getTypedElements($type, $offset=null, $lines=null, $ordering=null)
+    AIT_Item::getTypedElements($type, $offset=null, $lines=null, $ordering=null, array $cols=[])
 
 Description
 +++++++++++
@@ -408,6 +417,7 @@ mixed *$type*:: un type d'item ou un type de tag
 integer *$offset*:: décalage à parir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 
 Retour
@@ -423,7 +433,7 @@ fetchItems
 Synopsis
 ++++++++
 
-   AITResult fetchElements(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, $control = null)
+   AITResult fetchElements(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[], $control = null)
 
 Description
 +++++++++++
@@ -438,6 +448,7 @@ ArrayObject *$tags*:: Tableau de type d'item
 integer *$offset*:: décalage à partir du premier enregistrement 
 integer *$lines*:: nombre de lignes à retourner 
 integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 integer *$control*:: permet de filtrer suivant les tags (AIT::TAG) ou les items (AIT::ITEM)
 
 

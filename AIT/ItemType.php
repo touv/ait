@@ -542,7 +542,9 @@ class AIT_ItemType extends AIT
 
     // {{{ searchItems
     /**
-     * Recherche des items du type courant
+     * Recherche des items du type courant à partir des tags 
+     *
+     * Important : Ne sont ramenés que des items possédant des tags.
      *
      * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
      * @param integer $offset décalage à parir du premier enregistrement
@@ -561,7 +563,7 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
         if (!is_array($cols))
-            trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
 
         if ($this->isClassCallback('searchItemsHook'))
@@ -574,7 +576,7 @@ class AIT_ItemType extends AIT
             LEFT JOIN %2$s b ON tag.type=b.tag_id
             LEFT JOIN %2$s d ON tag.id=d.tag_id
             LEFT JOIN %1$s item ON d.item_id=item.id
-            WHERE b.item_id = ? AND item.type = ? %3$s
+            WHERE b.item_id = item.type AND item.type = ? %3$s
             ',
             $this->getPDO()->tag(),
             $this->getPDO()->tagged(),
@@ -593,7 +595,6 @@ class AIT_ItemType extends AIT
 
         $stmt = $this->getPDO()->prepare($sql);
         $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
-        $stmt->bindParam(2, $this->_id, PDO::PARAM_INT);
         $stmt->execute();
         settype($this->_id, 'integer');
         $ret = array();
@@ -603,7 +604,7 @@ class AIT_ItemType extends AIT
             $ret[] = new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
         }
         $stmt->closeCursor();
-        self::debug(self::timer(true), $sql, $this->_id, $this->_id);
+        self::debug(self::timer(true), $sql, $this->_id);
 
         $sql = 'SELECT COUNT(DISTINCT item.id) '.$sql2;
         $r = new AITResult($ret);
@@ -779,6 +780,77 @@ class AIT_ItemType extends AIT
             $tag->del(true);
         }
         $this->_rmTag($this->_id);
+    }
+    // }}}
+
+    // {{{ select
+    /**
+     * Selectionne des items du type courant à partir des items eux-même
+     *
+     * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
+     *
+     * @return AITResult
+     */
+    function selectItems($query, $offset = null, $lines = null, $ordering = null, $cols = array())
+    {
+        if (!is_null($offset) && !is_int($offset))
+            trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
+        if (!is_null($lines) && !is_int($lines))
+            trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
+        if (!is_null($ordering) && !is_int($ordering))
+            trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
+
+
+        if ($this->isClassCallback('selectItemsHook'))
+            $query = $this->callClassCallback('selectItemsHook', $query, $this);
+
+        if ($query !== '' and $query !== false) $query = 'AND '.$query;
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency';        
+        $sql2 = sprintf('
+            FROM %1$s item 
+            WHERE item.type = ? %2$s
+            ',
+            $this->getPDO()->tag(),
+            $query
+        );
+        $sql = $sql1.$sql2.$this->filter($cols);
+
+        self::sqler($sql, $offset, $lines, $ordering);
+        
+        if (($r = $this->callClassCallback(
+            'selectItemsCache',
+            $cid = self::str2cid($sql, $this->_id)
+        )) !== false) return $r;
+
+        self::timer();
+
+        $stmt = $this->getPDO()->prepare($sql);
+        $stmt->bindParam(1, $this->_id, PDO::PARAM_INT);
+        $stmt->execute();
+        settype($this->_id, 'integer');
+        $ret = array();
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            if (is_null($row['id'])) continue;
+            settype($row['id'], 'integer');
+            $ret[] = new AIT_Item($row['label'], $this->_id, $this->getPDO(), $row['id'], $row);
+        }
+        $stmt->closeCursor();
+        self::debug(self::timer(true), $sql, $this->_id, $this->_id);
+
+        $sql = 'SELECT COUNT(*) '.$sql2;
+        $r = new AITResult($ret);
+        $r->setQueryForTotal($sql, array($this->_id => PDO::PARAM_INT,), $this->getPDO());
+
+        if (isset($cid))
+            $this->callClassCallback('selectItemsCache', $cid, $r);
+
+        return $r;
     }
     // }}}
 

@@ -625,6 +625,8 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i1 = $it->addItem('a');
         $i2 = $it->addItem('b');
         $i3 = $it->addItem('c');
+        $i4 = $it->addItem('d');
+        $i5 = $it->addItem('e');
         $tt = $it->addTag('tagtype');
         $t1 = $tt->addTag('abcde');
         $t2 = $tt->addTag('bcdef');
@@ -633,19 +635,31 @@ class AITTest extends PHPUnit_Framework_TestCase
         $i2->attach($t2);
         $i3->attach($t1);
 
-        $items = $it->searchItems('');
+        $items = $it->searchItems('');  //  --> a, b, c
         $this->assertEquals($items->count(), 3);
 
-        $items = $it->searchItems('item.label=\'a\'');
+        $items = $it->selectItems(''); // --> a, b, c, d, e
+        $this->assertEquals($items->count(), 5);
+
+        $items = $it->searchItems('item.label=\'a\'');  // --> a
         $this->assertEquals($items->count(), 1);
 
-        $items = $it->searchItems('tag.label=\'abcde\'');
+        $items = $it->selectItems('item.label=\'a\''); // --> a
+        $this->assertEquals($items->count(), 1);
+
+        $items = $it->searchItems('item.label=\'e\''); // --> NULL
+        $this->assertEquals($items->count(), 0);
+
+        $items = $it->selectItems('item.label=\'e\''); // --> e
+        $this->assertEquals($items->count(), 1);
+
+        $items = $it->searchItems('tag.label=\'abcde\''); // --> a, c
         $this->assertEquals($items->count(), 2);
 
         $misc = $it->search('tag.label=\'abcde\'');
         $this->assertEquals($misc->count(), 1);
 
-        $misc = $it->search('tag.label like \'a%\'');
+        $misc = $it->search('tag.label like \'a%\''); // --> a, c
         $this->assertEquals($misc->count(), 2);
 
         $it->del();

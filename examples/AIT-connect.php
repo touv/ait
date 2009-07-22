@@ -14,6 +14,9 @@ $db = AIT::connect(
         $password
     );
 
+// Contrôle et création de la structure de données  
+$db->checkup(); 
+
 // On purge 
 $db->exec("TRUNCATE ".$db->tag());
 $db->exec("TRUNCATE ".$db->tagged());

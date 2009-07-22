@@ -716,6 +716,8 @@ class AIT extends AITRoot
     }
     // }}}
 
+   
+
     // {{{ _checkTag
     /**
      * Vérifie l'existance et le type d'un tag
@@ -1285,14 +1287,15 @@ class AIT extends AITRoot
      * Création de filtre sql sur les colonnes complétaires 
      *
      * @param array $a
+     * @param strinf $c
      */
-    protected function filter($a)
+    protected function filter($a, $c = 'tag')
     {
         $sql = '';
         if (is_array($a)) 
             foreach($this->_cols as $n => $t)
                 if (isset($a[$n])) 
-                    $sql = ' AND tag.'.$n.'='.$this->getPDO()->quote($a[$n], $t === 'integer' ? PDO::PARAM_INT : PDO::PARAM_STR);
+                    $sql = ' AND '.$c.'.'.$n.'='.$this->getPDO()->quote($a[$n], $t === 'integer' ? PDO::PARAM_INT : PDO::PARAM_STR);
         return $sql;
     }
     // }}}

@@ -298,7 +298,7 @@ class AIT_TagType extends AIT
     }
     // }}}
 
-      // {{{ searchTags
+    // {{{ searchTags
     /**
      * Recherche des tags du type courant
      *
@@ -306,10 +306,11 @@ class AIT_TagType extends AIT
      * @param integer $offset décalage à parir du premier enregistrement
      * @param integer $lines nombre de lignes à retourner
      * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
      *
      * @return AITResult
      */
-    function searchTags($query, $offset = null, $lines = null, $ordering = null)
+    function searchTags($query, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
         if (!is_null($offset) && !is_int($offset))
             trigger_error('Argument 2 passed to '.__METHOD__.' must be a integer, '.gettype($offset).' given', E_USER_ERROR);
@@ -317,6 +318,8 @@ class AIT_TagType extends AIT
             trigger_error('Argument 3 passed to '.__METHOD__.' must be a integer, '.gettype($lines).' given', E_USER_ERROR);
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
+        if (!is_array($cols))
+            trigger_error('Argument 5 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
         if ($this->isClassCallback('searchTagsHook'))
             $query = $this->callClassCallback('searchTagsHook', $query, $this);
@@ -330,7 +333,7 @@ class AIT_TagType extends AIT
             $this->getPDO()->tag(),
             $query
         );
-        $sql = $sql1.$sql2;
+        $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
         self::timer();
 
@@ -427,5 +430,22 @@ class AIT_TagType extends AIT
     }
     // }}}
 
+    // {{{ selectTags
+    /**
+     * Selectionne des tags du type courant
+     *
+     * @param string  $query requete (le format dépend de la search_callback) sans callback c'est du SQL
+     * @param integer $offset décalage à parir du premier enregistrement
+     * @param integer $lines nombre de lignes à retourner
+     * @param integer $ordering flag permettant le tri
+     * @param array   $cols filtre sur les champs complémentaires
+     *
+     * @return AITResult
+     */
+    function selectTags($query, $offset = null, $lines = null, $ordering = null, $cols = array())
+    {
+        return $this->searchTags($query, $offset, $lines, $ordering, $cols);
+    }
+    // }}}
 
 }

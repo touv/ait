@@ -313,18 +313,19 @@ Retour
 un objet AITResult (ArrayObject) contenant des objets AIT_TagType.
 
 // ----------------------------------------------------------------------------
-searchItems
+selectItems
 ^^^^^^^^^^^
 
 Synopsis
 ++++++++
 
-    AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
+    AITResult selectItems(mixed $query, integer $offset = null, integer $lines = null, integer $ordering = null, array $cols = [])
 
 Description
 +++++++++++
 
-Recherche des items du type courant
+Sélectionne des items du type courant à partir des items eux-même
+
 
 Paramètres
 ++++++++++
@@ -336,11 +337,57 @@ integer *$ordering*:: flag permettant le tri
 array *$cols*:: filtre sur les champs complémentaires
 
 
+Retour
+++++++
+
+un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_ItemType-selectItems.php[]
+-------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+searchItems
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
+
+Description
++++++++++++
+
+Recherche des items du type courant à partir des tags
+Important : Ne sont ramenés que des items possédant des tags.
+
+Paramètres
+++++++++++
+
+string *$query*:: requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
 
 Retour
 ++++++
 
 un objet AITResult (ArrayObject) contenant des objets AIT_Item.
+
+Exemple
++++++++
+
+[source]
+-------------------------------------------------
+include::../examples/AIT_ItemType-searchItems.php[]
+-------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 getItemBySystemID

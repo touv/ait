@@ -274,6 +274,36 @@ Retour
 
 un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
 
+// ----------------------------------------------------------------------------
+selectTags
+^^^^^^^^^^^
+
+Synopsis
+++++++++
+
+    AITResult selectTags(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null array $cols=[])
+
+Description
++++++++++++
+
+Recherche des tags du type courant. (alias de searchItems)
+
+Paramètres
+++++++++++
+
+string *$query*:: requete (le format peut varier en focntion de la callback) sans callback c'est une chaine de caractères contenant du SQL 
+integer *$offset*:: décalage à partir du premier enregistrement 
+integer *$lines*:: nombre de lignes à retourner 
+integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
+
+
+Retour
+++++++
+
+un objet AITResult (ArrayObject) contenant des objets AIT_Tag.
+
 
 include::../AIT.txt[]
 // vim: set syntax=asciidoc encoding=utf8 spl=fr:

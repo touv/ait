@@ -50,6 +50,11 @@ require_once 'AIT.php';
  */
 class AIT_Item extends AIT
 {
+    /**
+     * @var AITTagsObject  TagsObject de l'item courant
+     */
+    private $TagsObject;
+
     // {{{ __construct
     /**
      * Constructeur
@@ -401,7 +406,7 @@ class AIT_Item extends AIT
      */
     function getTypedElements($type, $offset = null, $lines = null, $ordering = null, $cols = array())
     {
-        if (! $type instanceof AIT_TagType and ! $type instanceof AIT_ItemType) 
+        if (! $type instanceof AIT_TagType and ! $type instanceof AIT_ItemType)
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a instance of AIT_TagType or AIT_ItemType, '.gettype($type).' given', E_USER_ERROR);
         return $this->fetchElements(new ArrayObject(array($type)), $offset, $lines, $ordering, $cols);
     }
@@ -546,6 +551,24 @@ class AIT_Item extends AIT
     public function getTagsObject()
     {
         return new AITTagsObject($this->getTags());
+    }
+    // }}}
+
+    // {{{ __get
+    /**
+     * Retourne les tags associé d'un type donnée
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get($name) {
+        if (is_null($name) or $name == '')
+            return null;
+        if (is_null($this->TagsObject))
+            $this->TagsObject = $this->getTagsObject();
+
+        return $this->TagsObject->{$name};
     }
     // }}}
 

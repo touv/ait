@@ -2238,7 +2238,6 @@ class AITTagsObject implements Countable, Iterator {
     }
     // }}}
 
-
     // {{{ __set
     /**
      * Magic function to set value

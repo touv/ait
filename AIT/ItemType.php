@@ -52,6 +52,7 @@ require_once 'AIT/TagType.php';
  */
 class AIT_ItemType extends AIT
 {
+    private $TagTypes = array();
     // {{{ __construct
     /**
      * Constructeur
@@ -819,7 +820,7 @@ class AIT_ItemType extends AIT
             $this->getPDO()->tag(),
             $query
         );
-        $sql = $sql1.$sql2.$this->filter($cols);
+        $sql = $sql1.$sql2.$this->filter($cols, 'item');
 
         self::sqler($sql, $offset, $lines, $ordering);
         
@@ -854,6 +855,23 @@ class AIT_ItemType extends AIT
     }
     // }}}
 
+    // {{{ __get
+    /**
+     * Retourne un type de tag associé
+     *
+     * @param string $name
+     *
+     * @return AIT_TypeTag
+     */
+    public function __get($name) {
+        if (is_null($name) or $name == '')
+            return null;
+        if (!isset($this->TagTypes[$name]))
+            $this->TagTypes[$name] = $this->defTag($name);
+
+        return $this->TagTypes[$name];
+    }
+    // }}}
 
 }
 

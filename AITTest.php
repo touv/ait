@@ -1135,6 +1135,36 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+    function test_attach_directaccess()
+    {
+        $it = new AIT_ItemType('A', $this->db);
+        $i1 = $it->addItem('B');
+        $i2 = $it->addItem('C');
+        $tt1 = $it->addTag('D');
+        $tt2 = $it->addTag('E');
+        $t1 = $tt1->addTag('F');
+        $t2 = $tt1->addTag('G');
+        $t3 = $tt2->addTag('H');
+
+        $i1->attach($t1)->attach($t2)->attach($t3);
+        $i2->attach($t3);
+
+
+        $this->assertEquals($it->D, $tt1);
+        $this->assertEquals($it->E, $tt2);
+
+        $this->assertEquals($i1->D->count(), 2);
+        $this->assertEquals($i1->E->count(), 1);
+        $this->assertEquals($i1->E->offsetGet(0)->getSystemID(), $t3->getSystemID());
+        $this->assertEquals($i2->E->count(), 1);
+        $this->assertEquals($i2->E->offsetGet(0)->getSystemID(), $t3->getSystemID());
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
+
+
 
     /**/
     private function _d()

@@ -320,7 +320,7 @@ class PDOAIT extends PDO
      *
      * @return AITSchema
      */
-    private function registerSchema($name, array $attr)
+    public function registerSchema($name, array $attr)
     {
         return new AITSchema($this, $name, $attr);
     }
@@ -1598,7 +1598,8 @@ class AIT extends AITRoot
             $stmt->closeCursor();
             self::debug(self::timer(true), $sql, $id);
 
-            return self::factory($pdo, $row);
+            if (is_array($row))
+                return self::factory($pdo, $row);
         }
         catch (PDOException $e) {
             self::catchError($e);

@@ -457,15 +457,17 @@ class AIT_Item extends AIT
             $w .= ' AND c.type = '. $control;
         }
 
-        $sql1 = 'SELECT tag.id id, tag.label label, tag.prefix prefix, tag.suffix suffix, tag.buffer buffer, tag.scheme scheme, tag.language language, tag.score score, tag.frequency frequency, tag.type type, c.type crtl ';
+        $sql1 = 'SELECT tag.id id, tag.label label, tag.prefix prefix, tag.suffix suffix, tag.buffer buffer, tag.scheme scheme, tag.language language, tag.score score, tag.frequency frequency, tag.type type, c.type crtl, content ';
         $sql2 = sprintf('
             FROM %1$s a
             LEFT JOIN %2$s tag ON a.tag_id=tag.id
             LEFT JOIN %2$s c ON tag.type=c.id
-            WHERE a.item_id = ? %3$s
+            LEFT JOIN %3$s dat ON tag.dat_hash=dat.hash
+            WHERE a.item_id = ? %4$s
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag(),
+            $this->getPDO()->dat(),
             $w
         );
         $sql = $sql1.$sql2.$this->filter($cols);

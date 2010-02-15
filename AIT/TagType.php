@@ -87,9 +87,9 @@ class AIT_TagType extends AIT
             $this->_id = $this->_addTag($this->_label, 2, $row);
             $this->callClassCallback('addHook', $this);
 
-            if ($row !== false) 
+            if ($row !== false)
                 foreach($this->_cols as $n => $t)
-                    if (isset($row[$n])) 
+                    if (isset($row[$n]))
                         $this->_set($n, $row[$n]);
 
             if ($this->_checkTagged($this->_id, $this->_item_id) === false) {
@@ -160,7 +160,7 @@ class AIT_TagType extends AIT
             ',
             $this->getPDO()->tag()
         );
-      
+
         if (($r = $this->callClassCallback(
             'getTagCache',
             $cid = self::str2cid($l, $this->_id)
@@ -229,12 +229,14 @@ class AIT_TagType extends AIT
         if (!is_array($cols))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, content';
         $sql2 = sprintf('
             FROM %s tag
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
             WHERE type = ?
             ',
-            $this->getPDO()->tag()
+            $this->getPDO()->tag(),
+            $this->getPDO()->dat()
         );
         $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
@@ -325,12 +327,14 @@ class AIT_TagType extends AIT
             $query = $this->callClassCallback('searchTagsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, content';
         $sql2 = sprintf('
             FROM %1$s tag
-            WHERE tag.type = ? %2$s
+            LEFT JOIN %2$s dat ON tag.dat_hash=dat.hash
+            WHERE tag.type = ? %3$s
             ',
             $this->getPDO()->tag(),
+            $this->getPDO()->dat(),
             $query
         );
         $sql = $sql1.$sql2.$this->filter($cols);

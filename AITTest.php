@@ -14,7 +14,7 @@ class AITTest extends PHPUnit_Framework_TestCase
     var $db;
     function setUp()
     {
-        $cnxstr = 'mysql:host=localhost;dbname=ait';
+        $cnxstr = 'mysql:host=127.0.0.1;port=330600;dbname=ait';
         //        $cnxstr = 'mysql:host=thouveni.ads.intra.inist.fr;dbname=allistag';
         $options = array(
             'prefix'         => 'test_',

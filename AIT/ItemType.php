@@ -80,9 +80,9 @@ class AIT_ItemType extends AIT
             $this->_id = $this->_addTag($this->_label, $this->_type, $row);
             $this->callClassCallback('addHook', $this);
 
-            if ($row !== false) 
+            if ($row !== false)
                 foreach($this->_cols as $n => $t)
-                    if (isset($row[$n])) 
+                    if (isset($row[$n]))
                         $this->_set($n, $row[$n]);
         }
         else {
@@ -122,14 +122,14 @@ class AIT_ItemType extends AIT
      *
      * @return AIT_TagType
      */
-    function getTagType($l)    
+    function getTagType($l)
     {
         if (!is_string($l))
             trigger_error('Argument 1 passed to '.__METHOD__.' must be a String, '.gettype($l).' given', E_USER_ERROR);
 
         $sql = sprintf('
             SELECT tag.id id, label, type
-            FROM %s tag 
+            FROM %s tag
             LEFT JOIN %s b ON tag.id=b.tag_id
             WHERE label = ? and type = %s and item_id = ?
             LIMIT 0,1
@@ -202,18 +202,20 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type, content ';
         $sql2 = sprintf('
-            FROM %s tag 
-            LEFT JOIN %s b ON tag.tag_id=b.id
+            FROM %1$s tagged
+            LEFT JOIN %2$s tag ON tagged.tag_id=tag.id
+            LEFT JOIN %3$s dat ON tag.dat_hash=dat.hash
             WHERE item_id = ?
             ',
             $this->getPDO()->tagged(),
-            $this->getPDO()->tag()
+            $this->getPDO()->tag(),
+            $this->getPDO()->dat()
         );
         $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
-        
+
         if (($r = $this->callClassCallback(
             'getTagTypesCache',
             $cid = self::str2cid($sql, $this->_id)
@@ -258,7 +260,7 @@ class AIT_ItemType extends AIT
                 SELECT count(*)
                 FROM %s tagged
                 WHERE item_id = ?
-                ', 
+                ',
                 $this->getPDO()->tagged()
             );
 
@@ -330,10 +332,10 @@ class AIT_ItemType extends AIT
             FROM %s tag
             WHERE label = ? AND type = ?
             LIMIT 0,1
-            ', 
+            ',
             $this->getPDO()->tag()
         );
-      
+
         if (($r = $this->callClassCallback(
             'getItemCache',
             $cid = self::str2cid($l, $this->_id)
@@ -406,12 +408,14 @@ class AIT_ItemType extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, content ';
         $sql2 = sprintf('
             FROM %s tag
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
             WHERE type = ?
-            ', 
-            $this->getPDO()->tag()
+            ',
+            $this->getPDO()->tag(),
+            $this->getPDO()->dat()
         );
         $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
@@ -491,14 +495,16 @@ class AIT_ItemType extends AIT
         }
         if ($n === 0) return new AITResult(array());
 
-        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type, content ';
         $sql2 = sprintf('
-            FROM %s tagged 
+            FROM %s tagged
             LEFT JOIN %s tag ON tagged.item_id = tag.id
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
             WHERE %s AND type = ?
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag(),
+            $this->getPDO()->dat(),
             $w
         );
         $sql = $sql1.$sql2.$this->filter($cols);
@@ -543,7 +549,7 @@ class AIT_ItemType extends AIT
 
     // {{{ searchItems
     /**
-     * Recherche des items du type courant à partir des tags 
+     * Recherche des items du type courant à partir des tags
      *
      * Important : Ne sont ramenés que des items possédant des tags.
      *
@@ -571,22 +577,24 @@ class AIT_ItemType extends AIT
             $query = $this->callClassCallback('searchItemsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.prefix prefix, item.suffix suffix, item.buffer buffer, item.scheme scheme, item.language language, item.score score, item.frequency frequency';        
+        $sql1 = 'SELECT DISTINCT item.id id, item.label label, item.prefix prefix, item.suffix suffix, item.buffer buffer, item.scheme scheme, item.language language, item.score score, item.frequency frequency, content';
         $sql2 = sprintf('
             FROM %1$s tag
             LEFT JOIN %2$s b ON tag.type=b.tag_id
             LEFT JOIN %2$s d ON tag.id=d.tag_id
             LEFT JOIN %1$s item ON d.item_id=item.id
-            WHERE b.item_id = item.type AND item.type = ? %3$s
+            LEFT JOIN %3$s dat ON tag.dat_hash=dat.hash
+            WHERE b.item_id = item.type AND item.type = ? %4$s
             ',
             $this->getPDO()->tag(),
             $this->getPDO()->tagged(),
+            $this->getPDO()->dat(),
             $query
         );
         $sql = $sql1.$sql2.$this->filter($cols);
 
         self::sqler($sql, $offset, $lines, $ordering);
-        
+
         if (($r = $this->callClassCallback(
             'searchItemsCache',
             $cid = self::str2cid($sql, $this->_id)
@@ -663,18 +671,20 @@ class AIT_ItemType extends AIT
 
 
         $w = $query->getSQL();
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type, content ';
         $sql2 = sprintf('
             FROM (%s) temp
             LEFT JOIN %s tag ON temp.item_id = tag.id
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
             WHERE type = ?
             ',
             $w,
-            $this->getPDO()->tag()
+            $this->getPDO()->tag(),
+            $this->getPDO()->dat()
         );
         $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);
-        
+
         if (($r = $this->callClassCallback(
             'queryItemsCache',
             $cid = self::str2cid($sql, $this->_id)
@@ -726,12 +736,14 @@ class AIT_ItemType extends AIT
         if (!is_null($ordering) && !is_int($ordering))
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a integer, '.gettype($ordering).' given', E_USER_ERROR);
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, content';
         $sql2 = sprintf('
             FROM %s tag
-            WHERE type = 1 
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
+            WHERE type = 1
             ',
-            $pdo->tag()
+            $pdo->tag(),
+            $pdo->dat()
         );
         $sql = $sql1.$sql2;
         self::sqler($sql, $offset, $lines, $ordering);
@@ -812,18 +824,20 @@ class AIT_ItemType extends AIT
             $query = $this->callClassCallback('selectItemsHook', $query, $this);
 
         if ($query !== '' and $query !== false) $query = 'AND '.$query;
-        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency';        
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, content';
         $sql2 = sprintf('
             FROM %1$s item 
-            WHERE item.type = ? %2$s
+            LEFT JOIN %2$s dat ON item.dat_hash=dat.hash
+            WHERE item.type = ? %3$s
             ',
             $this->getPDO()->tag(),
+            $this->getPDO()->dat(),
             $query
         );
         $sql = $sql1.$sql2.$this->filter($cols, 'item');
 
         self::sqler($sql, $offset, $lines, $ordering);
-        
+
         if (($r = $this->callClassCallback(
             'selectItemsCache',
             $cid = self::str2cid($sql, $this->_id)

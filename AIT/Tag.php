@@ -279,16 +279,18 @@ class AIT_Tag extends AIT
                 );
             }
         }
-        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type ';
+        $sql1 = 'SELECT DISTINCT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type, content ';
         $sql2 = sprintf('
             FROM %1$s a
             LEFT JOIN %1$s b ON a.item_id=b.item_id
             LEFT JOIN %2$s tag ON b.tag_id=tag.id
-            %3$s
-            WHERE a.tag_id = ?  %4$s
+            LEFT JOIN %3$s dat ON tag.dat_hash=dat.hash
+            %4$s
+            WHERE a.tag_id = ? %5$s
             ',
             $this->getPDO()->tagged(),
             $this->getPDO()->tag(),
+            $this->getPDO()->dat(),
             $s,
             $w
         );
@@ -399,14 +401,16 @@ class AIT_Tag extends AIT
             trigger_error('Argument 4 passed to '.__METHOD__.' must be a array'.gettype($cols).' given', E_USER_ERROR);
 
 
-        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language score, frequency, type ';
+        $sql1 = 'SELECT id, label, prefix, suffix, buffer, scheme, language, score, frequency, type, content ';
         $sql2 = sprintf('
             FROM %s a
             LEFT JOIN %s tag ON a.item_id=tag.id
+            LEFT JOIN %s dat ON tag.dat_hash=dat.hash
             WHERE tag_id = ?
             ',
             $this->getPDO()->tagged(),
-            $this->getPDO()->tag()
+            $this->getPDO()->tag(),
+            $this->getPDO()->dat()
         );
         $sql = $sql1.$sql2.$this->filter($cols);
         self::sqler($sql, $offset, $lines, $ordering);

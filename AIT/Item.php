@@ -518,7 +518,7 @@ class AIT_Item extends AIT
         }
         $this->_decreaseFrequency($this->_type);
         $this->_rmTagged(null, $this->_id);
-        $this->_rmTag($this->_id);
+        $this->_rmTag();
     }
     // }}}
 

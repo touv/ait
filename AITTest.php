@@ -1163,6 +1163,40 @@ class AITTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_d(), 2);
         $this->assertEquals($this->_q(), 0);
     }
+    function test_dat()
+    {
+        $it = new AIT_ItemType('itemtype', $this->db);
+        $i1 = $it->addItem('#1', array(
+            'content' => 'dièse un',
+        ));
+        $i2 = $it->addItem('#2', array(
+            'content' => 'dièse deux',
+        ));
+
+        $tt = $it->addTag('tagtype');
+        $t1 = $tt->addTag('@1', array(
+            'content' => 'arobase un',
+        ));
+        $t2 = $tt->addTag('@2', array(
+            'content' => 'arobase deux',
+        ));
+
+        $i1->attach($t1)->attach($t2);
+        $i2->attach($t1);
+
+        $t1b = $i2->getTag('@1', $tt);
+        $t2b = $i1->getTag('@2', $tt);
+        $i1b = $t2->getItems()->offsetGet(0);
+
+
+        $this->assertEquals($t1b->get('content'), 'arobase un');
+        $this->assertEquals($t2b->get('content'), 'arobase deux');
+        $this->assertEquals($i1b->get('content'), 'dièse un');
+
+        $it->del();
+        $this->assertEquals($this->_d(), 2);
+        $this->assertEquals($this->_q(), 0);
+    }
 
 
 

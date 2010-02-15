@@ -792,7 +792,7 @@ class AIT_ItemType extends AIT
         foreach($tags as $tag) {
             $tag->del(true);
         }
-        $this->_rmTag($this->_id);
+        $this->_rmTag();
     }
     // }}}
 

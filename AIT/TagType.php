@@ -430,7 +430,7 @@ class AIT_TagType extends AIT
             $tag->del($cascade);
         }
         $this->_rmTagged($this->_id, null);
-        $this->_rmTag($this->_id);
+        $this->_rmTag();
     }
     // }}}
 

@@ -1086,10 +1086,11 @@ class AIT extends AITRoot
     /**
      * Suppression d'une ligne dans tag
      *
-     * @param string $i id
      */
-    protected function _rmTag($i)
+    protected function _rmTag()
     {
+
+        $dat_hash = $this->_get('dat_hash', true);
         try {
             $sql = sprintf('
                 DELETE FROM %s WHERE id=?
@@ -1105,6 +1106,22 @@ class AIT extends AITRoot
             self::debug(self::timer(true), $sql, $this->_id);
 
             $this->_id = null;
+
+            $sql = sprintf('
+                DELETE FROM %2$s
+                USING %2$s 
+                LEFT JOIN %1$s tag ON %2$s.hash=tag.dat_hash
+                WHERE hash=? AND tag.id is NULL
+                ',
+                $this->getPDO()->tag(true),
+                $this->getPDO()->dat(true)
+            );
+            self::timer();
+            $stmt = $this->getPDO()->prepare($sql);
+            $stmt->bindParam(1, $dat_hash, PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->closeCursor();
+            self::debug(self::timer(true), $sql, $dat_hash);
         }
         catch (PDOException $e) {
             self::catchError($e);
@@ -1445,7 +1462,7 @@ class AIT extends AITRoot
                 $name = '_'.$attr[$name];
                 $value = $this->$name;
             }
-            if (isset($this->_cols[$name])) {
+            if (isset($this->_cols[$name]) or $name === 'content') {
                 $value = $this->_get($name);
             }
             if ($this->isClassCallback('getHook')) {

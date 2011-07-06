@@ -7,6 +7,11 @@ A2X=a2x
 CP=cp
 MKDIR=mkdir
 RM=rm
+VERSION=`./extract-version.sh`
+CURVER=AIT-$(VERSION).tgz
+APIKEY=5cd8785b-c05c-72d4-71f5-fa6fc9c39839
+PEARHOST=http://pear.respear.net/respear/
+
 
 all : apidoc webdoc
 apidoc : doxygen phpdocumentor
@@ -34,9 +39,13 @@ doxygen:
 
 phpdocumentor:
 	$(PHPDOC) -c apidoc.ini
+release: tagging pearing
 
-release: AIT-`./extract-version.sh`.tgz
+tagging: $(CURVER)
+	git tag -a -m "Version $(VERSION)"  v$(VERSION)
 
-AIT-`./extract-version.sh`.tgz: package.xml
-	$(PEAR) package package.xml
-	git tag -a -m "Version `./extract-version.sh`"  v`./extract-version.sh`
+pearing: $(CURVER)
+	@read -p "Who are you ? " toto && cat $(CURVER) | curl -u `echo $$toto`:$(APIKEY) -X POST --data-binary @- $(PEARHOST)
+
+$(CURVER): package.xml
+	$(PEAR) package $?

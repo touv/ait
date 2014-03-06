@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>7.5. AIT_Item</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.69.1" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="ch07.html" title="Chapter 7. Références des classes" /><link rel="prev" href="ch07s04s29.html" title="7.4.29. getBySystemID" /><link rel="next" href="ch07s05s02.html" title="7.5.2. addTag" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch07s04s29.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch07s05s02.html">Next</a></td></tr></table><hr /></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="_ait_item"></a>7.5. AIT_Item</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch07s05.html#_construct_4">7.5.1. __construct</a></span></dt><dt><span class="section"><a href="ch07s05s02.html">7.5.2. addTag</a></span></dt><dt><span class="section"><a href="ch07s05s03.html">7.5.3. delTag</a></span></dt><dt><span class="section"><a href="ch07s05s04.html">7.5.4. attach</a></span></dt><dt><span class="section"><a href="ch07s05s05.html">7.5.5. detach</a></span></dt><dt><span class="section"><a href="ch07s05s06.html">7.5.6. getTags</a></span></dt><dt><span class="section"><a href="ch07s05s07.html">7.5.7. getTypedTags</a></span></dt><dt><span class="section"><a href="ch07s05s08.html">7.5.8. fetchTags</a></span></dt><dt><span class="section"><a href="ch07s05s09.html">7.5.9. del</a></span></dt><dt><span class="section"><a href="ch07s05s10.html">7.5.10. getItemType</a></span></dt><dt><span class="section"><a href="ch07s05s11.html">7.5.11. getTagsObject</a></span></dt><dt><span class="section"><a href="ch07s05s12.html">7.5.12. getPDO</a></span></dt><dt><span class="section"><a href="ch07s05s13.html">7.5.13. ren</a></span></dt><dt><span class="section"><a href="ch07s05s14.html">7.5.14. exists</a></span></dt><dt><span class="section"><a href="ch07s05s15.html">7.5.15. getSystemID</a></span></dt><dt><span class="section"><a href="ch07s05s16.html">7.5.16. get</a></span></dt><dt><span class="section"><a href="ch07s05s17.html">7.5.17. getTimestamps</a></span></dt><dt><span class="section"><a href="ch07s05s18.html">7.5.18. getScore</a></span></dt><dt><span class="section"><a href="ch07s05s19.html">7.5.19. setScore</a></span></dt><dt><span class="section"><a href="ch07s05s20.html">7.5.20. setFrequency</a></span></dt><dt><span class="section"><a href="ch07s05s21.html">7.5.21. debug</a></span></dt><dt><span class="section"><a href="ch07s05s22.html">7.5.22. dump</a></span></dt><dt><span class="section"><a href="ch07s05s23.html">7.5.23. getBySystemID</a></span></dt></dl></div><p>Cette classe permet de manipuler un ITEM.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_construct_4"></a>7.5.1. __construct</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_37"></a>7.5.1.1. Synopsis</h4></div></div></div><pre class="literallayout">void __construct(string $l, integer $t, PDOAIT $pdo, integer $id=false)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_37"></a>7.5.1.2. Description</h4></div></div></div><p>Constructeur</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_37"></a>7.5.1.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+nom du nouveau item
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$t</strong></span>
+</p></td><td style="">
+<p>
+Identifiant système du type d'item associé (si connu)
+</p>
+</td></tr><tr><td style=""><p>
+PDOAIT <span class="strong"><strong>$pdo</strong></span>
+</p></td><td style="">
+<p>
+Instance de base AIT que l'on souhaite utiliser.
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$id</strong></span>
+</p></td><td style="">
+<p>
+Identifiant système de l'élément (si déjà connu).
+</p>
+</td></tr></tbody></table></div><p>defTag</p><pre class="programlisting">
+
+Synopsis
+++++++++
+
+    AIT_Tag defTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Retourne un tag associé à l'item courant.
+Si le Tag n'existe pas il est automatiquement créé.
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du tag
+AIT_TagType *$o*:: Type de Tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag.
+
+
+// ----------------------------------------------------------------------------
+getTag
+</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_38"></a>7.5.1.4. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Tag getTag(string $l, AIT_TagType $o)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_38"></a>7.5.1.5. Description</h4></div></div></div><p>Retourne un tag associé à l'item courant (si il existe)</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_38"></a>7.5.1.6. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+nom du tag
+</p>
+</td></tr><tr><td style=""><p>
+AIT_TagType <span class="strong"><strong>$o</strong></span>
+</p></td><td style="">
+<p>
+Type de Tag
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_34"></a>7.5.1.7. Retour</h4></div></div></div><p>Un objet AIT_Tag représentant le tag trouvé ou NULL si il n'existe pas.</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s04s29.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s05s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>

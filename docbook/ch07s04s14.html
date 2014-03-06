@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>7.4.14. queryItems</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.69.1" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="ch07s04.html" title="7.4. AIT_ItemType" /><link rel="prev" href="ch07s04s13.html" title="7.4.13. getItemBySystemID" /><link rel="next" href="ch07s04s15.html" title="7.4.15. countItems" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch07s04s13.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch07s04s15.html">Next</a></td></tr></table><hr /></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_queryitems"></a>7.4.14. queryItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_21"></a>7.4.14.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_ItemType::queryItems(AITQuery $query, $offset=null, $lines=null, $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_21"></a>7.4.14.2. Description</h4></div></div></div><p>On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_21"></a>7.4.14.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+<span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+$query objet contenant la requête d'interrogation.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à partir du premier enregistrement.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri.
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_18"></a>7.4.14.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple_6"></a>7.4.14.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$jazz    = $schema-&gt;style-&gt;getTag('Jazz');
+$blues   = $schema-&gt;style-&gt;getTag('Blues');
+$electro = $schema-&gt;style-&gt;getTag('Electro');
+
+$query = new AITQuery($db);
+
+// les disques marqués avec Jazz et Blues
+$query-&gt;all(new ArrayObject(array($jazz, $blues)));
+
+// Ou bien
+$query-&gt;eitheror();
+
+// Les disques marqués avec Jazz et Electro
+$query-&gt;all(new ArrayObject(array($jazz, $electro)));
+
+$items = $schema-&gt;disques-&gt;queryItems($query, 0, 10, AIT::ORDER_BY_SCORE|AIT::ORDER_ASC);
+foreach($items as $item) {
+    echo $item-&gt;get();
+}
+echo 'Showed : '.$items-&gt;count(). ' / '.$items-&gt;total()."\n";
+?&gt;
+</pre></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s04s13.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07s04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s04s15.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>

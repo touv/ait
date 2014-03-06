@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 4. Connexion/Configuration à Base de Données</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="index.html" title="Guide d'utilisation de AIT" /><link rel="prev" href="ch03.html" title="Chapter 3. Constantes pré-définies" /><link rel="next" href="ch05.html" title="Chapter 5. Les erreurs et leur gestion" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch03.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr></table><hr /></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="_connexion_configuration_base_de_donn_es"></a>Chapter 4. Connexion/Configuration à Base de Données</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch04.html#_sgbd_support_e">4.1. SGBD supportée</a></span></dt></dl></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="_sgbd_support_e"></a>4.1. SGBD supportée</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch04.html#_pr_requis">4.1.1. Pré-requis</a></span></dt><dt><span class="section"><a href="ch04.html#_connexion_la_base_de_donn_es">4.1.2. Connexion à la base de données</a></span></dt><dt><span class="section"><a href="ch04.html#_cr_ation_et_contr_le_de_la_structure_de_donn_es">4.1.3. Création et contrôle de la structure de données</a></span></dt></dl></div><p>AIT peut théoriquement fonctionner sur tous les SGBD supportés par l'extension PDO.
+En pratique AIT n'a été testé qu'avec MySQL.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_pr_requis"></a>4.1.1. Pré-requis</h3></div></div></div><p>AIT a besoin qu'une base de données soit créée peu importe son nom.</p><div class="sidebar"><p class="title"><b>Création d'une base de données avec Mysql</b></p><p>CREATE DATABASE AIT;</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_connexion_la_base_de_donn_es"></a>4.1.2. Connexion à la base de données</h3></div></div></div><p>AIT utilise l'extension <a class="ulink" href="http://www.php.net" target="_top">PHP</a> <a class="ulink" href="http://fr.php.net/pdo" target="_top">PDO</a>.
+Pour se connecter à la base on utilise donc une chaîne de connexion PDO.</p><p>La méthode AIT::connect prend les même paramètres que
+<a class="ulink" href="http://fr.php.net/manual/fr/pdo.construct.php" target="_top">le constructeur</a> de l'objet PDO.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis"></a>4.1.2.1. Synopsis</h4></div></div></div><pre class="literallayout">PDO  connect(string $dsn, string $username = 'root', string $password= '', array $driver_options=array(), array $ait_options=array())</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description"></a>4.1.2.2. Description</h4></div></div></div><p>Méthode statique permettant de se connecter à une base de données.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres"></a>4.1.2.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" style="border: none;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style="" valign="top"><p>
+string <span class="strong"><strong>$dsn</strong></span>
+</p></td><td style="" valign="top">
+<p>
+chaine de connexion
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+string <span class="strong"><strong>$username</strong></span>
+</p></td><td style="" valign="top">
+<p>
+user de connexion
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+string <span class="strong"><strong>$password</strong></span>
+</p></td><td style="" valign="top">
+<p>
+mot de passe de connexion
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+array <span class="strong"><strong>$driver_options</strong></span>
+</p></td><td style="" valign="top">
+<p>
+options pour pdo
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+array <span class="strong"><strong>$ait_options</strong></span>
+</p></td><td style="" valign="top">
+<p>
+options pour pdo
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour"></a>4.1.2.4. Retour</h4></div></div></div><p>Un objet AITPDO qui dérive l'objet PDO.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple"></a>4.1.2.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+
+require_once 'AIT.php';
+
+// Paramètres de connexion
+$dsn      = 'mysql:host=localhost;dbname=music';
+$user     = 'root';
+$password = '';
+
+// Connexion à la base
+$db = AIT::connect(
+        $dsn,
+        $user,
+        $password
+    );
+
+// Contrôle et création de la structure de données
+$db-&gt;checkup();
+
+// On purge
+$db-&gt;exec("TRUNCATE ".$db-&gt;tag());
+$db-&gt;exec("TRUNCATE ".$db-&gt;tagged());
+
+
+// Contrôle et création de la structure de données
+$db-&gt;checkup();
+</pre><div class="warning" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="../images/icons/warning.png" /></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>IL n'est pas possible d'utiliser directement un objet PDO. AIT pour fonctionner
+utilise un objet spécifique dérivé de l'objet PDO.</p></td></tr></table></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_cr_ation_et_contr_le_de_la_structure_de_donn_es"></a>4.1.3. Création et contrôle de la structure de données</h3></div></div></div><p>AIT contrôle et créé la structure de données nécessaire à son bon fonctionnement
+de manière automatique à condition de faire appel à la méthode checkup.</p><pre class="programlisting">
+$cnxstr = 'mysql:host=localhost;dbname=music';
+$db = AIT::connect($cnxstr, 'root');
+$db-&gt;checkup();
+</pre></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>

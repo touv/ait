@@ -1,0 +1,5514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<book lang="en">
+<bookinfo>
+    <title>Guide d'utilisation de AIT</title>
+    <author>
+        <firstname>Nicolas</firstname>
+        <surname>Thouvenin</surname>
+        <affiliation><address><email>nthouvenin@gmail.com</email></address></affiliation>
+    </author>
+    <authorinitials>NT</authorinitials>
+
+
+</bookinfo>
+<preface>
+<title>Preface</title>
+<simpara>AIT est un ensemble de classes PHP permettant le stockage et
+la recherche de métadonnées. AIT se base sur 2 concepts
+: des items et des tags. A partir de là, on peut stocker et effectuer
+des recherches toutes informations formalisées sur ces 2 concepts.</simpara>
+
+<simpara>Concrètement AIT peut être considéré simplement comme un moteur de Tag
+(Tag's engine) en PHP, ou alors si on pousse le raisonnement à l'extrême,
+comme un moteur générique de stockage d'information.</simpara>
+
+</preface>
+<chapter id="_installation">
+<title>Installation</title>
+<simpara>AIT se présente sous forme forme d'un fichier AIT-X.Y.Z.tgz.
+Ce fichier s'installe de deux manières.</simpara>
+
+<section id="_avec_pear">
+<title>Avec PEAR</title>
+<simpara>Pour installer :</simpara>
+
+<literallayout class="monospaced">$ pear install AIT-X.Y.Z.tgz</literallayout>
+<simpara>Pour désinstaller :</simpara>
+
+<literallayout class="monospaced">$ pear uninstall AIT</literallayout>
+<simpara>Pour mettre à jour :</simpara>
+
+<literallayout class="monospaced">$ pear upgrade AIT-X.Y.Z.tgz</literallayout>
+</section>
+<section id="_sans_pear">
+<title>sans PEAR</title>
+<simpara>Il suffit de décompresser l'archive dans un répertoire
+et d'ajuster la variable PHP include_path en fonction du
+répertoire que vous avez choisi.</simpara>
+
+</section>
+</chapter>
+<chapter id="_mod_le_de_donn_es">
+<title>Modéle de données</title>
+<simpara>AIT traite 4 concepts qui est important de bien comprendre. A chacun des ces quatres
+concepts est associé une classe PHP :</simpara>
+
+<itemizedlist>
+<listitem>
+<simpara>
+Les types d'items (AIT_ItemType)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Les items (AIT_Item)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Les types de tags (AIT_TagType)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Les tags (AIT_Tag)
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Ces 4 concepts respectent le modèle de données conceptuel suivant :</simpara>
+
+<simpara><inlinemediaobject>
+  <imageobject>
+  <imagedata fileref="../vitrualmodel.png"/>
+  </imageobject>
+  <textobject><phrase>Modéle de données virtuel</phrase></textobject>
+</inlinemediaobject></simpara>
+
+<note><simpara>Le modéle de données physique ne se présente pas de cette manière</simpara></note>
+</chapter>
+<chapter id="_constantes_pr_d_finies">
+<title>Constantes pré-définies</title>
+<table pgwide="0"
+frame="topbot"
+rowsep="1" colsep="1"
+>
+<title>Constantes pour le tri</title>
+<tgroup cols="3">
+<colspec colwidth="135pt" align="left"/>
+<colspec colwidth="38pt" align="center"/>
+<colspec colwidth="141pt" align="right"/>
+<thead>
+  <row>
+    <entry>
+    Constante
+    </entry>
+    <entry>
+    Valeur
+    </entry>
+    <entry>
+    Description
+    </entry>
+  </row>
+</thead>
+<tbody>
+  <row>
+    <entry>
+    ORDER_ASC (integer)
+    </entry>
+    <entry>
+    2
+    </entry>
+    <entry>
+    Demande un tri ascendant
+    </entry>
+  </row>
+  <row>
+    <entry>
+    ORDER_DESC (integer)
+    </entry>
+    <entry>
+    4
+    </entry>
+    <entry>
+    Demande un tri descendant
+    </entry>
+  </row>
+  <row>
+    <entry>
+    ORDER_BY_LABEL (integer)
+    </entry>
+    <entry>
+    8
+    </entry>
+    <entry>
+    Demande un tri sur le label
+    </entry>
+  </row>
+  <row>
+    <entry>
+    ORDER_BY_SCORE (integer)
+    </entry>
+    <entry>
+    18
+    </entry>
+    <entry>
+    Demande un tri sur le score
+    </entry>
+  </row>
+</tbody>
+</tgroup>
+</table>
+</chapter>
+<chapter id="_connexion_configuration_base_de_donn_es">
+<title>Connexion/Configuration à Base de Données</title>
+<section id="_sgbd_support_e">
+<title>SGBD supportée</title>
+<simpara>AIT peut théoriquement fonctionner sur tous les SGBD supportés par l'extension PDO.
+En pratique AIT n'a été testé qu'avec MySQL.</simpara>
+
+<section id="_pr_requis">
+<title>Pré-requis</title>
+<simpara>AIT a besoin qu'une base de données soit créée peu importe son nom.</simpara>
+
+<sidebar>
+<title>Création d'une base de données avec Mysql</title>
+<simpara>CREATE DATABASE AIT;</simpara>
+
+</sidebar>
+</section>
+<section id="_connexion_la_base_de_donn_es">
+<title>Connexion à la base de données</title>
+<simpara>AIT utilise l'extension <ulink url="http://www.php.net">PHP</ulink> <ulink url="http://fr.php.net/pdo">PDO</ulink>.
+Pour se connecter à la base on utilise donc une chaîne de connexion PDO.</simpara>
+
+<simpara>La méthode AIT::connect prend les même paramètres que
+<ulink url="http://fr.php.net/manual/fr/pdo.construct.php">le constructeur</ulink> de l'objet PDO.</simpara>
+
+<section id="_synopsis">
+<title>Synopsis</title>
+<literallayout class="monospaced">PDO  connect(string $dsn, string $username = 'root', string $password= '', array $driver_options=array(), array $ait_options=array())</literallayout>
+</section>
+<section id="_description">
+<title>Description</title>
+<simpara>Méthode statique permettant de se connecter à une base de données.</simpara>
+
+</section>
+<section id="_param_tres">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$dsn</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+chaine de connexion
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$username</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+user de connexion
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$password</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+mot de passe de connexion
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$driver_options</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+options pour pdo
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$ait_options</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+options pour pdo
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour">
+<title>Retour</title>
+<simpara>Un objet AITPDO qui dérive l'objet PDO.</simpara>
+
+</section>
+<section id="_exemple">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+
+require_once 'AIT.php';
+
+// Paramètres de connexion
+$dsn      = 'mysql:host=localhost;dbname=music';
+$user     = 'root';
+$password = '';
+
+// Connexion à la base
+$db = AIT::connect(
+        $dsn,
+        $user,
+        $password
+    );
+
+// Contrôle et création de la structure de données
+$db->checkup();
+
+// On purge
+$db->exec("TRUNCATE ".$db->tag());
+$db->exec("TRUNCATE ".$db->tagged());
+
+
+// Contrôle et création de la structure de données
+$db->checkup();]]>
+</programlisting>
+<warning><simpara>IL n'est pas possible d'utiliser directement un objet PDO. AIT pour fonctionner
+utilise un objet spécifique dérivé de l'objet PDO.</simpara></warning>
+</section>
+</section>
+<section id="_cr_ation_et_contr_le_de_la_structure_de_donn_es">
+<title>Création et contrôle de la structure de données</title>
+<simpara>AIT contrôle et créé la structure de données nécessaire à son bon fonctionnement
+de manière automatique à condition de faire appel à la méthode checkup.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[$cnxstr = 'mysql:host=localhost;dbname=music';
+$db = AIT::connect($cnxstr, 'root');
+$db->checkup();]]>
+</programlisting>
+</section>
+</section>
+</chapter>
+<chapter id="_les_erreurs_et_leur_gestion">
+<title>Les erreurs et leur gestion</title>
+<simpara>AIT fait appel à la fonction PHP <ulink url="http://fr2.php.net/trigger_error">trigger_error</ulink>
+à chaque fois qu'une erreur est rencontrée. Le niveau d'erreur est toujours E_USER_ERROR.
+A chaque fois que AIT rencontre une erreur l'exécution du code est donc stoppé.</simpara>
+
+</chapter>
+<chapter id="_debugger">
+<title>Debugger</title>
+<simpara>AIT posséde un mode <emphasis role="strong">debugging</emphasis> qui permet notamenent d'afficher les réquetes SQL envoyés à
+ la base. Ce mode peut-être activé et désactivé globalement ou ponctuellement. Dans ce dernier
+ cas, seule les requêtes produitent entre le moment ou le mode debug est activé et le moment
+ou il est désactivé seront affichées.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[AIT::$debugging = true;
+jazz = $schema->style->getTag('Jazz');
+AIT::$debugging = false;]]>
+</programlisting>
+</chapter>
+<chapter id="_d_veloppement">
+<title>Développement</title>
+<section id="_modification_amp_ajout">
+<title>Modification &amp; Ajout</title>
+<simpara>Le code source de AIT est disponible sur Github.com : <ulink url="http://github.com/touv/ait/tree/master">http://github.com/touv/ait/tree/master</ulink></simpara>
+
+</section>
+<section id="_tests_unitaires">
+<title>Tests Unitaires</title>
+<simpara>Le développement d'AIT est piloté par les tests unitaires. Pour cela on utilise <ulink url="http://www.phpunit.de/">PHPUnit</ulink></simpara>
+
+<example><title>Pour tester le code :</title>
+<screen>% phpunit AITTest.php
+% phpunit AITExtentedTest.php</screen>
+</example>
+<simpara>Bien évidement si l'on ajoute une fonctionnalité celle-ci devra posséder son propre test.</simpara>
+
+</section>
+</chapter>
+<chapter id="_r_f_rences_des_classes">
+<title>Références des classes</title>
+<simpara>Le cœur d'AIT est composé de 4 classes de bases qui hérite d'une seul classe mère.</simpara>
+
+<section id="_aitpdo">
+<title>AITPDO</title>
+<simpara>Cette classe permet de pointer sur la base données que l'on souhaite utiliser.</simpara>
+
+</section>
+<section id="_aitschema">
+<title>AITSchema</title>
+<simpara>Cette classe permet de créer et de manipuler des schémas de données.</simpara>
+
+<section id="_construct">
+<title>__construct</title>
+<section id="_synopsis_2">
+<title>Synopsis</title>
+<literallayout class="monospaced">void __construct(PDOAIT $pdo, $name, array $attributs)</literallayout>
+</section>
+<section id="_description_2">
+<title>Description</title>
+<simpara>Le constructeur de la classe.</simpara>
+
+</section>
+<section id="_param_tres_2">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AITPDO <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+L'instance de base AIT que l'on souhaite interroger.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Nom du schéma
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$attributs</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Liste des élements du schéma
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+</section>
+<section id="_get">
+<title>__get</title>
+<section id="_synopsis_3">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed __get(string $name)</literallayout>
+</section>
+<section id="_description_3">
+<title>Description</title>
+<simpara>Retroune un objet AIT_TypeItem si on donne en argument le nom du schéma.
+AIT_TypeTag si on donne en argument le nom d'un des élement du schéma.</simpara>
+
+</section>
+<section id="_param_tres_3">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Nom d'un élément du schéma
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_2">
+<title>Retour</title>
+<simpara>mixed</simpara>
+
+</section>
+</section>
+</section>
+<section id="_aitquery">
+<title>AITQuery</title>
+<simpara>Cette classe permet de créer des requêtes avancées pour trouver des items.</simpara>
+
+<section id="_construct_2">
+<title>__construct</title>
+<section id="_synopsis_4">
+<title>Synopsis</title>
+<literallayout class="monospaced">function __construct(AITPDO $pdo)</literallayout>
+</section>
+<section id="_description_4">
+<title>Description</title>
+<simpara>Le constructeur de la classe.</simpara>
+
+</section>
+<section id="_param_tres_4">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AITPDO <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+L'instance de base AIT que l'on souhaite interroger.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+</section>
+<section id="_all">
+<title>all</title>
+<section id="_synopsis_5">
+<title>Synopsis</title>
+<literallayout class="monospaced">public function all(ArrayObject $tags)</literallayout>
+</section>
+<section id="_description_5">
+<title>Description</title>
+<simpara>On recherche des items ayant tous les tags donnés en paramètre.</simpara>
+
+</section>
+<section id="_param_tres_5">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+<emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Contient des objet AIT_Tag représentant les tags que l'on souhaite rechercher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_3">
+<title>Retour</title>
+<simpara>Retourne FALSE si aucun tag n'a été trouvé dans le tableau d'entrée sinon retourne TRUE.</simpara>
+
+</section>
+</section>
+<section id="_one">
+<title>one</title>
+<section id="_synopsis_6">
+<title>Synopsis</title>
+<literallayout class="monospaced">public function one(ArrayObject $tags)</literallayout>
+</section>
+<section id="_description_6">
+<title>Description</title>
+<simpara>On recherche des items ayant au moisn l'un des tags donnés en paramètre.</simpara>
+
+</section>
+<section id="_param_tres_6">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+<emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Contient des objet AIT_Tag représentant les tags que l'on souhaite rechercher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_4">
+<title>Retour</title>
+<simpara>Retourne false si aucun tag n'a été trouvé dans le tableau d'entrée sinon retourne true.</simpara>
+
+</section>
+</section>
+<section id="_getsql">
+<title>getSQL</title>
+<section id="_synopsis_7">
+<title>Synopsis</title>
+<literallayout class="monospaced">public function getSQL()</literallayout>
+</section>
+<section id="_description_7">
+<title>Description</title>
+<simpara>Retourne la requête construite avec les méthodes one et all sous forme de requête SQL.</simpara>
+
+</section>
+<section id="_param_tres_7">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_5">
+<title>Retour</title>
+<simpara>Retourne une chaine de caractère contenant une requête SQL.</simpara>
+
+</section>
+</section>
+</section>
+<section id="_ait_itemtype">
+<title>AIT_ItemType</title>
+<simpara>Cette classe permet de manipuler un TYPE d'ITEM.</simpara>
+
+<section id="_construct_3">
+<title>__construct</title>
+<section id="_synopsis_8">
+<title>Synopsis</title>
+<literallayout class="monospaced">void __construct(string $l, PDOAIT $pdo)</literallayout>
+</section>
+<section id="_description_8">
+<title>Description</title>
+<simpara>Constructeur</simpara>
+
+</section>
+<section id="_param_tres_8">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$label</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Label du type d'item
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Instance de base AIT que l'on souhaite utiliser.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+</section>
+<section id="_deftagtype">
+<title>defTagType</title>
+<section id="_synopsis_9">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_TagType defTagType(string $l)</literallayout>
+</section>
+<section id="_description_9">
+<title>Description</title>
+<simpara>Retourne un type de tag associé au type d'item courant.
+Si le Tag n'existe pas il est automatiquement créé.</simpara>
+
+</section>
+<section id="_param_tres_9">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_6">
+<title>Retour</title>
+<simpara>Un objet AIT_TagType représentant le type de tag</simpara>
+
+</section>
+</section>
+<section id="_addtagtype">
+<title>addTagType</title>
+<section id="_synopsis_10">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_TagType addTagType(string $l)</literallayout>
+</section>
+<section id="_description_10">
+<title>Description</title>
+<simpara>Ajout d'un type de tag au type d'item courant</simpara>
+
+</section>
+<section id="_param_tres_10">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_7">
+<title>Retour</title>
+<simpara>Un objet AIT_TagType représentant le nouveau type de tag</simpara>
+
+</section>
+</section>
+<section id="_gettagtype">
+<title>getTagType</title>
+<section id="_synopsis_11">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_TagType getTagType(string $l)</literallayout>
+</section>
+<section id="_description_11">
+<title>Description</title>
+<simpara>Retourne un type de tag du type d'item courant en fonction de son label.</simpara>
+
+</section>
+<section id="_param_tres_11">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Le label.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_8">
+<title>Retour</title>
+<simpara>Un objet AIT_TagType représentant le type de tag trouvé ou NULL si il n'existe pas.</simpara>
+
+</section>
+</section>
+<section id="_newitem">
+<title>newItem</title>
+<section id="_synopsis_12">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item newItem()</literallayout>
+</section>
+<section id="_description_12">
+<title>Description</title>
+<simpara>Crée un item. Son label est calculé automatiquement en fonction de l'identifiant système.</simpara>
+
+</section>
+<section id="_param_tres_12">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_9">
+<title>Retour</title>
+<simpara>Un objet AIT_Item représentant le nouvel item.</simpara>
+
+</section>
+</section>
+<section id="_additem">
+<title>addItem</title>
+<section id="_synopsis_13">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item addItem(string $l)</literallayout>
+</section>
+<section id="_description_13">
+<title>Description</title>
+<simpara>Ajout d'un item au type d'item courant</simpara>
+
+</section>
+<section id="_param_tres_13">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du nouveau item
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_10">
+<title>Retour</title>
+<simpara>Un objet AIT_Item représentant le nouvel item.</simpara>
+
+</section>
+</section>
+<section id="_getitem">
+<title>getItem</title>
+<section id="_synopsis_14">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item getItem(string $l)</literallayout>
+</section>
+<section id="_description_14">
+<title>Description</title>
+<simpara>Récupère un item</simpara>
+
+</section>
+<section id="_param_tres_14">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de l'item
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_11">
+<title>Retour</title>
+<simpara>Un objet AIT_Item représentant l'item trouvé.</simpara>
+
+</section>
+<section id="_exemple_2">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+if (!is_null($item)) {
+    echo $item->get();
+}
+// Affichera :  a1902425]]>
+</programlisting>
+</section>
+</section>
+<section id="_defitem">
+<title>defItem</title>
+<section id="_synopsis_15">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item defItem(string $l)</literallayout>
+</section>
+<section id="_description_15">
+<title>Description</title>
+<simpara>Retourne un item associé au type d'item courant.
+Si l'item n'existe pas il est automatiquement créé.</simpara>
+
+</section>
+<section id="_param_tres_15">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de l'item
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_12">
+<title>Retour</title>
+<simpara>Un objet AIT_Item représentant l'item trouvé.</simpara>
+
+</section>
+</section>
+<section id="_getitems">
+<title>getItems</title>
+<section id="_synopsis_16">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_16">
+<title>Description</title>
+<simpara>Retourne tous les items du type d'item courant</simpara>
+
+</section>
+<section id="_param_tres_16">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_13">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+<section id="_exemple_3">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$items = $schema->disques->getItems();
+
+
+foreach ($items as $item) {
+    echo "- ".$item->get()."\n";
+}
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
+
+// Affichera :
+//
+// - a2407474
+// - a2274830
+// - a1902425
+// - a762424
+// - a1095444
+// (...)]]>
+</programlisting>
+</section>
+</section>
+<section id="_fetchitems">
+<title>fetchItems</title>
+<section id="_synopsis_17">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null,  array $cols=[])</literallayout>
+</section>
+<section id="_description_17">
+<title>Description</title>
+<simpara>Retourne les items possédant un ou plusieurs tags donnés en paramètres</simpara>
+
+</section>
+<section id="_param_tres_17">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+ArrayObject <emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tableau de tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_14">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+<section id="_exemple_4">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$jazz = $schema->style->getTag('Jazz');
+
+$tags = new ArrayObject();
+$tags->append($jazz);
+
+$items = $schema->disques->fetchItems($tags, 0, 10);
+
+foreach($items as $item) {
+    echo $item->get()."\n";
+}
+
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
+?>]]>
+</programlisting>
+</section>
+</section>
+<section id="_gettagtypes">
+<title>getTagTypes</title>
+<section id="_synopsis_18">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getTagTypes(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_18">
+<title>Description</title>
+<simpara>Retourne tous les types de tags de l'item courant</simpara>
+
+</section>
+<section id="_param_tres_18">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à parir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_15">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_TagType.</simpara>
+
+</section>
+</section>
+<section id="_selectitems">
+<title>selectItems</title>
+<section id="_synopsis_19">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult selectItems(mixed $query, integer $offset = null, integer $lines = null, integer $ordering = null, array $cols = [])</literallayout>
+</section>
+<section id="_description_19">
+<title>Description</title>
+<simpara>Sélectionne des items du type courant à partir des items eux-même</simpara>
+
+</section>
+<section id="_param_tres_19">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_16">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+<section id="_exemple_5">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$query = "item.label = 'a762424' OR item.label LIKE 'a2%' ";
+
+$items = $schema->disques->searchItems($query, 0, 10);
+
+foreach($items as $item) {
+    echo $item->get()."\n";
+}
+
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
+?>]]>
+</programlisting>
+</section>
+</section>
+<section id="_searchitems">
+<title>searchItems</title>
+<section id="_synopsis_20">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_20">
+<title>Description</title>
+<simpara>Recherche des items du type courant à partir des tags
+Important : Ne sont ramenés que des items possédant des tags.</simpara>
+
+</section>
+<section id="_param_tres_20">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_17">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+<section id="_exemple_6">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$query = "tag.label = 'Tourist' OR tag.label LIKE 'Heroe%' ";
+
+$items = $schema->disques->searchItems($query, 0, 10);
+
+foreach($items as $item) {
+    echo $item->get()."\n";
+}
+
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
+?>]]>
+</programlisting>
+</section>
+</section>
+<section id="_getitembysystemid">
+<title>getItemBySystemID</title>
+<section id="_synopsis_21">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item getItemBySystemID(integer $i)</literallayout>
+</section>
+<section id="_description_21">
+<title>Description</title>
+<simpara>Récupère un Item en fonction de son identifiant système</simpara>
+
+</section>
+<section id="_param_tres_21">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+un identifiant système
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_18">
+<title>Retour</title>
+<simpara>Un objet AIT_Item représentant l'item trouvé.</simpara>
+
+</section>
+<section id="_exemple_7">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$itemA = $schema->disques->getItem('a1902425');
+$id = $itemA->getSystemID();
+
+$itemB = $schema->disques->getItemBySystemID($id);
+
+if (!is_null($itemB)) {
+    echo $itemB->get();
+}
+// Affichera :  a1902425]]>
+</programlisting>
+</section>
+</section>
+<section id="_queryitems">
+<title>queryItems</title>
+<section id="_synopsis_22">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_ItemType::queryItems(AITQuery $query, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_22">
+<title>Description</title>
+<simpara>On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery</simpara>
+
+</section>
+<section id="_param_tres_22">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AITQuery*$l*
+</simpara></entry>
+<entry>
+<simpara>
+$query objet contenant la requête d'interrogation.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_19">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+<section id="_exemple_8">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$jazz    = $schema->style->getTag('Jazz');
+$blues   = $schema->style->getTag('Blues');
+$electro = $schema->style->getTag('Electro');
+
+$query = new AITQuery($db);
+
+// les disques marqués avec Jazz et Blues
+$query->all(new ArrayObject(array($jazz, $blues)));
+
+// Ou bien
+$query->eitheror();
+
+// Les disques marqués avec Jazz et Electro
+$query->all(new ArrayObject(array($jazz, $electro)));
+
+$items = $schema->disques->queryItems($query, 0, 10, AIT::ORDER_BY_SCORE|AIT::ORDER_ASC);
+foreach($items as $item) {
+    echo $item->get();
+}
+echo 'Showed : '.$items->count(). ' / '.$items->total()."\n";
+?>]]>
+</programlisting>
+</section>
+</section>
+<section id="_countitems">
+<title>countItems</title>
+<section id="_synopsis_23">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_ItemType::countItems()</literallayout>
+</section>
+<section id="_description_23">
+<title>Description</title>
+<simpara>Retourne le nombre total d'items attachés au type d'item courrant.</simpara>
+
+</section>
+<section id="_param_tres_23">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_20">
+<title>Retour</title>
+<simpara>un nombre entier représentant le nombre d'enregistrement.</simpara>
+
+</section>
+<section id="_exemple_9">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$counter = $schema->disques->countItems();
+
+echo $counter;
+
+// Affiche le nombre de disque]]>
+</programlisting>
+</section>
+</section>
+<section id="_counttagtypes">
+<title>countTagTypes</title>
+<section id="_synopsis_24">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_ItemType::countTags()</literallayout>
+</section>
+<section id="_description_24">
+<title>Description</title>
+<simpara>Retourne le nombre total de tags attachés au type d'item courrant.</simpara>
+
+</section>
+<section id="_param_tres_24">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_21">
+<title>Retour</title>
+<simpara>un nombre entier représentant le nombre d'enregistrement.</simpara>
+
+</section>
+</section>
+<section id="_del">
+<title>del</title>
+<section id="_synopsis_25">
+<title>Synopsis</title>
+<literallayout class="monospaced">void del()</literallayout>
+</section>
+<section id="_description_25">
+<title>Description</title>
+<simpara>Suppression de l'élément des tags et des items qui lui sont associés.</simpara>
+
+</section>
+<section id="_param_tres_25">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_22">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_getpdo">
+<title>getPDO</title>
+<section id="_synopsis_26">
+<title>Synopsis</title>
+<literallayout class="monospaced">PDO  getPDO()</literallayout>
+</section>
+<section id="_description_26">
+<title>Description</title>
+<simpara>Retourne l'objet PDOAIT utilisé dans l'objet</simpara>
+
+</section>
+<section id="_param_tres_26">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_23">
+<title>Retour</title>
+<simpara>Un objet PDO</simpara>
+
+</section>
+</section>
+<section id="_ren">
+<title>ren</title>
+<section id="_synopsis_27">
+<title>Synopsis</title>
+<literallayout class="monospaced">void ren(string $l)</literallayout>
+</section>
+<section id="_description_27">
+<title>Description</title>
+<simpara>Renomme l'élément. Cela revient à changer son label.</simpara>
+
+</section>
+<section id="_param_tres_27">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nouveau label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_24">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_exists">
+<title>exists</title>
+<section id="_synopsis_28">
+<title>Synopsis</title>
+<literallayout class="monospaced">boolean exists()</literallayout>
+</section>
+<section id="_description_28">
+<title>Description</title>
+<simpara>Vérifie l'existence de l'élément</simpara>
+
+</section>
+<section id="_param_tres_28">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_25">
+<title>Retour</title>
+<simpara>TRUE ou FALSE en focntion de l'existence de l'élément</simpara>
+
+</section>
+</section>
+<section id="_getsystemid">
+<title>getSystemID</title>
+<section id="_synopsis_29">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getSystemID()</literallayout>
+</section>
+<section id="_description_29">
+<title>Description</title>
+<simpara>Retourne l'identifiant système de l'élément.</simpara>
+
+</section>
+<section id="_param_tres_29">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_26">
+<title>Retour</title>
+<simpara>Un nombre entier représentant l'identifiant système.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$id = $item->getSystemID();
+
+var_dump($id);
+
+// Affichera : int(17)]]>
+</programlisting>
+</section>
+</section>
+<section id="_get_2">
+<title>get</title>
+<section id="_synopsis_30">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  get(string $name= 'label')</literallayout>
+</section>
+<section id="_description_30">
+<title>Description</title>
+<simpara>Retourne la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_30">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_27">
+<title>Retour</title>
+<simpara>mixed</simpara>
+
+</section>
+</section>
+<section id="_set">
+<title>set</title>
+<section id="_synopsis_31">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  set(string $value, string $name= 'label')</literallayout>
+</section>
+<section id="_description_31">
+<title>Description</title>
+<simpara>Fixe la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_31">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$value</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+valeur de la propriété
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_28">
+<title>Retour</title>
+<simpara>Aucun.</simpara>
+
+</section>
+</section>
+<section id="_search">
+<title>search</title>
+<section id="_synopsis_32">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult search(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)</literallayout>
+</section>
+<section id="_description_32">
+<title>Description</title>
+<simpara>Recherche des éléments (quelque soit le type)</simpara>
+
+</section>
+<section id="_param_tres_32">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_29">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag ou AIT_Item ou AIT_TagType ou AIT_ItemType.</simpara>
+
+</section>
+</section>
+<section id="_gettimestamps">
+<title>getTimestamps</title>
+<section id="_synopsis_33">
+<title>Synopsis</title>
+<literallayout class="monospaced">ArrayObject  getTimestamps()</literallayout>
+</section>
+<section id="_description_33">
+<title>Description</title>
+<simpara>Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément</simpara>
+
+</section>
+<section id="_param_tres_33">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_30">
+<title>Retour</title>
+<simpara>Un objet ArrayObject dont le premier item contient la date de modification
+et le deuxième contient la date de création.</simpara>
+
+</section>
+<section id="_exemple_10">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$timestamps = $item->getTimestamps();
+echo date('Y-m-d\TH:i:s\Z', $timestamps->updated)."\n";
+// Affichera : 2008-08-21T17:22:17Z
+echo $timestamps['created']."\n";
+// Affichera : 1219332137
+
+
+$jazz = $schema->style->getTag('Jazz');
+$timestamps = $jazz->getTimestamps();
+var_dump($timestamps);
+
+// Affichera :
+//  object(ArrayObject)#15 (2) {
+//     ["updated"]=>
+//     int(1219332137)
+//     ["created"]=>
+//     int(1219332137)
+//  }
+//]]>
+</programlisting>
+</section>
+</section>
+<section id="_getscore">
+<title>getScore</title>
+<section id="_synopsis_34">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getScore()</literallayout>
+</section>
+<section id="_description_34">
+<title>Description</title>
+<simpara>Retourne le score de l'élément</simpara>
+
+</section>
+<section id="_param_tres_34">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_31">
+<title>Retour</title>
+<simpara>Un entier représentant le score l'élément.</simpara>
+
+</section>
+</section>
+<section id="_setscore">
+<title>setScore</title>
+<section id="_synopsis_35">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setScore($i)</literallayout>
+</section>
+<section id="_description_35">
+<title>Description</title>
+<simpara>Donne un score à  l'élément</simpara>
+
+</section>
+<section id="_param_tres_35">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant le score l'élément.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_32">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_setfrequency">
+<title>setFrequency</title>
+<section id="_synopsis_36">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setFrequency($i)</literallayout>
+</section>
+<section id="_description_36">
+<title>Description</title>
+<simpara>Donne une fréquence à l'élément</simpara>
+
+</section>
+<section id="_param_tres_36">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant la fréquence de l'élément
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_33">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_debug">
+<title>debug</title>
+<section id="_synopsis_37">
+<title>Synopsis</title>
+<literallayout class="monospaced">void debug()</literallayout>
+</section>
+<section id="_description_37">
+<title>Description</title>
+<simpara>DEBUG</simpara>
+
+</section>
+<section id="_param_tres_37">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_34">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_dump">
+<title>dump</title>
+<section id="_synopsis_38">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed dump(string $s = '', boolean $r = false)</literallayout>
+</section>
+<section id="_description_38">
+<title>Description</title>
+<simpara>Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des &lt;pre&gt; et &lt;/pre&gt;</simpara>
+
+</section>
+<section id="_param_tres_38">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$s</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+chaine de carat cure à afficher avant le contenu de l'objet.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+booelan <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+si vrai a retourne la chaine à afficher plutôt que de l'afficher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_35">
+<title>Retour</title>
+<simpara>Retourne NULL ou une chaine de caractères (dépend du paramètre $r).</simpara>
+
+</section>
+</section>
+<section id="_getbysystemid">
+<title>getBySystemID</title>
+<section id="_synopsis_39">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed AIT::getBySystemID(PDOAIT $pdo, $id)</literallayout>
+</section>
+<section id="_description_39">
+<title>Description</title>
+<simpara>Créé l'objet correspondant à un identifiant système</simpara>
+
+</section>
+<section id="_param_tres_39">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+pointeur sur la base de données
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+identifiant systéme
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_36">
+<title>Retour</title>
+<simpara>Retourne NULL ou une instance d'objet (AIT_ItemType, AIT_Item, AIT_TagType, AIT_Tag)</simpara>
+
+</section>
+<section id="_exemple_11">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$o = AIT::getBySystemID($db, 17);
+echo $o->get() ." : ";
+
+$o = AIT::getBySystemID($db, 18);
+echo $o->get() .", ";
+
+$o = AIT::getBySystemID($db, 19);
+echo $o->get() ."\n";
+
+// Affichera : a1902425 : Heroes, Antonio Vivaldi]]>
+</programlisting>
+</section>
+</section>
+</section>
+<section id="_ait_item">
+<title>AIT_Item</title>
+<simpara>Cette classe permet de manipuler un ITEM.</simpara>
+
+<section id="_construct_4">
+<title>__construct</title>
+<section id="_synopsis_40">
+<title>Synopsis</title>
+<literallayout class="monospaced">void __construct(string $l, integer $t, PDOAIT $pdo, integer $id=false)</literallayout>
+</section>
+<section id="_description_40">
+<title>Description</title>
+<simpara>Constructeur</simpara>
+
+</section>
+<section id="_param_tres_40">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du nouveau item
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$t</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système du type d'item associé (si connu)
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Instance de base AIT que l'on souhaite utiliser.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système de l'élément (si déjà connu).
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+<simpara>defTag</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[
+Synopsis
+++++++++
+
+    AIT_Tag defTag(string $l, AIT_TagType $o)
+
+Description
++++++++++++
+
+Retourne un tag associé à l'item courant.
+Si le Tag n'existe pas il est automatiquement créé.
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du tag
+AIT_TagType *$o*:: Type de Tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag.
+
+
+// ----------------------------------------------------------------------------
+getTag]]>
+</programlisting>
+</section>
+<section id="_synopsis_41">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag getTag(string $l, AIT_TagType $o)</literallayout>
+</section>
+<section id="_description_41">
+<title>Description</title>
+<simpara>Retourne un tag associé à l'item courant (si il existe)</simpara>
+
+</section>
+<section id="_param_tres_41">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+AIT_TagType <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Type de Tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_37">
+<title>Retour</title>
+<simpara>Un objet AIT_Tag représentant le tag trouvé ou NULL si il n'existe pas.</simpara>
+
+</section>
+</section>
+<section id="_addtag">
+<title>addTag</title>
+<section id="_synopsis_42">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag addTag(string $l, AIT_TagType $o)</literallayout>
+</section>
+<section id="_description_42">
+<title>Description</title>
+<simpara>Ajout d'un tag à l'item courant</simpara>
+
+</section>
+<section id="_param_tres_42">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du nouveau tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+AIT_TagType <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Type de Tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_38">
+<title>Retour</title>
+<simpara>Un objet AIT_Tag représentant le nouveau tag.</simpara>
+
+</section>
+</section>
+<section id="_deltag">
+<title>delTag</title>
+<section id="_synopsis_43">
+<title>Synopsis</title>
+<literallayout class="monospaced">delTag(string $l, AIT_TagType $o)</literallayout>
+</section>
+<section id="_description_43">
+<title>Description</title>
+<simpara>Supprime un tag à l'item courant</simpara>
+
+</section>
+<section id="_param_tres_43">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du nouveau tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+AIT_TagType <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Type de Tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_39">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_attach">
+<title>attach</title>
+<section id="_synopsis_44">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item attach(AIT_Tag $o, mixed $r = null)</literallayout>
+</section>
+<section id="_description_44">
+<title>Description</title>
+<simpara>Ajoute une association entre le tag et un item. On peut présiser l'ordre des tags en indiquant
+un tag après lequel on doit s'inserer ou la constante AIT::INSERT_FIRST. Dans ce cas on ajoutera
+le tag en premier dans la liste des tags associés à AIT_Item. Si $r reste à NULL le tag sera ajouté
+en fin de liste.</simpara>
+
+</section>
+<section id="_param_tres_44">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AIT_Tag <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+mixed <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un objet AIT_Tag ou AIT::INSERT_FIRST
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_40">
+<title>Retour</title>
+<simpara>Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.</simpara>
+
+</section>
+</section>
+<section id="_detach">
+<title>detach</title>
+<section id="_synopsis_45">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item detach(AIT_Tag $o)</literallayout>
+</section>
+<section id="_description_45">
+<title>Description</title>
+<simpara>Supprime une association entre le tag et un item</simpara>
+
+</section>
+<section id="_param_tres_45">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AIT_Tag <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_41">
+<title>Retour</title>
+<simpara>Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.</simpara>
+
+</section>
+</section>
+<section id="_gettags">
+<title>getTags</title>
+<section id="_synopsis_46">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_46">
+<title>Description</title>
+<simpara>Retourne tous les tags de l'item courant</simpara>
+
+</section>
+<section id="_param_tres_46">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_42">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_gettypedtags">
+<title>getTypedTags</title>
+<section id="_synopsis_47">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item::getTypedTags(AIT_TagType $typetag, $offset=null, $lines=null, $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_47">
+<title>Description</title>
+<simpara>Retourne tous les tags d'un certain type de l'item courant</simpara>
+
+</section>
+<section id="_param_tres_47">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AIT_TagType <emphasis role="strong">$typetag</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+un type de tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à parir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_43">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+<section id="_exemple_12">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+
+$tags = $item->getTypedTags($schema->style);
+
+if ($tags->count() > 0) {
+    echo "- ".$tags->offsetGet(0)->get()."\n";
+}
+echo 'Found : '.$tags->count(). ' / '.$tags->total()."\n";]]>
+</programlisting>
+</section>
+</section>
+<section id="_fetchtags">
+<title>fetchTags</title>
+<section id="_synopsis_48">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult fetchTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_48">
+<title>Description</title>
+<simpara>Retourne les tags possédant de un ou plusieurs tags donnés</simpara>
+
+</section>
+<section id="_param_tres_48">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+ArrayObject <emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tableau de type de tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_44">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_getitems_2">
+<title>getItems</title>
+<section id="_synopsis_49">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_49">
+<title>Description</title>
+<simpara>Retourne tous les items attachés à l'item courant</simpara>
+
+</section>
+<section id="_param_tres_49">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_45">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+</section>
+<section id="_gettypeditems">
+<title>getTypedItems</title>
+<section id="_synopsis_50">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item::getTypedItems(AIT_ItemType $typeitem, $offset=null, $lines=null, $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_50">
+<title>Description</title>
+<simpara>Retourne tous les items d'un certain type attaché à l'item courant</simpara>
+
+</section>
+<section id="_param_tres_50">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AIT_ItemType <emphasis role="strong">$itemtag</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+un type d'item
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à parir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_46">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+</section>
+<section id="_fetchitems_2">
+<title>fetchItems</title>
+<section id="_synopsis_51">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult fetchItems(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_51">
+<title>Description</title>
+<simpara>Retourne les items attachés à l'item courant à condition qu'il soit de l'un des types d'item
+donné dans $types</simpara>
+
+</section>
+<section id="_param_tres_51">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+ArrayObject <emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tableau de type d'item
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_47">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+<simpara>getElements</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[
+Synopsis
+++++++++
+
+    AITResult getElements(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])
+
+Description
++++++++++++
+
+Retourne tous les éléments attachés à l'item courant
+
+Paramètres
+++++++++++
+
+integer *$offset*:: décalage à partir du premier enregistrement
+integer *$lines*:: nombre de lignes à retourner
+integer *$ordering*:: flag permettant le tri
+array *$cols*:: filtre sur les champs complémentaires
+
+
+
+Retour
+++++++
+
+Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.
+
+// ----------------------------------------------------------------------------
+getTypedElements]]>
+</programlisting>
+</section>
+<section id="_synopsis_52">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Item::getTypedElements($type, $offset=null, $lines=null, $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_52">
+<title>Description</title>
+<simpara>Retourne tous les élements d'un certain type attaché à l'item courant</simpara>
+
+</section>
+<section id="_param_tres_52">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+mixed <emphasis role="strong">$type</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+un type d'item ou un type de tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à parir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_48">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_fetchitems_3">
+<title>fetchItems</title>
+<section id="_synopsis_53">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult fetchElements(ArrayObject $types, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[], $control = null)</literallayout>
+</section>
+<section id="_description_53">
+<title>Description</title>
+<simpara>Retourne les élements attachés à l'item courant à condition qu'il soit de l'un des types d'item
+donné dans $types</simpara>
+
+</section>
+<section id="_param_tres_53">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+ArrayObject <emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tableau de type d'item
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$control</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+permet de filtrer suivant les tags (AIT::TAG) ou les items (AIT::ITEM)
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_49">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Item et/ou AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_del_2">
+<title>del</title>
+<section id="_synopsis_54">
+<title>Synopsis</title>
+<literallayout class="monospaced">void del(boolean $cascade = false)</literallayout>
+</section>
+<section id="_description_54">
+<title>Description</title>
+<simpara>Suppression de l'élément. On peut également avec le paramètre $cascade supprimer les tags associés.</simpara>
+
+</section>
+<section id="_param_tres_54">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+boolean <emphasis role="strong">$cascade</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+permet une suppression en cascade
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_50">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_getitemtype">
+<title>getItemType</title>
+<section id="_synopsis_55">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_ItemType getItemType()</literallayout>
+</section>
+<section id="_description_55">
+<title>Description</title>
+<simpara>Retourne le type d'item associé à l'élément courant</simpara>
+
+</section>
+<section id="_param_tres_55">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_51">
+<title>Retour</title>
+<simpara>Un objet AIT_ItemType représentant le type d'item associé.</simpara>
+
+</section>
+</section>
+<section id="_gettagsobject">
+<title>getTagsObject</title>
+<section id="_synopsis_56">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITTagsObject getTagsObject()</literallayout>
+</section>
+<section id="_description_56">
+<title>Description</title>
+<simpara>Retourne tous les tags de l'élement courant sous forme d'un objet.</simpara>
+
+</section>
+<section id="_param_tres_56">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_52">
+<title>Retour</title>
+<simpara>Un objet AITTagsObject représentant un ensemble de tag trié par type</simpara>
+
+</section>
+<section id="_exemple_13">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+
+$tct = $item->getTagsObject();
+
+echo $tct->titre->offsetGet(0)->get() . "\n";
+# Affichera : Heroes
+
+foreach($tct->artiste as $tag)
+    echo ' * ' .$tag->get();
+
+# Affichera : * Antonio Vivaldi * Philippe Jaroussky]]>
+</programlisting>
+</section>
+</section>
+<section id="_getpdo_2">
+<title>getPDO</title>
+<section id="_synopsis_57">
+<title>Synopsis</title>
+<literallayout class="monospaced">PDO  getPDO()</literallayout>
+</section>
+<section id="_description_57">
+<title>Description</title>
+<simpara>Retourne l'objet PDOAIT utilisé dans l'objet</simpara>
+
+</section>
+<section id="_param_tres_57">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_53">
+<title>Retour</title>
+<simpara>Un objet PDO</simpara>
+
+</section>
+</section>
+<section id="_ren_2">
+<title>ren</title>
+<section id="_synopsis_58">
+<title>Synopsis</title>
+<literallayout class="monospaced">void ren(string $l)</literallayout>
+</section>
+<section id="_description_58">
+<title>Description</title>
+<simpara>Renomme l'élément. Cela revient à changer son label.</simpara>
+
+</section>
+<section id="_param_tres_58">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nouveau label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_54">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_exists_2">
+<title>exists</title>
+<section id="_synopsis_59">
+<title>Synopsis</title>
+<literallayout class="monospaced">boolean exists()</literallayout>
+</section>
+<section id="_description_59">
+<title>Description</title>
+<simpara>Vérifie l'existence de l'élément</simpara>
+
+</section>
+<section id="_param_tres_59">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_55">
+<title>Retour</title>
+<simpara>TRUE ou FALSE en focntion de l'existence de l'élément</simpara>
+
+</section>
+</section>
+<section id="_getsystemid_2">
+<title>getSystemID</title>
+<section id="_synopsis_60">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getSystemID()</literallayout>
+</section>
+<section id="_description_60">
+<title>Description</title>
+<simpara>Retourne l'identifiant système de l'élément.</simpara>
+
+</section>
+<section id="_param_tres_60">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_56">
+<title>Retour</title>
+<simpara>Un nombre entier représentant l'identifiant système.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$id = $item->getSystemID();
+
+var_dump($id);
+
+// Affichera : int(17)]]>
+</programlisting>
+</section>
+</section>
+<section id="_get_3">
+<title>get</title>
+<section id="_synopsis_61">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  get(string $name= 'label')</literallayout>
+</section>
+<section id="_description_61">
+<title>Description</title>
+<simpara>Retourne la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_61">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_57">
+<title>Retour</title>
+<simpara>mixed</simpara>
+
+</section>
+</section>
+<section id="_set_2">
+<title>set</title>
+<section id="_synopsis_62">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  set(string $value, string $name= 'label')</literallayout>
+</section>
+<section id="_description_62">
+<title>Description</title>
+<simpara>Fixe la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_62">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$value</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+valeur de la propriété
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_58">
+<title>Retour</title>
+<simpara>Aucun.</simpara>
+
+</section>
+</section>
+<section id="_search_2">
+<title>search</title>
+<section id="_synopsis_63">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult search(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)</literallayout>
+</section>
+<section id="_description_63">
+<title>Description</title>
+<simpara>Recherche des éléments (quelque soit le type)</simpara>
+
+</section>
+<section id="_param_tres_63">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_59">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag ou AIT_Item ou AIT_TagType ou AIT_ItemType.</simpara>
+
+</section>
+</section>
+<section id="_gettimestamps_2">
+<title>getTimestamps</title>
+<section id="_synopsis_64">
+<title>Synopsis</title>
+<literallayout class="monospaced">ArrayObject  getTimestamps()</literallayout>
+</section>
+<section id="_description_64">
+<title>Description</title>
+<simpara>Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément</simpara>
+
+</section>
+<section id="_param_tres_64">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_60">
+<title>Retour</title>
+<simpara>Un objet ArrayObject dont le premier item contient la date de modification
+et le deuxième contient la date de création.</simpara>
+
+</section>
+<section id="_exemple_14">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$timestamps = $item->getTimestamps();
+echo date('Y-m-d\TH:i:s\Z', $timestamps->updated)."\n";
+// Affichera : 2008-08-21T17:22:17Z
+echo $timestamps['created']."\n";
+// Affichera : 1219332137
+
+
+$jazz = $schema->style->getTag('Jazz');
+$timestamps = $jazz->getTimestamps();
+var_dump($timestamps);
+
+// Affichera :
+//  object(ArrayObject)#15 (2) {
+//     ["updated"]=>
+//     int(1219332137)
+//     ["created"]=>
+//     int(1219332137)
+//  }
+//]]>
+</programlisting>
+</section>
+</section>
+<section id="_getscore_2">
+<title>getScore</title>
+<section id="_synopsis_65">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getScore()</literallayout>
+</section>
+<section id="_description_65">
+<title>Description</title>
+<simpara>Retourne le score de l'élément</simpara>
+
+</section>
+<section id="_param_tres_65">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_61">
+<title>Retour</title>
+<simpara>Un entier représentant le score l'élément.</simpara>
+
+</section>
+</section>
+<section id="_setscore_2">
+<title>setScore</title>
+<section id="_synopsis_66">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setScore($i)</literallayout>
+</section>
+<section id="_description_66">
+<title>Description</title>
+<simpara>Donne un score à  l'élément</simpara>
+
+</section>
+<section id="_param_tres_66">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant le score l'élément.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_62">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_setfrequency_2">
+<title>setFrequency</title>
+<section id="_synopsis_67">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setFrequency($i)</literallayout>
+</section>
+<section id="_description_67">
+<title>Description</title>
+<simpara>Donne une fréquence à l'élément</simpara>
+
+</section>
+<section id="_param_tres_67">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant la fréquence de l'élément
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_63">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_debug_2">
+<title>debug</title>
+<section id="_synopsis_68">
+<title>Synopsis</title>
+<literallayout class="monospaced">void debug()</literallayout>
+</section>
+<section id="_description_68">
+<title>Description</title>
+<simpara>DEBUG</simpara>
+
+</section>
+<section id="_param_tres_68">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_64">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_dump_2">
+<title>dump</title>
+<section id="_synopsis_69">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed dump(string $s = '', boolean $r = false)</literallayout>
+</section>
+<section id="_description_69">
+<title>Description</title>
+<simpara>Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des &lt;pre&gt; et &lt;/pre&gt;</simpara>
+
+</section>
+<section id="_param_tres_69">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$s</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+chaine de carat cure à afficher avant le contenu de l'objet.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+booelan <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+si vrai a retourne la chaine à afficher plutôt que de l'afficher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_65">
+<title>Retour</title>
+<simpara>Retourne NULL ou une chaine de caractères (dépend du paramètre $r).</simpara>
+
+</section>
+</section>
+<section id="_getbysystemid_2">
+<title>getBySystemID</title>
+<section id="_synopsis_70">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed AIT::getBySystemID(PDOAIT $pdo, $id)</literallayout>
+</section>
+<section id="_description_70">
+<title>Description</title>
+<simpara>Créé l'objet correspondant à un identifiant système</simpara>
+
+</section>
+<section id="_param_tres_70">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+pointeur sur la base de données
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+identifiant systéme
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_66">
+<title>Retour</title>
+<simpara>Retourne NULL ou une instance d'objet (AIT_ItemType, AIT_Item, AIT_TagType, AIT_Tag)</simpara>
+
+</section>
+<section id="_exemple_15">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$o = AIT::getBySystemID($db, 17);
+echo $o->get() ." : ";
+
+$o = AIT::getBySystemID($db, 18);
+echo $o->get() .", ";
+
+$o = AIT::getBySystemID($db, 19);
+echo $o->get() ."\n";
+
+// Affichera : a1902425 : Heroes, Antonio Vivaldi]]>
+</programlisting>
+</section>
+</section>
+</section>
+<section id="_ait_tagtype">
+<title>AIT_TagType</title>
+<simpara>Cette classe permet de manipuler un "type de tag".</simpara>
+
+<section id="_construct_5">
+<title>__construct</title>
+<section id="_synopsis_71">
+<title>Synopsis</title>
+<literallayout class="monospaced">void __construct(string $l, integer $i, AITPDO $pdo, integer $id = false)</literallayout>
+</section>
+<section id="_description_71">
+<title>Description</title>
+<simpara>Constructeur</simpara>
+
+</section>
+<section id="_param_tres_71">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Label du type de tag.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système du type d'item associé.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+AITPDO <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+L'instance de base AIT que l'on souhaite utiliser.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système de l'élément (si déjà connu) .
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+</section>
+<section id="_newtag">
+<title>newTag</title>
+<section id="_synopsis_72">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag newTag()</literallayout>
+</section>
+<section id="_description_72">
+<title>Description</title>
+<simpara>Crée un tag. Son label est calculé automatiquement en fonction de l'identifiant système.</simpara>
+
+</section>
+<section id="_param_tres_72">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_67">
+<title>Retour</title>
+<simpara>un objet AIT_Tag.</simpara>
+
+</section>
+<section id="_exemple_16">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+// Ajout d'un nouveau tag
+$tag = $schema->style->newTag();
+
+echo $tag->get();]]>
+</programlisting>
+<simpara>defTag</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[
+Synopsis
+++++++++
+
+    AIT_Tag defTag(string $l)
+
+Description
++++++++++++
+
+Récupére un tag du type courant. Si le tag n'existe pas, il est automatiquement créé.
+
+Paramètres
+++++++++++
+
+string *$l*:: nom du nouveau tag
+
+
+Retour
+++++++
+
+Un objet AIT_Tag représentant le tag
+
+
+// ----------------------------------------------------------------------------
+addTag]]>
+</programlisting>
+</section>
+<section id="_synopsis_73">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag addTag(string $l)</literallayout>
+</section>
+<section id="_description_73">
+<title>Description</title>
+<simpara>Ajout d'un tag au type de tag courant</simpara>
+
+</section>
+<section id="_param_tres_73">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du nouveau tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_68">
+<title>Retour</title>
+<simpara>Un objet AIT_Tag représentant le nouveau tag</simpara>
+
+</section>
+</section>
+<section id="_gettag">
+<title>getTag</title>
+<section id="_synopsis_74">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag getTag(string $l)</literallayout>
+</section>
+<section id="_description_74">
+<title>Description</title>
+<simpara>Récupère un tag</simpara>
+
+</section>
+<section id="_param_tres_74">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom du tag
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_69">
+<title>Retour</title>
+<simpara>Un objet AIT_Tag représentant le tag trouvé ou NULL si il n'existe pas.</simpara>
+
+</section>
+</section>
+<section id="_gettags_2">
+<title>getTags</title>
+<section id="_synopsis_75">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_75">
+<title>Description</title>
+<simpara>Retourne tous les tags du type de tag courant.</simpara>
+
+</section>
+<section id="_param_tres_75">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_70">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_gettagbysystemid">
+<title>getTagBySystemID</title>
+<section id="_synopsis_76">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag getTagBySystemID(inetger $i)</literallayout>
+</section>
+<section id="_description_76">
+<title>Description</title>
+<simpara>Récupère un tag avec son identifiant système.</simpara>
+
+</section>
+<section id="_param_tres_76">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+l'identifiant système.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_71">
+<title>Retour</title>
+<simpara>Un objet AIT_Tag représentant le tag trouvé.</simpara>
+
+</section>
+</section>
+<section id="_countitems_2">
+<title>countItems</title>
+<section id="_synopsis_77">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_TagType::countItems()</literallayout>
+</section>
+<section id="_description_77">
+<title>Description</title>
+<simpara>Retourne le nombre total de tags attachés au type de tag courrant.</simpara>
+
+</section>
+<section id="_param_tres_77">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_72">
+<title>Retour</title>
+<simpara>un nombre entier représentant le nombre d'enregistrement.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+echo $schema->style->countItems();]]>
+</programlisting>
+</section>
+</section>
+<section id="_del_3">
+<title>del</title>
+<section id="_synopsis_78">
+<title>Synopsis</title>
+<literallayout class="monospaced">void del(boolean $cascade = false)</literallayout>
+</section>
+<section id="_description_78">
+<title>Description</title>
+<simpara>Suppression de l'élément et des tags qui lui sont associés.
+On peut également avec le paramètre $cascade supprimer les items associés aux tags.</simpara>
+
+</section>
+<section id="_param_tres_78">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+boolean <emphasis role="strong">$cascade</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+permet une suppression en cascade
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_73">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_searchtags">
+<title>searchTags</title>
+<section id="_synopsis_79">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult searchTags(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null array $cols=[])</literallayout>
+</section>
+<section id="_description_79">
+<title>Description</title>
+<simpara>Recherche des tags du type courant</simpara>
+
+</section>
+<section id="_param_tres_79">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en focntion de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_74">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_selecttags">
+<title>selectTags</title>
+<section id="_synopsis_80">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult selectTags(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null array $cols=[])</literallayout>
+</section>
+<section id="_description_80">
+<title>Description</title>
+<simpara>Recherche des tags du type courant. (alias de searchItems)</simpara>
+
+</section>
+<section id="_param_tres_80">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en focntion de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_75">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_getpdo_3">
+<title>getPDO</title>
+<section id="_synopsis_81">
+<title>Synopsis</title>
+<literallayout class="monospaced">PDO  getPDO()</literallayout>
+</section>
+<section id="_description_81">
+<title>Description</title>
+<simpara>Retourne l'objet PDOAIT utilisé dans l'objet</simpara>
+
+</section>
+<section id="_param_tres_81">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_76">
+<title>Retour</title>
+<simpara>Un objet PDO</simpara>
+
+</section>
+</section>
+<section id="_ren_3">
+<title>ren</title>
+<section id="_synopsis_82">
+<title>Synopsis</title>
+<literallayout class="monospaced">void ren(string $l)</literallayout>
+</section>
+<section id="_description_82">
+<title>Description</title>
+<simpara>Renomme l'élément. Cela revient à changer son label.</simpara>
+
+</section>
+<section id="_param_tres_82">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nouveau label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_77">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_exists_3">
+<title>exists</title>
+<section id="_synopsis_83">
+<title>Synopsis</title>
+<literallayout class="monospaced">boolean exists()</literallayout>
+</section>
+<section id="_description_83">
+<title>Description</title>
+<simpara>Vérifie l'existence de l'élément</simpara>
+
+</section>
+<section id="_param_tres_83">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_78">
+<title>Retour</title>
+<simpara>TRUE ou FALSE en focntion de l'existence de l'élément</simpara>
+
+</section>
+</section>
+<section id="_getsystemid_3">
+<title>getSystemID</title>
+<section id="_synopsis_84">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getSystemID()</literallayout>
+</section>
+<section id="_description_84">
+<title>Description</title>
+<simpara>Retourne l'identifiant système de l'élément.</simpara>
+
+</section>
+<section id="_param_tres_84">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_79">
+<title>Retour</title>
+<simpara>Un nombre entier représentant l'identifiant système.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$id = $item->getSystemID();
+
+var_dump($id);
+
+// Affichera : int(17)]]>
+</programlisting>
+</section>
+</section>
+<section id="_get_4">
+<title>get</title>
+<section id="_synopsis_85">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  get(string $name= 'label')</literallayout>
+</section>
+<section id="_description_85">
+<title>Description</title>
+<simpara>Retourne la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_85">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_80">
+<title>Retour</title>
+<simpara>mixed</simpara>
+
+</section>
+</section>
+<section id="_set_3">
+<title>set</title>
+<section id="_synopsis_86">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  set(string $value, string $name= 'label')</literallayout>
+</section>
+<section id="_description_86">
+<title>Description</title>
+<simpara>Fixe la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_86">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$value</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+valeur de la propriété
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_81">
+<title>Retour</title>
+<simpara>Aucun.</simpara>
+
+</section>
+</section>
+<section id="_search_3">
+<title>search</title>
+<section id="_synopsis_87">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult search(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)</literallayout>
+</section>
+<section id="_description_87">
+<title>Description</title>
+<simpara>Recherche des éléments (quelque soit le type)</simpara>
+
+</section>
+<section id="_param_tres_87">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_82">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag ou AIT_Item ou AIT_TagType ou AIT_ItemType.</simpara>
+
+</section>
+</section>
+<section id="_gettimestamps_3">
+<title>getTimestamps</title>
+<section id="_synopsis_88">
+<title>Synopsis</title>
+<literallayout class="monospaced">ArrayObject  getTimestamps()</literallayout>
+</section>
+<section id="_description_88">
+<title>Description</title>
+<simpara>Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément</simpara>
+
+</section>
+<section id="_param_tres_88">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_83">
+<title>Retour</title>
+<simpara>Un objet ArrayObject dont le premier item contient la date de modification
+et le deuxième contient la date de création.</simpara>
+
+</section>
+<section id="_exemple_17">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$timestamps = $item->getTimestamps();
+echo date('Y-m-d\TH:i:s\Z', $timestamps->updated)."\n";
+// Affichera : 2008-08-21T17:22:17Z
+echo $timestamps['created']."\n";
+// Affichera : 1219332137
+
+
+$jazz = $schema->style->getTag('Jazz');
+$timestamps = $jazz->getTimestamps();
+var_dump($timestamps);
+
+// Affichera :
+//  object(ArrayObject)#15 (2) {
+//     ["updated"]=>
+//     int(1219332137)
+//     ["created"]=>
+//     int(1219332137)
+//  }
+//]]>
+</programlisting>
+</section>
+</section>
+<section id="_getscore_3">
+<title>getScore</title>
+<section id="_synopsis_89">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getScore()</literallayout>
+</section>
+<section id="_description_89">
+<title>Description</title>
+<simpara>Retourne le score de l'élément</simpara>
+
+</section>
+<section id="_param_tres_89">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_84">
+<title>Retour</title>
+<simpara>Un entier représentant le score l'élément.</simpara>
+
+</section>
+</section>
+<section id="_setscore_3">
+<title>setScore</title>
+<section id="_synopsis_90">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setScore($i)</literallayout>
+</section>
+<section id="_description_90">
+<title>Description</title>
+<simpara>Donne un score à  l'élément</simpara>
+
+</section>
+<section id="_param_tres_90">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant le score l'élément.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_85">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_setfrequency_3">
+<title>setFrequency</title>
+<section id="_synopsis_91">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setFrequency($i)</literallayout>
+</section>
+<section id="_description_91">
+<title>Description</title>
+<simpara>Donne une fréquence à l'élément</simpara>
+
+</section>
+<section id="_param_tres_91">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant la fréquence de l'élément
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_86">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_debug_3">
+<title>debug</title>
+<section id="_synopsis_92">
+<title>Synopsis</title>
+<literallayout class="monospaced">void debug()</literallayout>
+</section>
+<section id="_description_92">
+<title>Description</title>
+<simpara>DEBUG</simpara>
+
+</section>
+<section id="_param_tres_92">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_87">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_dump_3">
+<title>dump</title>
+<section id="_synopsis_93">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed dump(string $s = '', boolean $r = false)</literallayout>
+</section>
+<section id="_description_93">
+<title>Description</title>
+<simpara>Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des &lt;pre&gt; et &lt;/pre&gt;</simpara>
+
+</section>
+<section id="_param_tres_93">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$s</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+chaine de carat cure à afficher avant le contenu de l'objet.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+booelan <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+si vrai a retourne la chaine à afficher plutôt que de l'afficher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_88">
+<title>Retour</title>
+<simpara>Retourne NULL ou une chaine de caractères (dépend du paramètre $r).</simpara>
+
+</section>
+</section>
+<section id="_getbysystemid_3">
+<title>getBySystemID</title>
+<section id="_synopsis_94">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed AIT::getBySystemID(PDOAIT $pdo, $id)</literallayout>
+</section>
+<section id="_description_94">
+<title>Description</title>
+<simpara>Créé l'objet correspondant à un identifiant système</simpara>
+
+</section>
+<section id="_param_tres_94">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+pointeur sur la base de données
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+identifiant systéme
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_89">
+<title>Retour</title>
+<simpara>Retourne NULL ou une instance d'objet (AIT_ItemType, AIT_Item, AIT_TagType, AIT_Tag)</simpara>
+
+</section>
+<section id="_exemple_18">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$o = AIT::getBySystemID($db, 17);
+echo $o->get() ." : ";
+
+$o = AIT::getBySystemID($db, 18);
+echo $o->get() .", ";
+
+$o = AIT::getBySystemID($db, 19);
+echo $o->get() ."\n";
+
+// Affichera : a1902425 : Heroes, Antonio Vivaldi]]>
+</programlisting>
+</section>
+</section>
+</section>
+<section id="_ait_tag">
+<title>AIT_Tag</title>
+<simpara>Cette classe permet de manipuler un TAG.</simpara>
+
+<section id="_construct_6">
+<title>__construct</title>
+<section id="_synopsis_95">
+<title>Synopsis</title>
+<literallayout class="monospaced">void __construct($l, $t, $i, PDOAIT $pdo, $id=false)</literallayout>
+</section>
+<section id="_description_95">
+<title>Description</title>
+<simpara>Le constructeur de la classe.</simpara>
+
+</section>
+<section id="_param_tres_95">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Label du TAG
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$t</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système du TYPE de TAG associé.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système de l'ITEM (si connu).
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Instance de base AIT que l'on souhaite utiliser.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Identifiant système de l'élément (si déjà connu).
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+</section>
+<section id="_detach_2">
+<title>detach</title>
+<section id="_synopsis_96">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag detach()</literallayout>
+</section>
+<section id="_description_96">
+<title>Description</title>
+<simpara>Supprime l'association entre le tag son item</simpara>
+
+</section>
+<section id="_param_tres_96">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_90">
+<title>Retour</title>
+<simpara>Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.</simpara>
+
+</section>
+<section id="_exemple_19">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+
+$tags = $item->getTypedTags($schema->style);
+
+foreach($tags as $tag) {
+    $tag->detach();
+}
+// Supprime tous les tags "style" asscoié à a1902425]]>
+</programlisting>
+</section>
+</section>
+<section id="_attach_2">
+<title>attach</title>
+<section id="_synopsis_97">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_Tag attach(AIT_Item $o, Mixed $r = null)</literallayout>
+</section>
+<section id="_description_97">
+<title>Description</title>
+<simpara>Ajoute une association entre le tag et un item. On peut présiser l'ordre des tags en indiquant
+un tag après lequel on doit s'inserer ou la constante AIT::INSERT_FIRST. Dans ce cas on ajoutera
+le tag en premier dans la liste des tags associés à AIT_Item. Si $r reste à NULL le tag sera ajouté
+en fin de liste.</simpara>
+
+</section>
+<section id="_param_tres_97">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+AIT_Item <emphasis role="strong">$o</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un objet contenant un item.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+mixed <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un objet AIT_Tag ou AIT::INSERT_FIRST
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_91">
+<title>Retour</title>
+<simpara>Retourne l'objet en lui-même. Ce qui permet d'enchainer les méthodes.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+
+$tag = $schema->style->addTag('disco');
+
+// Ajout du tag "disco" à "a1902425"
+$tag->attach($item);]]>
+</programlisting>
+</section>
+</section>
+<section id="_getrelatedtags">
+<title>getRelatedTags</title>
+<section id="_synopsis_98">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getRelatedTags(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_98">
+<title>Description</title>
+<simpara>Retourne tous les tags associés au même item que le tag courant.</simpara>
+
+</section>
+<section id="_param_tres_98">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à parir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_92">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_fetchrelatedtags">
+<title>fetchRelatedTags</title>
+<section id="_synopsis_99">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_99">
+<title>Description</title>
+<simpara>Retourne les tags associés au même item que le tag courant mais en
+filtrant sur une certain nombre de type de tag.</simpara>
+
+</section>
+<section id="_param_tres_99">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+ArrayObject <emphasis role="strong">$tags</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Tableau de type de tag
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_93">
+<title>Retour</title>
+<simpara>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</simpara>
+
+</section>
+</section>
+<section id="_countitems_3">
+<title>countItems</title>
+<section id="_synopsis_100">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  countItems()</literallayout>
+</section>
+<section id="_description_100">
+<title>Description</title>
+<simpara>Retourne le nombre d'items attachés au tag courrant.</simpara>
+
+</section>
+<section id="_param_tres_100">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_94">
+<title>Retour</title>
+<simpara>Un entier représentant le nombre d'items</simpara>
+
+</section>
+<section id="_exemple_20">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$jazz = $schema->style->getTag('Jazz');
+
+if (!is_null($jazz))
+    echo $jazz->countItems();
+
+// Affichera : 2]]>
+</programlisting>
+</section>
+</section>
+<section id="_del_4">
+<title>del</title>
+<section id="_synopsis_101">
+<title>Synopsis</title>
+<literallayout class="monospaced">void del(boolean $cascade = false)</literallayout>
+</section>
+<section id="_description_101">
+<title>Description</title>
+<simpara>Suppression de l'élément. On peut également avec le paramètre $cascade supprimer les items associés.</simpara>
+
+</section>
+<section id="_param_tres_101">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+boolean <emphasis role="strong">$cascade</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+permet une suppression en cascade
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_95">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_gettagtype_2">
+<title>getTagType</title>
+<section id="_synopsis_102">
+<title>Synopsis</title>
+<literallayout class="monospaced">AIT_TagType getTagType()</literallayout>
+</section>
+<section id="_description_102">
+<title>Description</title>
+<simpara>Retourne le type de tag associé à l'élément courant</simpara>
+
+</section>
+<section id="_param_tres_102">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_96">
+<title>Retour</title>
+<simpara>Un objet AIT_TagType représentant le type de tag associé.</simpara>
+
+</section>
+</section>
+<section id="_getitems_3">
+<title>getItems</title>
+<section id="_synopsis_103">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</literallayout>
+</section>
+<section id="_description_103">
+<title>Description</title>
+<simpara>Retourne tous les items du tag courrant</simpara>
+
+</section>
+<section id="_param_tres_103">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+array <emphasis role="strong">$cols</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+filtre sur les champs complémentaires
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_97">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</simpara>
+
+</section>
+</section>
+<section id="_getpdo_4">
+<title>getPDO</title>
+<section id="_synopsis_104">
+<title>Synopsis</title>
+<literallayout class="monospaced">PDO  getPDO()</literallayout>
+</section>
+<section id="_description_104">
+<title>Description</title>
+<simpara>Retourne l'objet PDOAIT utilisé dans l'objet</simpara>
+
+</section>
+<section id="_param_tres_104">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_98">
+<title>Retour</title>
+<simpara>Un objet PDO</simpara>
+
+</section>
+</section>
+<section id="_ren_4">
+<title>ren</title>
+<section id="_synopsis_105">
+<title>Synopsis</title>
+<literallayout class="monospaced">void ren(string $l)</literallayout>
+</section>
+<section id="_description_105">
+<title>Description</title>
+<simpara>Renomme l'élément. Cela revient à changer son label.</simpara>
+
+</section>
+<section id="_param_tres_105">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$l</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nouveau label
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_99">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_exists_4">
+<title>exists</title>
+<section id="_synopsis_106">
+<title>Synopsis</title>
+<literallayout class="monospaced">boolean exists()</literallayout>
+</section>
+<section id="_description_106">
+<title>Description</title>
+<simpara>Vérifie l'existence de l'élément</simpara>
+
+</section>
+<section id="_param_tres_106">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_100">
+<title>Retour</title>
+<simpara>TRUE ou FALSE en focntion de l'existence de l'élément</simpara>
+
+</section>
+</section>
+<section id="_getsystemid_4">
+<title>getSystemID</title>
+<section id="_synopsis_107">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getSystemID()</literallayout>
+</section>
+<section id="_description_107">
+<title>Description</title>
+<simpara>Retourne l'identifiant système de l'élément.</simpara>
+
+</section>
+<section id="_param_tres_107">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_101">
+<title>Retour</title>
+<simpara>Un nombre entier représentant l'identifiant système.</simpara>
+
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$id = $item->getSystemID();
+
+var_dump($id);
+
+// Affichera : int(17)]]>
+</programlisting>
+</section>
+</section>
+<section id="_get_5">
+<title>get</title>
+<section id="_synopsis_108">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  get(string $name= 'label')</literallayout>
+</section>
+<section id="_description_108">
+<title>Description</title>
+<simpara>Retourne la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_108">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_102">
+<title>Retour</title>
+<simpara>mixed</simpara>
+
+</section>
+</section>
+<section id="_set_4">
+<title>set</title>
+<section id="_synopsis_109">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed  set(string $value, string $name= 'label')</literallayout>
+</section>
+<section id="_description_109">
+<title>Description</title>
+<simpara>Fixe la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, buffer, prefix, suffix</simpara>
+
+</section>
+<section id="_param_tres_109">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$value</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+valeur de la propriété
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+string <emphasis role="strong">$name</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nom de la propriété
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_103">
+<title>Retour</title>
+<simpara>Aucun.</simpara>
+
+</section>
+</section>
+<section id="_search_4">
+<title>search</title>
+<section id="_synopsis_110">
+<title>Synopsis</title>
+<literallayout class="monospaced">AITResult search(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)</literallayout>
+</section>
+<section id="_description_110">
+<title>Description</title>
+<simpara>Recherche des éléments (quelque soit le type)</simpara>
+
+</section>
+<section id="_param_tres_110">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$query</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+requete (le format peut varier en fonction de la callback) sans callback c'est une chaine de caractères contenant du SQL
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$offset</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+décalage à partir du premier enregistrement
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$lines</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+nombre de lignes à retourner
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$ordering</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+flag permettant le tri
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_104">
+<title>Retour</title>
+<simpara>un objet AITResult (ArrayObject) contenant des objets AIT_Tag ou AIT_Item ou AIT_TagType ou AIT_ItemType.</simpara>
+
+</section>
+</section>
+<section id="_gettimestamps_4">
+<title>getTimestamps</title>
+<section id="_synopsis_111">
+<title>Synopsis</title>
+<literallayout class="monospaced">ArrayObject  getTimestamps()</literallayout>
+</section>
+<section id="_description_111">
+<title>Description</title>
+<simpara>Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément</simpara>
+
+</section>
+<section id="_param_tres_111">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_105">
+<title>Retour</title>
+<simpara>Un objet ArrayObject dont le premier item contient la date de modification
+et le deuxième contient la date de création.</simpara>
+
+</section>
+<section id="_exemple_21">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$item = $schema->disques->getItem('a1902425');
+$timestamps = $item->getTimestamps();
+echo date('Y-m-d\TH:i:s\Z', $timestamps->updated)."\n";
+// Affichera : 2008-08-21T17:22:17Z
+echo $timestamps['created']."\n";
+// Affichera : 1219332137
+
+
+$jazz = $schema->style->getTag('Jazz');
+$timestamps = $jazz->getTimestamps();
+var_dump($timestamps);
+
+// Affichera :
+//  object(ArrayObject)#15 (2) {
+//     ["updated"]=>
+//     int(1219332137)
+//     ["created"]=>
+//     int(1219332137)
+//  }
+//]]>
+</programlisting>
+</section>
+</section>
+<section id="_getscore_4">
+<title>getScore</title>
+<section id="_synopsis_112">
+<title>Synopsis</title>
+<literallayout class="monospaced">integer  getScore()</literallayout>
+</section>
+<section id="_description_112">
+<title>Description</title>
+<simpara>Retourne le score de l'élément</simpara>
+
+</section>
+<section id="_param_tres_112">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_106">
+<title>Retour</title>
+<simpara>Un entier représentant le score l'élément.</simpara>
+
+</section>
+</section>
+<section id="_setscore_4">
+<title>setScore</title>
+<section id="_synopsis_113">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setScore($i)</literallayout>
+</section>
+<section id="_description_113">
+<title>Description</title>
+<simpara>Donne un score à  l'élément</simpara>
+
+</section>
+<section id="_param_tres_113">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant le score l'élément.
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_107">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_setfrequency_4">
+<title>setFrequency</title>
+<section id="_synopsis_114">
+<title>Synopsis</title>
+<literallayout class="monospaced">void setFrequency($i)</literallayout>
+</section>
+<section id="_description_114">
+<title>Description</title>
+<simpara>Donne une fréquence à l'élément</simpara>
+
+</section>
+<section id="_param_tres_114">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$i</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+Un entier représentant la fréquence de l'élément
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_108">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_debug_4">
+<title>debug</title>
+<section id="_synopsis_115">
+<title>Synopsis</title>
+<literallayout class="monospaced">void debug()</literallayout>
+</section>
+<section id="_description_115">
+<title>Description</title>
+<simpara>DEBUG</simpara>
+
+</section>
+<section id="_param_tres_115">
+<title>Paramètres</title>
+<simpara>Aucun.</simpara>
+
+</section>
+<section id="_retour_109">
+<title>Retour</title>
+<simpara>NULL.</simpara>
+
+</section>
+</section>
+<section id="_dump_4">
+<title>dump</title>
+<section id="_synopsis_116">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed dump(string $s = '', boolean $r = false)</literallayout>
+</section>
+<section id="_description_116">
+<title>Description</title>
+<simpara>Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des &lt;pre&gt; et &lt;/pre&gt;</simpara>
+
+</section>
+<section id="_param_tres_116">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+string <emphasis role="strong">$s</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+chaine de carat cure à afficher avant le contenu de l'objet.
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+booelan <emphasis role="strong">$r</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+si vrai a retourne la chaine à afficher plutôt que de l'afficher
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_110">
+<title>Retour</title>
+<simpara>Retourne NULL ou une chaine de caractères (dépend du paramètre $r).</simpara>
+
+</section>
+</section>
+<section id="_getbysystemid_4">
+<title>getBySystemID</title>
+<section id="_synopsis_117">
+<title>Synopsis</title>
+<literallayout class="monospaced">mixed AIT::getBySystemID(PDOAIT $pdo, $id)</literallayout>
+</section>
+<section id="_description_117">
+<title>Description</title>
+<simpara>Créé l'objet correspondant à un identifiant système</simpara>
+
+</section>
+<section id="_param_tres_117">
+<title>Paramètres</title>
+<informaltable tabstyle="hlabeledlist" pgwide="0" frame="none" colsep="0" rowsep="0"><tgroup cols="2"><colspec colwidth="3*"/><colspec colwidth="7*"/><tbody valign="top">
+<row>
+<entry><simpara>
+PDOAIT <emphasis role="strong">$pdo</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+pointeur sur la base de données
+</simpara>
+</entry>
+</row>
+<row>
+<entry><simpara>
+integer <emphasis role="strong">$id</emphasis>
+</simpara></entry>
+<entry>
+<simpara>
+identifiant systéme
+</simpara>
+</entry>
+</row>
+</tbody></tgroup></informaltable>
+</section>
+<section id="_retour_111">
+<title>Retour</title>
+<simpara>Retourne NULL ou une instance d'objet (AIT_ItemType, AIT_Item, AIT_TagType, AIT_Tag)</simpara>
+
+</section>
+<section id="_exemple_22">
+<title>Exemple</title>
+<programlisting language="php" linenumbering="unnumbered">
+<![CDATA[<?php
+require_once 'prepend.php';
+
+$o = AIT::getBySystemID($db, 17);
+echo $o->get() ." : ";
+
+$o = AIT::getBySystemID($db, 18);
+echo $o->get() .", ";
+
+$o = AIT::getBySystemID($db, 19);
+echo $o->get() ."\n";
+
+// Affichera : a1902425 : Heroes, Antonio Vivaldi]]>
+</programlisting>
+</section>
+</section>
+</section>
+<section id="_ait">
+<title>AIT</title>
+<simpara>Cette classe posséde quelques méthodes statiques</simpara>
+
+</section>
+</chapter>
+<chapter id="_maintenance">
+<title>Maintenance</title>
+<simpara>Voici quelques requêtes SQL permettant de contrôler l'état d'un base AIT :</simpara>
+
+<section id="_contr_ler_la_coh_rence_de_la_base">
+<title>Contrôler la cohérence de la base</title>
+<simpara>Voici quelques requêtes pour vérifier que des lignes les jointures entre tag soit toujours vrai.</simpara>
+
+<programlisting language="sql" linenumbering="unnumbered">
+<![CDATA[SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.item_id=tag.id WHERE tag.id IS NULL
+SELECT tagged.* FROM tagged LEFT JOIN tag ON tagged.tag_id=tag.id WHERE tag.id IS NULL
+SELECT a.* FROM tag a LEFT JOIN tag b ON a.type=b.id WHERE a.id <> 1 and a.id <> 2 and b.id IS NULL]]>
+</programlisting>
+</section>
+<section id="_visualiser_les_tags_non_utilis_s">
+<title>Visualiser les tags non utilisés</title>
+<simpara>C'est à dire les tags non associés à un item.</simpara>
+
+<programlisting language="sql" linenumbering="unnumbered">
+<![CDATA[SELECT *
+FROM tag a LEFT JOIN tag b ON a.type=b.id
+WHERE b.type=2 and a.frequency=0]]>
+</programlisting>
+<programlisting language="sql" linenumbering="unnumbered">
+<![CDATA[SELECT *
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id
+WHERE b.type=2 and a.frequency=0 and item_id IS NULL]]>
+</programlisting>
+<programlisting language="sql" linenumbering="unnumbered">
+<![CDATA[SELECT *
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.tag_id
+WHERE b.type=2 and item_id IS NULL]]>
+</programlisting>
+</section>
+<section id="_visualiser_les_items_non_utilis_s">
+<title>Visualiser les items non utilisés</title>
+<simpara>C'est à dire les items ne possédant aucun tag.</simpara>
+
+<programlisting language="sql" linenumbering="unnumbered">
+<![CDATA[SELECT *
+FROM tag a LEFT JOIN tag b ON a.type=b.id LEFT JOIN tagged c ON a.id=c.item_id
+WHERE b.type=1 and c.tag_id IS NULL]]>
+</programlisting>
+<simpara>§§§</simpara>
+
+</section>
+</chapter>
+</book>

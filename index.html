@@ -1,82 +1,104 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<title>touv/ait @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #f13aae;
-		  font-family: "Helvetica,Arial,FreeSans"; 
-  		color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #0ec551; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #0ec551; }
-    h3 { text-align: center; color: #0ec551; }
-    a { color: #0ec551; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>AIT - All is tag</title>
+<link rel="stylesheet" href="default.css" type="text/css" />
 </head>
-
 <body>
-  <a href="http://github.com/touv/ait"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-  
-  <div id="container">
+<div class="container">
 
-    <div class="download">
-      <a href="http://github.com/touv/ait/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/touv/ait/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-      
-    <h1><a href="http://github.com/touv/ait">ait</a> 
-      <span class="small">by <a href="http://github.com/touv">touv</a></span></h1>
-
-    <div class="description">
-      All Is Tag, engine storage for tags and more
-    </div>
-
-    <h2>License</h2>
-<p>LGPL</p>
-<h2>Authors</h2>
-<p>Nicolas Thouvenin (nthouvenin@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Nicolas Thouvenin (nthouvenin@gmail.com)<br/>      </p>
+<!--#include virtual="navigation.html"-->
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/touv/ait/zipball/master">zip</a> or
-      <a href="http://github.com/touv/ait/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/touv/ait</pre>
-    </p>
-      
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/touv/ait">touv/ait</a>
-    </div>
-    
-  </div>
+<div class="holder_top">
+</div>
 
-  
+<div class="holder">
+<h1>All Is Tag</h1>
+<h2>En résumé</h2>
+<p>
+AIT est un ensemble de classes PHP permettant le stockage et la recherche de métadonnées. AIT se base sur 2 concepts : des items et des tags. 
+A partir de là, on peut stocker et effectuer des recherches toutes informations formalisées sur ces 2 concepts.
+</p>
+
+<p>
+Concrètement AIT peut être considéré simplement comme un moteur de Tag (Tag's engine) en PHP, ou alors si on pousse le raisonnement à l'extrême,  comme un moteur générique de stockage d'information.
+</p>
+
+<h2>En pratique</h2>
+<p>
+Voici un exemple de code AIT pour stocker et rechercher des disques :
+</p>
+<pre class="php" name="code">
+
+require_once 'AIT.php';
+require_once 'AIT/Extended/Searching.php';
+
+// Connexion à la base 
+$db = AIT::connect(
+        'mysql:host=localhost;dbname=test', 
+        'root'
+);
+
+// Contrôle et création de la structure de données
+$db->checkup();
+
+// Ajout d'un plugin
+$db->extendWith(new AIT_Extended_Searching());
+
+
+// Définition d'un schéma de données
+$sm = $db->registerSchema('Disques', array('titre', 'artiste', 'style'));
+
+
+// Ajout de quelques Tags génériques
+$jazz      = $sm->style->addTag('Jazz');
+$blues     = $sm->style->addTag('Blues');
+$electro   = $sm->style->addTag('Electro');
+$classique = $sm->style->addTag('Musique Classique');
+
+// Ajout de quelques items
+$d1 = $sm->disques->addItem('a2407474');
+$d1->addTag('Bossa nova stories', $sm->titre); 
+$d1->addTag('Eliane Elias',       $sm->artiste);  
+$d1->attach($jazz)->attach($blues);
+
+$d2 = $sm->disques->addItem('a2274830');
+$d2->addTag('Fuck me I\'m famous Ibiza mix 08', $sm->titre); 
+$d2->addTag('David Guetta',                     $sm->artiste); 
+$d2->attach($electro);
+
+$d3 = $sm->disques->addItem('a1902425');
+$d3->addTag('Heroes',             $sm->titre); 
+$d3->addTag('Antonio Vivaldi',    $sm->artiste); 
+$d3->addTag('Philippe Jaroussky', $sm->artiste); 
+$d3->attach($classique);
+
+
+// Recherche Full Text
+$result = $sm->disques->searchItems('*es');
+foreach($result as $item) $item->dump();
+
+// Recherche par tags
+$result = $sm->disques->fetchItems(new ArrayObject(array($electro)));
+foreach($result as $item) $item->dump();
+
+// Etc ...
+
+</pre>
+
+<br/>
+&nbsp;
+</div>
+
+<!--#include virtual="signature.html"-->
+
+</div>
+
+
+<!--#include virtual="syntaxhighlighter.html"-->
+
 </body>
 </html>
+

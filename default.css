@@ -1,0 +1,119 @@
+/*
+Template name: Light
+Template URI: http://templates.arcsin.se/light-website-template/
+Release date: 2006-08-20
+Description: Bright and smooth.
+Author: Viktor Persson
+Author URI: http://arcsin.se/
+
+This template is licensed under a Creative Commons Attribution 2.5 License:
+http://templates.arcsin.se/license/
+*/
+
+/* standard elements */
+* {
+/*    margin: 0;*/
+/*    padding: 0;*/
+}
+a {
+	color: #567;
+}
+a:hover {
+	color: #28E;
+}
+body {
+	background: #F2F2F2 url(images/bg.gif) repeat-y center top;
+	color: #555A60;
+	margin: 0;
+}
+h1 {
+		font-size: 1.4em;
+		margin-top: 0;
+		margin-bottom: 4px;
+}
+li {
+		list-style: url(images/li.gif);
+		/*    margin-left: 18px;*/
+}
+cite {
+		background: url(images/quote.gif) no-repeat;
+		color: #456;
+		display: block;
+		font: normal 1.4em "Lucida Sans Unicode",serif;
+		padding-left: 28px;
+}
+h1,h2,h3 {
+		color: #557799;
+}
+
+/* misc */
+.clearer {
+		clear: both;
+}
+
+/* structure */
+.container {
+		margin: 0 auto;
+		width: 730px;
+}
+
+/* title */
+div.navigation .title {
+		float: left;
+		margin-top: 22px;
+		text-align: center;
+		width: 220px;
+}
+div.navigation .title h1 {
+		font: normal .8em Verdana,sans-serif;
+}
+div.navigation .title h2 {
+		color: #999;
+		font: normal .8em Verdana,sans-serif;
+}
+
+/* navigation */
+.navigation {
+		background: url(images/holder.jpg) no-repeat;
+		height: 100px;
+		padding: 0 16px;
+}
+.navigation a {
+		border-left: 1px solid #DDD;
+		border-right: 1px solid #FFF;
+		color: #89A;
+		float: right;
+		font: bold .8em "Trebuchet MS",sans-serif;
+		margin-top: 9px;
+		padding: 58px 18px 8px;
+		text-align: center;
+		text-decoration: none;
+}
+.navigation a:hover {
+		background: #FFF url(images/navhover.gif) repeat-x;
+		color: #28E;
+		padding: 56px 18px 10px;
+}
+
+/* holders */
+.holder {
+		background: url(images/bgholder.jpg) repeat-y;
+		padding: 0 32px;
+}
+.holder h1 {
+	border-bottom: 2px solid silver;
+}
+
+.holder_top,.footer {
+		clear: both;
+		background: url(images/holder.jpg) no-repeat;
+		height: 40px;
+}
+
+/* footer */
+.footer {
+		background-position: left bottom;
+		color: #666;
+		font-size: .7em;
+		text-align: center;
+}

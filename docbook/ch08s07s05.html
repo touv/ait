@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>8.7.5. fetchRelatedTags</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="ch08s07.html" title="8.7. AIT_Tag" /><link rel="prev" href="ch08s07s04.html" title="8.7.4. getRelatedTags" /><link rel="next" href="ch08s07s06.html" title="8.7.6. countItems" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch08s07s04.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch08s07s06.html">Next</a></td></tr></table><hr /></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_fetchrelatedtags"></a>8.7.5. fetchRelatedTags</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_99"></a>8.7.5.1. Synopsis</h4></div></div></div><pre class="literallayout">AITResult fetchRelatedTags(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null, array $cols=[])</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_99"></a>8.7.5.2. Description</h4></div></div></div><p>Retourne les tags associés au même item que le tag courant mais en
+filtrant sur une certain nombre de type de tag.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_99"></a>8.7.5.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" style="border: none;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style="" valign="top"><p>
+ArrayObject <span class="strong"><strong>$tags</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Tableau de type de tag
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$offset</strong></span>
+</p></td><td style="" valign="top">
+<p>
+décalage à partir du premier enregistrement
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$lines</strong></span>
+</p></td><td style="" valign="top">
+<p>
+nombre de lignes à retourner
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="" valign="top">
+<p>
+flag permettant le tri
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+array <span class="strong"><strong>$cols</strong></span>
+</p></td><td style="" valign="top">
+<p>
+filtre sur les champs complémentaires
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_93"></a>8.7.5.4. Retour</h4></div></div></div><p>Un objet AITResult (ArrayObject) contenant des objets AIT_Tag.</p></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s07s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08s07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s07s06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>

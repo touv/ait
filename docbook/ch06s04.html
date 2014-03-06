@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>6.4. AIT_ItemType</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.69.1" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="ch06.html" title="Chapter 6. Références des classes" /><link rel="prev" href="ch06s03.html" title="6.3. AITQuery" /><link rel="next" href="ch06s05.html" title="6.5. AIT_Item" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch06s03.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch06s05.html">Next</a></td></tr></table><hr /></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="_ait_itemtype"></a>6.4. AIT_ItemType</h2></div></div></div><p>Cette classe permet de manipuler un TYPE d'ITEM.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_construct_3"></a>6.4.1. __construct</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_8"></a>6.4.1.1. Synopsis</h4></div></div></div><pre class="literallayout">void __construct(string $l, PDOAIT $pdo)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_8"></a>6.4.1.2. Description</h4></div></div></div><p>Constructeur</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_8"></a>6.4.1.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$label</strong></span>
+</p></td><td style="">
+<p>
+Label du type d'item
+</p>
+</td></tr><tr><td style=""><p>
+PDOAIT <span class="strong"><strong>$pdo</strong></span>
+</p></td><td style="">
+<p>
+Instance de base AIT que l'on souhaite utiliser.
+</p>
+</td></tr></tbody></table></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_addtag"></a>6.4.2. addTag</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_9"></a>6.4.2.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Tag addTag(string $l)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_9"></a>6.4.2.2. Description</h4></div></div></div><p>Ajout d'un type de tag au type d'item courant</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_9"></a>6.4.2.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+label
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_6"></a>6.4.2.4. Retour</h4></div></div></div><p>Un objet AIT_TagType représentant le nouveau type de tag</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_gettag"></a>6.4.3. getTag</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_10"></a>6.4.3.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_TagType getTag(string $l)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_10"></a>6.4.3.2. Description</h4></div></div></div><p>Retourne un type de tag du type d'item courant en fonction de son label.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_10"></a>6.4.3.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+Le label.
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_7"></a>6.4.3.4. Retour</h4></div></div></div><p>Un objet AIT_TagType représentant le type de tag trouvé.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_newitem"></a>6.4.4. newItem</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_11"></a>6.4.4.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Item newItem()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_11"></a>6.4.4.2. Description</h4></div></div></div><p>Crée un item. Son label est calculé automatiquement en fonction de l'identifiant système.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_11"></a>6.4.4.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_8"></a>6.4.4.4. Retour</h4></div></div></div><p>Un objet AIT_Item représentant le nouvel item.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_additem"></a>6.4.5. addItem</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_12"></a>6.4.5.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Item addItem(string $l)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_12"></a>6.4.5.2. Description</h4></div></div></div><p>Ajout d'un item au type d'item courant</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_12"></a>6.4.5.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+nom du nouveau item
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_9"></a>6.4.5.4. Retour</h4></div></div></div><p>Un objet AIT_Item représentant le nouvel item.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getitem"></a>6.4.6. getItem</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_13"></a>6.4.6.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Item getItem(string $l)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_13"></a>6.4.6.2. Description</h4></div></div></div><p>Récupère un item</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_13"></a>6.4.6.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+nom de l'item
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_10"></a>6.4.6.4. Retour</h4></div></div></div><p>Un objet AIT_Item représentant l'item trouvé.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple_2"></a>6.4.6.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$item = $schema-&gt;disques-&gt;getItem('a1902425');
+if (!is_null($item)) {
+    echo $item-&gt;get();
+}
+// Affichera :  a1902425
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getitems"></a>6.4.7. getItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_14"></a>6.4.7.1. Synopsis</h4></div></div></div><pre class="literallayout">AITResult getItems(integer $offset=null, integer $lines=null, integer $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_14"></a>6.4.7.2. Description</h4></div></div></div><p>Retourne tous les items du type d'item courant</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_14"></a>6.4.7.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+integer <span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à partir du premier enregistrement
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_11"></a>6.4.7.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple_3"></a>6.4.7.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$items = $schema-&gt;disques-&gt;getItems();
+
+
+foreach ($items as $item) {
+    echo "- ".$item-&gt;get()."\n";
+}
+echo 'Showed : '.$items-&gt;count(). ' / '.$items-&gt;total()."\n";
+
+// Affichera :
+//
+// - a2407474
+// - a2274830
+// - a1902425
+// - a762424
+// - a1095444
+// (...)
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_fetchitems"></a>6.4.8. fetchItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_15"></a>6.4.8.1. Synopsis</h4></div></div></div><pre class="literallayout">AITResult fetchItems(ArrayObject $tags, integer $offset=null, integer $lines=null, integer $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_15"></a>6.4.8.2. Description</h4></div></div></div><p>Retourne les items possédant un ou plusieurs tags donnés en paramètres</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_15"></a>6.4.8.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+ArrayObject <span class="strong"><strong>$tags</strong></span>
+</p></td><td style="">
+<p>
+Tableau de tag
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à partir du premier enregistrement
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_12"></a>6.4.8.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple_4"></a>6.4.8.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$jazz = $schema-&gt;style-&gt;getTag('Jazz');
+
+$tags = new ArrayObject();
+$tags-&gt;append($jazz);
+
+$items = $schema-&gt;disques-&gt;fetchItems($tags, 0, 10);
+
+foreach($items as $item) {
+    echo $item-&gt;get()."\n";
+}
+
+echo 'Showed : '.$items-&gt;count(). ' / '.$items-&gt;total()."\n";
+?&gt;
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_gettags"></a>6.4.9. getTags</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_16"></a>6.4.9.1. Synopsis</h4></div></div></div><pre class="literallayout">AITResult getTags(integer $offset=null, integer $lines=null, integer $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_16"></a>6.4.9.2. Description</h4></div></div></div><p>Retourne tous les types de tags de l'item courant</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_16"></a>6.4.9.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+integer <span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à parir du premier enregistrement
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_13"></a>6.4.9.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_TagType.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_searchitems"></a>6.4.10. searchItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_17"></a>6.4.10.1. Synopsis</h4></div></div></div><pre class="literallayout">AITResult searchItems(mixed $query, integer $offset=null, integer $lines=null, integer $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_17"></a>6.4.10.2. Description</h4></div></div></div><p>Recherche des items du type courant</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_17"></a>6.4.10.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$query</strong></span>
+</p></td><td style="">
+<p>
+requete (le format dépend de la search_callback) sans callback c'est une chaine de caractères contenant du SQL
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à parir du premier enregistrement
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner
+</p>
+</td></tr><tr><td style=""><p>
+integer <span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_14"></a>6.4.10.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getitembysystemid"></a>6.4.11. getItemBySystemID</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_18"></a>6.4.11.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_Item getItemBySystemID(integer $i)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_18"></a>6.4.11.2. Description</h4></div></div></div><p>Récupère un Item en fonction de son identifiant système</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_18"></a>6.4.11.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+integer <span class="strong"><strong>$i</strong></span>
+</p></td><td style="">
+<p>
+un identifiant système
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_15"></a>6.4.11.4. Retour</h4></div></div></div><p>Un objet AIT_Item représentant l'item trouvé.</p><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$itemA = $schema-&gt;disques-&gt;getItem('a1902425');
+$id = $itemA-&gt;getSystemID();
+
+$itemB = $schema-&gt;disques-&gt;getItemBySystemID($id);
+
+if (!is_null($itemB)) {
+    echo $itemB-&gt;get();
+}
+// Affichera :  a1902425
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_queryitems"></a>6.4.12. queryItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_19"></a>6.4.12.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_ItemType::queryItems(AITQuery $query, $offset=null, $lines=null, $ordering=null)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_19"></a>6.4.12.2. Description</h4></div></div></div><p>On recherche des items associés au TYPE d'ITEM courant à partir d'un objet AITQuery</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_19"></a>6.4.12.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+<span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+$query objet contenant la requête d'interrogation.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$offset</strong></span>
+</p></td><td style="">
+<p>
+décalage à partir du premier enregistrement.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$lines</strong></span>
+</p></td><td style="">
+<p>
+nombre de lignes à retourner.
+</p>
+</td></tr><tr><td style=""><p>
+<span class="strong"><strong>$ordering</strong></span>
+</p></td><td style="">
+<p>
+flag permettant le tri.
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_16"></a>6.4.12.4. Retour</h4></div></div></div><p>un objet AITResult (ArrayObject) contenant des objets AIT_Item.</p><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$jazz    = $schema-&gt;style-&gt;getTag('Jazz');
+$blues   = $schema-&gt;style-&gt;getTag('Blues');
+$electro = $schema-&gt;style-&gt;getTag('Electro');
+
+$query = new AITQuery($db);
+
+// les disques marqués avec Jazz et Blues
+$query-&gt;all(new ArrayObject(array($jazz, $blues)));
+
+// Ou bien
+$query-&gt;eitheror();
+
+// Les disques marqués avec Jazz et Electro
+$query-&gt;all(new ArrayObject(array($jazz, $electro)));
+
+$items = $schema-&gt;disques-&gt;queryItems($query, 0, 10, AIT::ORDER_BY_SCORE|AIT::ORDER_ASC);
+foreach($items as $item) {
+    echo $item-&gt;get();
+}
+echo 'Showed : '.$items-&gt;count(). ' / '.$items-&gt;total()."\n";
+?&gt;
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_countitems"></a>6.4.13. countItems</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_20"></a>6.4.13.1. Synopsis</h4></div></div></div><pre class="literallayout">AIT_ItemType::countItems()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_20"></a>6.4.13.2. Description</h4></div></div></div><p>Retourne le nombre total d'items attaché au type d'item courrant.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_20"></a>6.4.13.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_17"></a>6.4.13.4. Retour</h4></div></div></div><p>un nombre entier représentant le nombre d'enregistrment.</p><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$counter = $schema-&gt;disques-&gt;countItems();
+
+echo $counter;
+
+// Affiche le nombre de disque
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getpdo"></a>6.4.14. getPDO</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_21"></a>6.4.14.1. Synopsis</h4></div></div></div><pre class="literallayout">PDO  getPDO()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_21"></a>6.4.14.2. Description</h4></div></div></div><p>Retourne l'objet PDOAIT utilisé dans l'objet</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_21"></a>6.4.14.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_18"></a>6.4.14.4. Retour</h4></div></div></div><p>Un objet PDO</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_ren"></a>6.4.15. ren</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_22"></a>6.4.15.1. Synopsis</h4></div></div></div><pre class="literallayout">void ren(string $l)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_22"></a>6.4.15.2. Description</h4></div></div></div><p>Renomme l'élément. Cela revient à changer son label.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_22"></a>6.4.15.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="">
+<p>
+nouveau label
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_19"></a>6.4.15.4. Retour</h4></div></div></div><p>NULL.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_del"></a>6.4.16. del</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_23"></a>6.4.16.1. Synopsis</h4></div></div></div><pre class="literallayout">void del()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_23"></a>6.4.16.2. Description</h4></div></div></div><p>Suppression de l'élément</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_23"></a>6.4.16.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_20"></a>6.4.16.4. Retour</h4></div></div></div><p>NULL.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_exists"></a>6.4.17. exists</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_24"></a>6.4.17.1. Synopsis</h4></div></div></div><pre class="literallayout">boolean exists()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_24"></a>6.4.17.2. Description</h4></div></div></div><p>Vérifie l'existence de l'élément</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_24"></a>6.4.17.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_21"></a>6.4.17.4. Retour</h4></div></div></div><p>TRUE ou FALSE en focntion de l'existence de l'élément</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getsystemid"></a>6.4.18. getSystemID</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_25"></a>6.4.18.1. Synopsis</h4></div></div></div><pre class="literallayout">integer  getSystemID()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_25"></a>6.4.18.2. Description</h4></div></div></div><p>Retourne l'identifiant système de l'élément.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_25"></a>6.4.18.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_22"></a>6.4.18.4. Retour</h4></div></div></div><p>Un nombre entier représentant l'identifiant système.</p><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$item = $schema-&gt;disques-&gt;getItem('a1902425');
+$id = $item-&gt;getSystemID();
+
+var_dump($id);
+
+// Affichera : int(17)
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_get_2"></a>6.4.19. get</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_26"></a>6.4.19.1. Synopsis</h4></div></div></div><pre class="literallayout">mixed  get(string $name= 'label')</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_26"></a>6.4.19.2. Description</h4></div></div></div><p>Retourne la valeur d'une propriété de l'élément.
+Les propriétés accessibles sont : type, label, space</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_26"></a>6.4.19.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$name</strong></span>
+</p></td><td style="">
+<p>
+nom de la propriété
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_23"></a>6.4.19.4. Retour</h4></div></div></div><p>mixed</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_gettimestamps"></a>6.4.20. getTimestamps</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_27"></a>6.4.20.1. Synopsis</h4></div></div></div><pre class="literallayout">ArrayObject  getTimestamps()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_27"></a>6.4.20.2. Description</h4></div></div></div><p>Retourne la date de dernière modification et la date de création de l'élément.
+les différents "temps" enregistré pour l'élément</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_27"></a>6.4.20.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_24"></a>6.4.20.4. Retour</h4></div></div></div><p>Un objet ArrayObject dont le premier item contient la date de modification
+et le deuxième contient la date de création.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_exemple_5"></a>6.4.20.5. Exemple</h4></div></div></div><pre class="programlisting">
+&lt;?php
+require_once 'prepend.php';
+
+$item = $schema-&gt;disques-&gt;getItem('a1902425');
+$timestamps = $item-&gt;getTimestamps();
+echo date('Y-m-d\TH:i:s\Z', $timestamps-&gt;updated)."\n";
+// Affichera : 2008-08-21T17:22:17Z
+echo $timestamps['created']."\n";
+// Affichera : 1219332137
+
+
+$jazz = $schema-&gt;style-&gt;getTag('Jazz');
+$timestamps = $jazz-&gt;getTimestamps();
+var_dump($timestamps);
+
+// Affichera :
+//  object(ArrayObject)#15 (2) {
+//     ["updated"]=&gt;
+//     int(1219332137)
+//     ["created"]=&gt;
+//     int(1219332137)
+//  }
+//
+</pre></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_getscore"></a>6.4.21. getScore</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_28"></a>6.4.21.1. Synopsis</h4></div></div></div><pre class="literallayout">integer  getScore()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_28"></a>6.4.21.2. Description</h4></div></div></div><p>Retourne le score de l'élément</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_28"></a>6.4.21.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_25"></a>6.4.21.4. Retour</h4></div></div></div><p>Un entier représentant le score l'élément.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_setscore"></a>6.4.22. setScore</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_29"></a>6.4.22.1. Synopsis</h4></div></div></div><pre class="literallayout">void setScore($i)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_29"></a>6.4.22.2. Description</h4></div></div></div><p>Donne un score à  l'élément</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_29"></a>6.4.22.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+integer <span class="strong"><strong>$i</strong></span>
+</p></td><td style="">
+<p>
+Un entier représentant le score l'élément.
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_26"></a>6.4.22.4. Retour</h4></div></div></div><p>NULL.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_debug"></a>6.4.23. debug</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_30"></a>6.4.23.1. Synopsis</h4></div></div></div><pre class="literallayout">void debug()</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_30"></a>6.4.23.2. Description</h4></div></div></div><p>DEBUG</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_30"></a>6.4.23.3. Paramètres</h4></div></div></div><p>Aucun.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_27"></a>6.4.23.4. Retour</h4></div></div></div><p>NULL.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_dump"></a>6.4.24. dump</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_31"></a>6.4.24.1. Synopsis</h4></div></div></div><pre class="literallayout">mixed dump(string $s = '', boolean $r = false)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_31"></a>6.4.24.2. Description</h4></div></div></div><p>Afficher le contenu de l'objet.
+Si $r est TRUE. Alors le contenu de l'objet précédé éventuellement
+de $s seront affichée entouré des &lt;pre&gt; et &lt;/pre&gt;</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_31"></a>6.4.24.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" border="0" style="border-collapse: collapse;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style=""><p>
+string <span class="strong"><strong>$s</strong></span>
+</p></td><td style="">
+<p>
+chaine de carat cure à afficher avant le contenu de l'objet.
+</p>
+</td></tr><tr><td style=""><p>
+booelan <span class="strong"><strong>$r</strong></span>
+</p></td><td style="">
+<p>
+si vrai a retourne la chaine à afficher plutôt que de l'afficher
+</p>
+</td></tr></tbody></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_retour_28"></a>6.4.24.4. Retour</h4></div></div></div><p>Retourne NULL ou une chaine de caractères (dépend du paramètre $r).</p></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>

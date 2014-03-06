@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>8.7. AIT_Tag</title><link rel="stylesheet" href="../default.css" type="text/css" /><link rel="stylesheet" href="../docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.73.2" /><link rel="start" href="index.html" title="Guide d'utilisation de AIT" /><link rel="up" href="ch08.html" title="Chapter 8. Références des classes" /><link rel="prev" href="ch08s06s23.html" title="8.6.23. getBySystemID" /><link rel="next" href="ch08s07s02.html" title="8.7.2. detach" /></head><body><!--#include virtual="../docbook.header.html"--><!--#include virtual="../docbook.navigation.html"--><!--#include virtual="../docbook.startcontent.html"--><div class="navheader"><table width="100%" summary="Navigation header"><tr><td width="20%" align="left"><a accesskey="p" href="ch08s06s23.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch08s07s02.html">Next</a></td></tr></table><hr /></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="_ait_tag"></a>8.7. AIT_Tag</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch08s07.html#_construct_6">8.7.1. __construct</a></span></dt><dt><span class="section"><a href="ch08s07s02.html">8.7.2. detach</a></span></dt><dt><span class="section"><a href="ch08s07s03.html">8.7.3. attach</a></span></dt><dt><span class="section"><a href="ch08s07s04.html">8.7.4. getRelatedTags</a></span></dt><dt><span class="section"><a href="ch08s07s05.html">8.7.5. fetchRelatedTags</a></span></dt><dt><span class="section"><a href="ch08s07s06.html">8.7.6. countItems</a></span></dt><dt><span class="section"><a href="ch08s07s07.html">8.7.7. del</a></span></dt><dt><span class="section"><a href="ch08s07s08.html">8.7.8. getTagType</a></span></dt><dt><span class="section"><a href="ch08s07s09.html">8.7.9. getItems</a></span></dt><dt><span class="section"><a href="ch08s07s10.html">8.7.10. getPDO</a></span></dt><dt><span class="section"><a href="ch08s07s11.html">8.7.11. ren</a></span></dt><dt><span class="section"><a href="ch08s07s12.html">8.7.12. exists</a></span></dt><dt><span class="section"><a href="ch08s07s13.html">8.7.13. getSystemID</a></span></dt><dt><span class="section"><a href="ch08s07s14.html">8.7.14. get</a></span></dt><dt><span class="section"><a href="ch08s07s15.html">8.7.15. set</a></span></dt><dt><span class="section"><a href="ch08s07s16.html">8.7.16. search</a></span></dt><dt><span class="section"><a href="ch08s07s17.html">8.7.17. getTimestamps</a></span></dt><dt><span class="section"><a href="ch08s07s18.html">8.7.18. getScore</a></span></dt><dt><span class="section"><a href="ch08s07s19.html">8.7.19. setScore</a></span></dt><dt><span class="section"><a href="ch08s07s20.html">8.7.20. setFrequency</a></span></dt><dt><span class="section"><a href="ch08s07s21.html">8.7.21. debug</a></span></dt><dt><span class="section"><a href="ch08s07s22.html">8.7.22. dump</a></span></dt><dt><span class="section"><a href="ch08s07s23.html">8.7.23. getBySystemID</a></span></dt></dl></div><p>Cette classe permet de manipuler un TAG.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="_construct_6"></a>8.7.1. __construct</h3></div></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_synopsis_95"></a>8.7.1.1. Synopsis</h4></div></div></div><pre class="literallayout">void __construct($l, $t, $i, PDOAIT $pdo, $id=false)</pre></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_description_95"></a>8.7.1.2. Description</h4></div></div></div><p>Le constructeur de la classe.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="_param_tres_95"></a>8.7.1.3. Paramètres</h4></div></div></div><div class="hlabeledlist"><table cellpadding="4px" style="border: none;"><colgroup><col /><col /></colgroup><tbody valign="top"><tr><td style="" valign="top"><p>
+string <span class="strong"><strong>$l</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Label du TAG
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$t</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Identifiant système du TYPE de TAG associé.
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$i</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Identifiant système de l'ITEM (si connu).
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+PDOAIT <span class="strong"><strong>$pdo</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Instance de base AIT que l'on souhaite utiliser.
+</p>
+</td></tr><tr><td style="" valign="top"><p>
+integer <span class="strong"><strong>$id</strong></span>
+</p></td><td style="" valign="top">
+<p>
+Identifiant système de l'élément (si déjà connu).
+</p>
+</td></tr></tbody></table></div></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s06s23.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s07s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div><!--#include virtual="../docbook.stopcontent.html"--><!--#include virtual="../signature.html"--></body></html>
